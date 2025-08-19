@@ -1,40 +1,59 @@
+"use client";
+
 import { mockPosts } from "@/lib/mock/posts";
 import Image from "next/image";
+import { Card, Flex, Box, Text, Avatar } from "@radix-ui/themes";
 
 export default function BlogList() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {mockPosts.map((post) => (
-        <div
+        <Card
           key={post.id}
-          className="flex gap-4 md:gap-6 border-b pb-6 items-start"
+          className="rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
         >
-          <div className="relative w-28 h-20 md:w-40 md:h-28 shrink-0">
+          <Box className="relative w-full h-56">
             <Image
               src={post.image}
               alt={post.title}
               fill
-              sizes="(min-width: 768px) 160px, 112px"
-              className="object-cover rounded-lg"
+              className="object-cover"
             />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-base md:text-xl font-semibold">{post.title}</h2>
-            <p className="text-gray-600 line-clamp-3">{post.excerpt}</p>
-            <div className="flex items-center gap-3 mt-3 text-sm text-gray-500">
-              <Image
-                src={post.author.avatar}
-                alt={post.author.name}
-                width={24}
-                height={24}
-                className="rounded-full"
-              />
-              <span className="truncate">{post.author.name}</span>
-              <span>•</span>
-              <span>{new Date(post.date).toLocaleDateString()}</span>
+          </Box>
+
+          <Box className="p-5 space-y-3">
+            <Text as="h2" size="5" weight="bold" className="line-clamp-2">
+              {post.title}
+            </Text>
+            <Text size="2" color="gray">
+              {new Date(post.date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </Text>
+            <Text size="2" color="gray" className="line-clamp-3">
+              {post.excerpt}
+            </Text>
+
+            <div className="pt-3">
+              <div className="inline-flex items-center gap-2 whitespace-nowrap">
+                <Avatar
+                  src={post.author.avatar}
+                  fallback={post.author.name[0]}
+                  radius="full"
+                  className="w-4 h-4 shrink-0"
+                />
+                <span className="text-sm">
+                  {post.author.name}{" "}
+                  <span className="text-gray-500">
+                    • {post.readTime} min read
+                  </span>
+                </span>
+              </div>
             </div>
-          </div>
-        </div>
+          </Box>
+        </Card>
       ))}
     </div>
   );

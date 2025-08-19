@@ -17,8 +17,8 @@ export interface Post {
       excerpt: "An overview of creating a blog with Next.js 15, Radix UI, and Prisma.",
       image: "/images/posts/truck.jpg",
       author: {
-        name: "NZLouis",
-        avatar: "/images/authors/LouisLu.png",
+        name: "Louis Lu",
+        avatar: "/images/authors/l.ico",
       },
       date: "2025-08-10",
     },
@@ -28,8 +28,8 @@ export interface Post {
       excerpt: "Key lessons learned while migrating a static Hugo blog to Next.js.",
       image: "/images/posts/shark.jpg",
       author: {
-        name: "NZLouis",
-        avatar: "/images/authors/LouisLu.png",
+        name: "Louis Lu",
+        avatar: "/images/authors/l.ico",
       },
       date: "2025-08-12",
     },
