@@ -8,6 +8,7 @@ export interface Post {
       avatar: string
     }
     date: string
+    readTime: string
   }
   
   export const mockPosts: Post[] = [
@@ -21,6 +22,7 @@ export interface Post {
         avatar: "/images/authors/l.ico",
       },
       date: "2025-08-10",
+      readTime: "2 min",
     },
     {
       id: "2",
@@ -32,6 +34,7 @@ export interface Post {
         avatar: "/images/authors/l.ico",
       },
       date: "2025-08-12",
+      readTime: "3 min",
     },
   ]
   
