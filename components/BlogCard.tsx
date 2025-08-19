@@ -2,6 +2,7 @@
 
 import * as Avatar from "@radix-ui/react-avatar";
 import Link from "next/link";
+import Image from "next/image";
 
 interface BlogCardProps {
   title: string;
@@ -25,18 +26,29 @@ export default function BlogCard({
 }: BlogCardProps) {
   return (
     <div className="flex gap-4 rounded-xl border bg-white p-4 shadow-sm hover:shadow-md transition">
-      <div className="h-28 w-36 flex-shrink-0 overflow-hidden rounded-md">
-        <img src={image} alt={title} className="h-full w-full object-cover" />
+      <div className="relative h-28 w-36 flex-shrink-0 overflow-hidden rounded-md">
+        <Image
+          src={image}
+          alt={title}
+          fill
+          sizes="(min-width: 768px) 144px, 100vw"
+          className="object-cover rounded-md"
+          priority
+        />
       </div>
-      <div className="flex flex-col justify-between">
+
+      <div className="flex flex-col justify-between flex-1">
         <div>
-          <Link href={`/posts/${slug}`}>
-            <h3 className="text-lg font-semibold hover:underline">{title}</h3>
+          <Link href={`/posts/${slug}`} passHref>
+            <a className="block">
+              <h3 className="text-lg font-semibold hover:underline">{title}</h3>
+            </a>
           </Link>
           <p className="mt-1 text-sm text-gray-600">{summary}</p>
         </div>
+
         <div className="mt-3 flex items-center gap-2">
-          <Avatar.Root className="inline-flex h-6 w-6 select-none items-center justify-center overflow-hidden rounded-full border">
+          <Avatar.Root className="inline-flex h-5 w-5 select-none items-center justify-center overflow-hidden rounded-full border shrink-0">
             <Avatar.Image
               className="h-full w-full object-cover"
               src={author.avatar}

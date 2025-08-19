@@ -2,7 +2,7 @@
 
 import { mockPosts } from "@/lib/mock/posts";
 import Image from "next/image";
-import { Card, Flex, Box, Text, Avatar } from "@radix-ui/themes";
+import { Card, Box, Text, Avatar } from "@radix-ui/themes";
 
 export default function BlogList() {
   return (
