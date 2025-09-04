@@ -2,15 +2,15 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { mockPosts } from '@/lib/mock/posts';
 import Image from 'next/image';
-import { Box, Text, Avatar } from '@radix-ui/themes';
+import { Box, Avatar } from '@radix-ui/themes';
 import Markdown from '@/lib/markdown';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function BlogPost({ params }: PageProps) {
