@@ -11,7 +11,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b bg-white">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
           <Link href="/" className="flex items-center">
             <div className="flex items-center w-[100px] h-[30px]">
