@@ -41,7 +41,11 @@ export async function POST(request: NextRequest) {
     // Track AI summary usage if postId is provided
     if (postId) {
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/stats`, {
+        // Use relative URL for internal API calls in production
+        const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '';
+        const statsUrl = baseUrl ? `${baseUrl}/api/stats` : '/api/stats';
+
+        await fetch(statsUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
