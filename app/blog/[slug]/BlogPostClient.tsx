@@ -71,10 +71,11 @@ function CommentsSection({ postId }: { postId: string }) {
         setShowForm(false);
         setFormData({ name: '', email: '', comment: '', isAnonymous: false });
       } else {
-        console.error('Failed to submit comment');
+        const errorData = await response.json();
+        alert(`Failed to submit comment: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('Error submitting comment:', error);
+      alert('Network error: Failed to submit comment. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -541,6 +542,30 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
           {/* Table of Contents - Hidden on mobile, shown on lg screens */}
           <div className="hidden lg:block w-full lg:w-[300px] lg:sticky lg:top-24 lg:self-start">
             <TableOfContents content={post.content} />
+          </div>
+        </div>
+
+        {/* Like Section */}
+        <div className="mt-8 pt-8 border-t border-gray-200">
+          <div className="flex items-center justify-center gap-4">
+            <button
+              onClick={handleLike}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-200 ${
+                isLiked
+                  ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <svg
+                className="w-6 h-6"
+                fill={isLiked ? "currentColor" : "none"}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <span className="text-lg font-medium">{stats.likes}</span>
+            </button>
           </div>
         </div>
 

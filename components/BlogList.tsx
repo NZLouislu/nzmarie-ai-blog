@@ -11,9 +11,14 @@ interface PostStats {
   likes: number;
   comments: number;
   ai_questions: number;
+  ai_summaries: number;
 }
 
-export default function BlogList() {
+interface BlogListProps {
+  singleColumn?: boolean;
+}
+
+export default function BlogList({ singleColumn = false }: BlogListProps) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [statsMap, setStatsMap] = useState<Record<string, PostStats>>({});
 
@@ -48,7 +53,7 @@ export default function BlogList() {
           } catch (error) {
             console.error('Failed to load stats for post:', post.id, error);
           }
-          return { postId: post.id, stats: { views: 1, likes: 1, comments: 0, ai_questions: 1 } };
+          return { postId: post.id, stats: { views: 1, likes: 1, comments: 0, ai_questions: 1, ai_summaries: 0 } };
         });
 
         const statsResults = await Promise.all(statsPromises);
@@ -66,11 +71,11 @@ export default function BlogList() {
   }, [posts]);
 
   return (
-    <div className="space-y-8">
+    <div className={singleColumn ? "space-y-8" : "grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"}>
       {posts.map((post) => (
         <Link key={post.id} href={`/blog/${post.slug}`} className="block">
-          <Card className="rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 bg-white cursor-pointer">
-            <Box className="relative w-full h-64">
+          <Card className="rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 bg-white cursor-pointer h-full">
+            <Box className="relative w-full h-48">
               <Image
                 src={post.image || "/images/posts/truck.jpg"}
                 alt={post.title}
@@ -79,8 +84,8 @@ export default function BlogList() {
               />
             </Box>
 
-            <Box className="p-6 space-y-4">
-              <h3 className="text-2xl font-bold line-clamp-2">
+            <Box className="p-4 space-y-3 flex-1 flex flex-col">
+              <h3 className="text-xl font-bold line-clamp-2">
                 {post.title}
               </h3>
               <Text size="3" color="gray">
@@ -90,7 +95,7 @@ export default function BlogList() {
                   day: "numeric",
                 })}
               </Text>
-              <Text size="3" color="gray" className="line-clamp-3">
+              <Text size="3" color="gray" className="line-clamp-3 flex-1">
                 {post.excerpt}
               </Text>
 
@@ -129,6 +134,12 @@ export default function BlogList() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03 8 9-8s9 3.582 9 8z" />
                       </svg>
                       <span>{statsMap[post.id].comments}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span>{statsMap[post.id].ai_summaries || 0}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

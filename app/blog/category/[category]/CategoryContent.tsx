@@ -65,7 +65,7 @@ export default function CategoryContent({ category, posts }: CategoryContentProp
 
         <div className="flex flex-col md:flex-row gap-12 md:justify-center">
           <div className="md:flex-[7] w-full max-w-[900px]">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
               {posts.map((post) => (
                 <Link key={post.id} href={`/blog/${post.slug}`} className="block">
                   <Card className="rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 bg-white cursor-pointer h-full">
