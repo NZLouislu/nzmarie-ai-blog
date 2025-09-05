@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { question, context } = await request.json();
+    const { question, context, postId } = await request.json();
 
     if (!question || !context) {
       return NextResponse.json({ error: 'Question and context are required' }, { status: 400 });
@@ -44,6 +44,25 @@ Please provide a clear, accurate answer based on the article content.`;
 
     const data = await response.json();
     const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || 'I apologize, but I was unable to generate a response. Please try again.';
+
+    // Track AI question if postId is provided
+    if (postId) {
+      try {
+        await fetch(`${request.nextUrl.origin}/api/stats`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            postId: postId,
+            action: 'ai_question'
+          }),
+        });
+      } catch (statsError) {
+        console.error('Failed to track AI question:', statsError);
+        // Don't fail the main request if stats tracking fails
+      }
+    }
 
     return NextResponse.json({ answer });
   } catch (error) {

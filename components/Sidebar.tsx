@@ -24,7 +24,9 @@ export default function Sidebar() {
 
   return (
     <div className="md:flex-[3] w-full md:sticky md:top-24 md:self-start space-y-8">
-      <AboutMe />
+      <div className="hidden md:block">
+        <AboutMe />
+      </div>
 
       {allTags.length > 0 && (
         <div className="bg-white rounded-2xl shadow-lg p-6">

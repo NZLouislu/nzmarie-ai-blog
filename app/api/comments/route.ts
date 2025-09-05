@@ -30,11 +30,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Starting comment submission...');
     const { postId, name, email, comment, isAnonymous } = await request.json();
 
     if (!postId || !comment) {
       return NextResponse.json({ error: 'Post ID and comment are required' }, { status: 400 });
     }
+
+    console.log('Attempting to connect to database...');
+    const startTime = Date.now();
 
     const newComment = await prisma.comment.create({
       data: {
@@ -46,9 +50,19 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    const endTime = Date.now();
+    console.log(`Database operation completed in ${endTime - startTime}ms`);
+
     return NextResponse.json(newComment);
   } catch (error) {
     console.error('Comments API error:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+    }
     return NextResponse.json({ error: 'Failed to save comment' }, { status: 500 });
   }
 }

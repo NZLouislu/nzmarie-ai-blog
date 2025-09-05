@@ -75,6 +75,7 @@ function CommentsSection({ postId }: { postId: string }) {
         alert(`Failed to submit comment: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
+      console.error('Comment submission error:', error);
       alert('Network error: Failed to submit comment. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -204,7 +205,8 @@ function AIChatbot({ postContent, postId }: { postContent: string; postId: strin
         },
         body: JSON.stringify({
           question: input,
-          context: postContent
+          context: postContent,
+          postId: postId
         }),
       });
 
@@ -226,7 +228,8 @@ function AIChatbot({ postContent, postId }: { postContent: string; postId: strin
       } else {
         setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
       }
-    } catch {
+    } catch (error) {
+      console.error('AI assistant error:', error);
       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
     } finally {
       setIsLoading(false);
