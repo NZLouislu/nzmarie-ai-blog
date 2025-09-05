@@ -10,6 +10,7 @@ interface TotalStats {
   totalLikes: number;
   totalComments: number;
   totalAiQuestions: number;
+  totalAiSummaries: number;
 }
 
 export default function HomePage() {
@@ -17,7 +18,8 @@ export default function HomePage() {
     totalViews: 0,
     totalLikes: 0,
     totalComments: 0,
-    totalAiQuestions: 0
+    totalAiQuestions: 0,
+    totalAiSummaries: 0
   });
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export default function HomePage() {
         </Text>
 
         {/* Statistics Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 w-full max-w-6xl mb-12">
           <div className="bg-white rounded-lg shadow-md p-6 text-center border border-gray-200">
             <div className="flex items-center justify-center mb-2">
               <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,6 +91,16 @@ export default function HomePage() {
               <span className="text-2xl font-bold text-gray-900">{totalStats.totalAiQuestions.toLocaleString()}</span>
             </div>
             <p className="text-gray-600">AI Questions</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-6 text-center border border-gray-200">
+            <div className="flex items-center justify-center mb-2">
+              <svg className="w-6 h-6 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span className="text-2xl font-bold text-gray-900">{totalStats.totalAiSummaries.toLocaleString()}</span>
+            </div>
+            <p className="text-gray-600">AI Summaries</p>
           </div>
         </div>
       </div>

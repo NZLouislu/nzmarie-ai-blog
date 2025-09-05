@@ -29,6 +29,7 @@ model PostStat {
   views        Int    @default(0)
   likes        Int    @default(0)
   ai_questions Int    @default(0)
+  ai_summaries Int    @default(0)
 
   @@map("post_stats")
 }
@@ -40,6 +41,7 @@ model DailyStat {
   views        Int      @default(0)
   likes        Int      @default(0)
   ai_questions Int      @default(0)
+  ai_summaries Int      @default(0)
 
   @@unique([post_id, date])
   @@map("daily_stats")

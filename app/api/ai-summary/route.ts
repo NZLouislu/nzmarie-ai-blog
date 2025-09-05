@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { content } = await request.json();
+    const { content, postId } = await request.json();
 
     if (!content) {
       return NextResponse.json({ error: 'Content is required' }, { status: 400 });
@@ -37,6 +37,24 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
     const summary = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to generate summary';
+
+    // Track AI summary usage if postId is provided
+    if (postId) {
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/stats`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            postId: postId,
+            action: 'ai_summary'
+          }),
+        });
+      } catch (statsError) {
+        console.error('Failed to track AI summary usage:', statsError);
+      }
+    }
 
     return NextResponse.json({ summary });
   } catch (error) {

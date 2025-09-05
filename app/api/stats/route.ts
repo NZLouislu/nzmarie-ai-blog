@@ -33,7 +33,8 @@ export async function GET(request: NextRequest) {
         views: 1,
         likes: 1,
         comments: commentCount || 0,
-        ai_questions: 1
+        ai_questions: 1,
+        ai_summaries: 0
       };
 
       if (!stats) {
@@ -59,13 +60,14 @@ export async function GET(request: NextRequest) {
         views: stats.views,
         likes: stats.likes,
         comments: commentCount || 0,
-        ai_questions: stats.ai_questions
+        ai_questions: stats.ai_questions,
+        ai_summaries: stats.ai_summaries || 0
       });
     } else {
       // Get total stats for all posts
       const { data: stats, error: statsError } = await supabase
         .from('post_stats')
-        .select('views, likes, ai_questions');
+        .select('views, likes, ai_questions, ai_summaries');
 
       if (statsError) {
         console.error('Total stats error:', statsError);
@@ -80,6 +82,7 @@ export async function GET(request: NextRequest) {
       const totalViews = stats?.reduce((sum, stat) => sum + (stat.views || 0), 0) || 0;
       const totalLikes = stats?.reduce((sum, stat) => sum + (stat.likes || 0), 0) || 0;
       const totalAiQuestions = stats?.reduce((sum, stat) => sum + (stat.ai_questions || 0), 0) || 0;
+      const totalAiSummaries = stats?.reduce((sum, stat) => sum + (stat.ai_summaries || 0), 0) || 0;
 
       const { count: totalComments } = await supabase
         .from('comments')
@@ -89,7 +92,8 @@ export async function GET(request: NextRequest) {
         totalViews,
         totalLikes,
         totalComments: totalComments || 0,
-        totalAiQuestions
+        totalAiQuestions,
+        totalAiSummaries
       });
     }
   } catch (error) {
@@ -244,7 +248,8 @@ export async function POST(request: NextRequest) {
             title: 'Blog Post',
             views: 0,
             likes: 0,
-            ai_questions: 1
+            ai_questions: 1,
+            ai_summaries: 0
           });
       }
 
@@ -272,7 +277,66 @@ export async function POST(request: NextRequest) {
             date: today,
             views: 0,
             likes: 0,
-            ai_questions: 1
+            ai_questions: 1,
+            ai_summaries: 0
+          });
+      }
+
+      return NextResponse.json({ success: true });
+    }
+
+    if (action === 'ai_summary') {
+      // Increment AI summaries
+      const { data: existing } = await supabase
+        .from('post_stats')
+        .select('ai_summaries')
+        .eq('post_id', postId)
+        .single();
+
+      if (existing) {
+        await supabase
+          .from('post_stats')
+          .update({ ai_summaries: (existing.ai_summaries || 0) + 1 })
+          .eq('post_id', postId);
+      } else {
+        await supabase
+          .from('post_stats')
+          .insert({
+            post_id: postId,
+            title: 'Blog Post',
+            views: 0,
+            likes: 0,
+            ai_questions: 0,
+            ai_summaries: 1
+          });
+      }
+
+      // Update daily stats
+      const today = new Date().toISOString().split('T')[0];
+
+      const { data: existingDaily } = await supabase
+        .from('daily_stats')
+        .select('ai_summaries')
+        .eq('post_id', postId)
+        .eq('date', today)
+        .single();
+
+      if (existingDaily) {
+        await supabase
+          .from('daily_stats')
+          .update({ ai_summaries: (existingDaily.ai_summaries || 0) + 1 })
+          .eq('post_id', postId)
+          .eq('date', today);
+      } else {
+        await supabase
+          .from('daily_stats')
+          .insert({
+            post_id: postId,
+            date: today,
+            views: 0,
+            likes: 0,
+            ai_questions: 0,
+            ai_summaries: 1
           });
       }
 
