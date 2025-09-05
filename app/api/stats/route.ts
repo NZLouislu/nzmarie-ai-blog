@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
         .single();
 
       // Get comment count
-      const { count: commentCount, error: commentError } = await supabase
+      const { count: commentCount } = await supabase
         .from('comments')
         .select('*', { count: 'exact', head: true })
         .eq('post_id', postId);
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
       const totalLikes = stats?.reduce((sum, stat) => sum + (stat.likes || 0), 0) || 0;
       const totalAiQuestions = stats?.reduce((sum, stat) => sum + (stat.ai_questions || 0), 0) || 0;
 
-      const { count: totalComments, error: commentError } = await supabase
+      const { count: totalComments } = await supabase
         .from('comments')
         .select('*', { count: 'exact', head: true });
 
