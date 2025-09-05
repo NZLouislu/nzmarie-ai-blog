@@ -20,26 +20,21 @@ export default function Markdown({ content }: { content: string }) {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
         components={{
-          img: ({ src, alt, width, height, ...props }) => (
-            typeof src === 'string' ? (
-              <div className="relative w-full h-48">
-                <Image
-                  src={src}
-                  alt={alt || ''}
-                  fill
-                  className="rounded-lg shadow-md object-cover"
-                  {...props}
-                />
-              </div>
-            ) : (
-              <img
-                src={src}
-                alt={alt}
-                className="rounded-lg shadow-md max-w-full h-auto"
-                {...props}
-              />
-            )
-          ),
+          img: ({ src, alt }) => {
+            if (typeof src === 'string') {
+              return (
+                <div className="relative w-full h-48 my-4">
+                  <Image
+                    src={src}
+                    alt={alt || ''}
+                    fill
+                    className="rounded-lg shadow-md object-cover"
+                  />
+                </div>
+              );
+            }
+            return null;
+          },
           h1: ({ children, ...props }) => {
             const text = typeof children === 'string' ? children : '';
             const id = generateHeadingId(text);
