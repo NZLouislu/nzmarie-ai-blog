@@ -21,7 +21,7 @@ export default function BlogList() {
             </Box>
 
             <Box className="p-6 space-y-4">
-              <Text size="6" weight="bold" className="line-clamp-2">
+              <Text size="7" weight="bold" className="line-clamp-2">
                 {post.title}
               </Text>
               <Text size="3" color="gray">

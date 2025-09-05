@@ -9,7 +9,7 @@ export default function PostCard({ post }: { post: PostMeta }) {
     <Card size="3" variant="surface">
       <Flex direction="column" gap="2">
         <Link href={`/blog/${post.slug}`}>
-          <Heading size="4">{post.title}</Heading>
+          <Heading size="5" weight="bold">{post.title}</Heading>
         </Link>
         <Text size="2" color="gray">
           {format(new Date(post.publishedAt ?? post.updatedAt), "yyyy-MM-dd")}

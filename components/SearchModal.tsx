@@ -97,7 +97,7 @@ export default function SearchModal({ isOpen, onClose, posts }: SearchModalProps
                   onClick={onClose}
                   className="block p-6 hover:bg-gray-50 transition-colors"
                 >
-                  <h3 className="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                     {post.title}
                   </h3>
                   <p className="text-sm text-gray-600 line-clamp-2 mb-2">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getBySlug } from '@/lib/posts';
+import { getBySlug, listPublished } from '@/lib/posts';
+import { Post } from '@/lib/types';
 import Image from 'next/image';
 import { Box, Avatar } from '@radix-ui/themes';
 import Markdown from '@/lib/markdown';
@@ -42,7 +43,7 @@ export default async function BlogPost({ params }: PageProps) {
           {/* Main Content */}
           <div className="flex-1 max-w-full lg:max-w-[900px]">
             <div className="mb-6 lg:mb-8">
-              <h1 className="text-3xl lg:text-4xl font-bold mb-3 lg:mb-4">{post.title}</h1>
+              <h1 className="text-4xl lg:text-5xl font-bold mb-3 lg:mb-4">{post.title}</h1>
               {post.subtitle && (
                 <h2 className="text-lg lg:text-xl text-gray-600 mb-4 italic">{post.subtitle}</h2>
               )}
@@ -101,4 +102,12 @@ export default async function BlogPost({ params }: PageProps) {
       <Footer />
     </>
   );
+}
+
+export async function generateStaticParams() {
+  const posts = listPublished();
+
+  return posts.map((post: Post) => ({
+    slug: post.slug,
+  }));
 }

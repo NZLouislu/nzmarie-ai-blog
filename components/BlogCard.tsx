@@ -41,7 +41,7 @@ export default function BlogCard({
         <div>
           <Link href={`/posts/${slug}`} passHref>
             <a className="block">
-              <h3 className="text-lg font-semibold hover:underline">{title}</h3>
+              <h3 className="text-xl font-bold hover:underline">{title}</h3>
             </a>
           </Link>
           <p className="mt-1 text-sm text-gray-600">{summary}</p>

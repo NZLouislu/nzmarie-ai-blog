@@ -60,7 +60,7 @@ export default function ArchivePage() {
                               href={`/blog/${post.slug}`}
                               className="text-gray-900 hover:text-blue-600 transition-colors flex-1"
                             >
-                              {post.title}
+                              <span className="text-lg font-semibold">{post.title}</span>
                             </Link>
                           </div>
                         );
