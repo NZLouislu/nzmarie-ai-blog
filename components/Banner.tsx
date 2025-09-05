@@ -4,14 +4,13 @@ import Image from "next/image";
 
 export default function Banner() {
   return (
-    <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden">
-      <div className="relative w-full" style={{ aspectRatio: "16 / 4" }}>
+    <div className="w-full px-6 py-12">
+      <div className="relative w-full h-96 rounded-3xl overflow-hidden">
         <Image
           src="/images/duck-pack.jpg"
           alt="Banner"
           fill
           priority
-          sizes="100vw"
           className="object-cover object-center"
         />
       </div>

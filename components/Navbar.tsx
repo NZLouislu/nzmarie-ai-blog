@@ -1,23 +1,40 @@
 "use client";
 
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/categories");
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
-          <Link href="/" className="flex items-center">
+        <div className="mx-auto flex max-w-[1200px] items-center px-4 py-3 md:px-6">
+          <Link href="/" className="flex items-center flex-shrink-0">
             <div className="flex items-center w-[100px] h-[30px]">
               <Image
                 src="/images/nzlouis-logo.png"
-                alt="Nzlouis logo — Lu Louis"
+                alt="NZLouis logo — Louis Lu"
                 width={100}
                 height={30}
                 priority
@@ -26,34 +43,78 @@ export default function Navbar() {
             </div>
           </Link>
 
-          <NavigationMenu.Root className="hidden md:flex">
+          <div className="flex-1"></div>
+
+          <div className="flex items-center gap-4 flex-shrink-0">
+            <NavigationMenu.Root className="hidden md:flex">
             <NavigationMenu.List className="flex gap-6">
               <NavigationMenu.Item>
                 <Link
                   href="/"
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
-                  Home
+                  All Posts
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
                 <Link
-                  href="/blog"
+                  href="/blog/category/backend"
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
-                  Blog
+                  Backend
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
                 <Link
-                  href="/about"
+                  href="/blog/category/frontend"
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
-                  About
+                  Frontend
+                </Link>
+              </NavigationMenu.Item>
+              <NavigationMenu.Item>
+                <Link
+                  href="/blog/category/life"
+                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                >
+                  Life
+                </Link>
+              </NavigationMenu.Item>
+              <NavigationMenu.Item>
+                <Link
+                  href="/blog/category/tech"
+                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                >
+                  Tech
+                </Link>
+              </NavigationMenu.Item>
+              <NavigationMenu.Item>
+                <Link
+                  href="/archive"
+                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                >
+                  Archive
                 </Link>
               </NavigationMenu.Item>
             </NavigationMenu.List>
           </NavigationMenu.Root>
+
+            <a
+              href="https://nzlouis.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium hover:text-blue-600 transition-colors"
+            >
+              About me
+            </a>
+            <Link
+              href="/search"
+              className="flex items-center justify-center p-2 text-gray-700 hover:text-blue-600 focus:outline-none transition-colors"
+              title="Search"
+            >
+              <Search size={20} />
+            </Link>
+          </div>
 
           <button
             onClick={() => setOpen(!open)}
@@ -78,26 +139,54 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <Link
-                    href="/blog"
+                    href="/blog/category/backend"
                     className="block text-sm font-medium hover:text-blue-600"
                     onClick={() => setOpen(false)}
                   >
-                    Blog
+                    Backend
                   </Link>
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <Link
-                    href="/about"
+                    href="/blog/category/frontend"
                     className="block text-sm font-medium hover:text-blue-600"
                     onClick={() => setOpen(false)}
                   >
-                    About
+                    Frontend
+                  </Link>
+                </NavigationMenu.Item>
+                <NavigationMenu.Item>
+                  <Link
+                    href="/blog/category/life"
+                    className="block text-sm font-medium hover:text-blue-600"
+                    onClick={() => setOpen(false)}
+                  >
+                    Life
+                  </Link>
+                </NavigationMenu.Item>
+                <NavigationMenu.Item>
+                  <Link
+                    href="/blog/category/tech"
+                    className="block text-sm font-medium hover:text-blue-600"
+                    onClick={() => setOpen(false)}
+                  >
+                    Tech
+                  </Link>
+                </NavigationMenu.Item>
+                <NavigationMenu.Item>
+                  <Link
+                    href="/archive"
+                    className="block text-sm font-medium hover:text-blue-600"
+                    onClick={() => setOpen(false)}
+                  >
+                    Archive
                   </Link>
                 </NavigationMenu.Item>
               </NavigationMenu.List>
             </NavigationMenu.Root>
           </div>
         )}
+
       </nav>
     </>
   );

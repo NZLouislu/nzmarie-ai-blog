@@ -1,17 +1,14 @@
-"use client";
-
-import * as Separator from "@radix-ui/react-separator";
 import { Box, Heading, Text, Flex } from "@radix-ui/themes";
 import BlogList from "@/components/BlogList";
-import AboutMe from "./AboutMe";
+import Sidebar from "./Sidebar";
 
 export default function HomePage() {
   return (
-    <Box className="w-full px-6 py-12 mx-auto max-w-[1200px]">
+    <Box className="w-full px-6 py-12">
       <div className="flex flex-col items-center mb-20">
         <Heading
           size="6"
-          className="text-5xl font-bold mb-2 leading-loose bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+          className="text-5xl font-bold -mt-10 mb-2 leading-loose bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
         >
           NZLouis&apos; Blog
         </Heading>
@@ -20,19 +17,11 @@ export default function HomePage() {
         </Text>
       </div>
 
-      <Separator.Root
-        orientation="horizontal"
-        decorative
-        className="bg-gradient-to-r from-transparent via-gray-300 to-transparent my-12 h-px w-full"
-      />
-
-      <Flex className="flex flex-col md:flex-row gap-12 md:justify-center">
+      <Flex className="flex flex-col md:flex-row gap-12 md:justify-center mt-12">
         <Box className="md:flex-[7] w-full max-w-[900px]">
           <BlogList />
         </Box>
-        <Box className="md:flex-[3] w-full">
-          <AboutMe />
-        </Box>
+        <Sidebar />
       </Flex>
     </Box>
   );
