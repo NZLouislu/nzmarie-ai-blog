@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { createClient } from '@supabase/supabase-js';
 
-const prisma = new PrismaClient();
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,14 +15,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
     }
 
-    const comments = await prisma.comment.findMany({
-      where: {
-        post_id: postId
-      },
-      orderBy: {
-        created_at: 'desc'
-      }
-    });
+    const { data: comments, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
+    }
 
     return NextResponse.json(comments);
   } catch (error) {
@@ -37,18 +42,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Post ID and comment are required' }, { status: 400 });
     }
 
-    console.log('Attempting to connect to database...');
+    console.log('Attempting to save to Supabase...');
     const startTime = Date.now();
 
-    const newComment = await prisma.comment.create({
-      data: {
+    const { data: newComment, error } = await supabase
+      .from('comments')
+      .insert({
         post_id: postId,
         name: isAnonymous ? null : name,
         email: isAnonymous ? null : email,
         comment,
         is_anonymous: isAnonymous
-      }
-    });
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return NextResponse.json({ error: 'Failed to save comment' }, { status: 500 });
+    }
 
     const endTime = Date.now();
     console.log(`Database operation completed in ${endTime - startTime}ms`);
