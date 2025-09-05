@@ -21,9 +21,9 @@ export default function BlogList() {
             </Box>
 
             <Box className="p-6 space-y-4">
-              <Text size="7" weight="bold" className="line-clamp-2">
+              <h3 className="text-2xl font-bold line-clamp-2">
                 {post.title}
-              </Text>
+              </h3>
               <Text size="3" color="gray">
                 {new Date(post.createdAt).toLocaleDateString("en-US", {
                   year: "numeric",

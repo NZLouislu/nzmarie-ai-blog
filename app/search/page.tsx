@@ -176,9 +176,9 @@ function SearchContent() {
                         </Box>
 
                         <Box className="p-6 space-y-4 flex-1 flex flex-col">
-                          <Text size="7" weight="bold" className="line-clamp-2">
+                          <h3 className="text-2xl font-bold line-clamp-2">
                             {post.title}
-                          </Text>
+                          </h3>
                           {post.excerpt && (
                             <Text size="4" color="gray" className="line-clamp-1 italic">
                               {post.excerpt}
