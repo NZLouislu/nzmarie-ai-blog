@@ -1,15 +1,13 @@
 import { Post } from "./types";
 import matter from "gray-matter";
+import fs from "fs";
+import path from "path";
 
-const fs = typeof window === "undefined" ? eval("require")("fs") : null;
-const path = typeof window === "undefined" ? eval("require")("path") : null;
-
-const postsDirectory = path ? path.join(process.cwd(), "lib/post") : "";
+const postsDirectory = path.join(process.cwd(), "lib/post");
 
 function getPostSlugs() {
   try {
-    return fs
-      .readdirSync(postsDirectory)
+    return fs.readdirSync(postsDirectory)
       .filter((file: string) => file.endsWith(".md"));
   } catch (error) {
     console.error("Error reading posts directory:", error);
