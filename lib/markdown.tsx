@@ -2,6 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import Image from 'next/image';
 
 function generateHeadingId(text: string): string {
   return text
@@ -19,13 +20,25 @@ export default function Markdown({ content }: { content: string }) {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
         components={{
-          img: ({ src, alt, ...props }) => (
-            <img
-              src={src}
-              alt={alt}
-              className="rounded-lg shadow-md max-w-full h-auto"
-              {...props}
-            />
+          img: ({ src, alt, width, height, ...props }) => (
+            typeof src === 'string' ? (
+              <div className="relative w-full h-48">
+                <Image
+                  src={src}
+                  alt={alt || ''}
+                  fill
+                  className="rounded-lg shadow-md object-cover"
+                  {...props}
+                />
+              </div>
+            ) : (
+              <img
+                src={src}
+                alt={alt}
+                className="rounded-lg shadow-md max-w-full h-auto"
+                {...props}
+              />
+            )
           ),
           h1: ({ children, ...props }) => {
             const text = typeof children === 'string' ? children : '';

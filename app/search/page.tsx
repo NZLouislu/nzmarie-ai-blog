@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,13 +19,12 @@ interface Post {
   author?: string;
 }
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
-  const [allTags, setAllTags] = useState<string[]>([]);
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -33,20 +32,6 @@ export default function SearchPage() {
       performSearch(initialQuery);
     }
 
-    // Fetch tags for sidebar
-    const fetchTags = async () => {
-      try {
-        const response = await fetch('/api/tags');
-        if (response.ok) {
-          const data = await response.json();
-          setAllTags(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch tags:', error);
-      }
-    };
-
-    fetchTags();
   }, [initialQuery]);
 
   const performSearch = async (searchQuery: string) => {
@@ -175,7 +160,7 @@ export default function SearchPage() {
             ) : results.length > 0 ? (
               <div className="space-y-6">
                 <p className="text-gray-600">
-                  Found {results.length} result{results.length !== 1 ? 's' : ''} for "{query}"
+                  Found {results.length} result{results.length !== 1 ? 's' : ''} for &quot;{query}&quot;
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                   {results.map((post) => (
@@ -242,3 +227,14 @@ export default function SearchPage() {
     </>
   );
 }
+
+function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchContent />
+    </Suspense>
+  );
+}
+
+export default SearchPage;
+export const dynamic = 'force-dynamic';

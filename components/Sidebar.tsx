@@ -53,7 +53,7 @@ export default function Sidebar() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-medium text-gray-900">NZMarie's Blog</h4>
+                <h4 className="font-medium text-gray-900">NZMarie&apos;s Blog</h4>
                 <p className="text-sm text-gray-600">Explore amazing content</p>
               </div>
               <svg

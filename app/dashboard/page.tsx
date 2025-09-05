@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -13,8 +13,6 @@ import {
 } from "@radix-ui/themes";
 import Markdown from "@/lib/markdown";
 import Container from "@/components/Container";
-import { listPublished } from "@/lib/posts";
-import { nanoid } from "nanoid/non-secure";
 
 type Draft = {
   title: string;
@@ -33,7 +31,6 @@ const toSlug = (s: string) =>
     .replace(/\-+/g, "-");
 
 export default function EditorPage() {
-  const [posts, setPosts] = useState(listPublished());
   const [draft, setDraft] = useState<Draft>({
     title: "Untitled",
     slug: "untitled",
@@ -42,30 +39,8 @@ export default function EditorPage() {
     excerpt: "Post excerpt…",
   });
 
-  const tagArray = useMemo(
-    () =>
-      draft.tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
-    [draft.tags]
-  );
 
   function handlePublish() {
-    const newPost = {
-      id: nanoid(),
-      slug: draft.slug || toSlug(draft.title),
-      title: draft.title,
-      excerpt: draft.excerpt,
-      tags: tagArray,
-      categories: ["blog"],
-      status: "published" as const,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      publishedAt: new Date().toISOString(),
-      content: draft.content,
-    };
-    setPosts((prevPosts) => [newPost, ...prevPosts]);
     alert("Published (demo in-memory save). You can see it on the homepage.");
   }
 

@@ -1,30 +1,14 @@
 "use client";
 
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Menu, X, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("/api/categories");
-        if (response.ok) {
-          const data = await response.json();
-          setCategories(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   return (
     <>
