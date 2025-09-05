@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  post_id     String
+  name        String?
+  email       String?
+  comment     String
+  is_anonymous Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  @@map("comments")
+}
+
+model PostStat {
+  id           String @id @default(cuid())
+  post_id      String @unique
+  title        String @default("Blog Post")
+  views        Int    @default(0)
+  likes        Int    @default(0)
+  ai_questions Int    @default(0)
+
+  @@map("post_stats")
+}
+
+model DailyStat {
+  id           String   @id @default(cuid())
+  post_id      String
+  date         DateTime @default(now())
+  views        Int      @default(0)
+  likes        Int      @default(0)
+  ai_questions Int      @default(0)
+
+  @@unique([post_id, date])
+  @@map("daily_stats")
+}

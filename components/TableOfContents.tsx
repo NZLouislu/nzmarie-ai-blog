@@ -15,6 +15,7 @@ interface TableOfContentsProps {
 export default function TableOfContents({ content }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<TocItem[]>([]);
   const [activeHeading, setActiveHeading] = useState<string>('');
+  const [tocHeight, setTocHeight] = useState<string>('max-h-96');
 
   useEffect(() => {
     const extractHeadings = (content: string): TocItem[] => {
@@ -45,6 +46,24 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     setHeadings(extractHeadings(content));
   }, [content]);
 
+  useEffect(() => {
+    const updateTocHeight = () => {
+      const isMobile = window.innerWidth < 768;
+      if (!isMobile) {
+        // 非手机用户：屏幕高度减去 32px (上下各 16px)
+        const availableHeight = window.innerHeight - 32;
+        setTocHeight(`max-h-[${availableHeight}px]`);
+      } else {
+        // 手机用户：保持原有高度
+        setTocHeight('max-h-96');
+      }
+    };
+
+    updateTocHeight();
+    window.addEventListener('resize', updateTocHeight);
+    return () => window.removeEventListener('resize', updateTocHeight);
+  }, []);
+
   const scrollToHeading = (id: string) => {
     setActiveHeading(id);
     const element = document.getElementById(id);
@@ -72,7 +91,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   return (
     <div className="sticky top-8 bg-white rounded-2xl shadow-lg p-6">
       <h3 className="text-lg font-semibold mb-4">Table of Contents</h3>
-      <nav className="space-y-2 max-h-96 overflow-y-auto">
+      <nav className={`space-y-2 overflow-y-auto ${tocHeight}`}>
         {headings.map((heading, index) => (
           <button
             key={index}
