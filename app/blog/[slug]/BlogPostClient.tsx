@@ -183,7 +183,15 @@ function CommentsSection({ postId }: { postId: string }) {
 }
 
 // AI Chatbot Component
-function AIChatbot({ postContent, postId }: { postContent: string; postId: string }) {
+interface Stats {
+  views: number;
+  likes: number;
+  comments: number;
+  ai_questions: number;
+  ai_summaries: number;
+}
+
+function AIChatbot({ postContent, postId, setStats, stats }: { postContent: string; postId: string; setStats: React.Dispatch<React.SetStateAction<Stats>>; stats: Stats }) {
   const [messages, setMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -196,6 +204,12 @@ function AIChatbot({ postContent, postId }: { postContent: string; postId: strin
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+
+    const previousStats = stats;
+    setStats(prev => ({
+      ...prev,
+      ai_questions: (prev.ai_questions || 0) + 1
+    }));
 
     try {
       const response = await fetch('/api/ai-assistant', {
@@ -227,10 +241,12 @@ function AIChatbot({ postContent, postId }: { postContent: string; postId: strin
         });
       } else {
         setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
+        setStats(previousStats);
       }
     } catch (error) {
       console.error('AI assistant error:', error);
       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
+      setStats(previousStats);
     } finally {
       setIsLoading(false);
     }
@@ -306,6 +322,11 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
   // Load stats and increment view count on component mount
   React.useEffect(() => {
     const loadStatsAndIncrementView = async () => {
+      setStats(prev => ({
+        ...prev,
+        views: prev.views + 1
+      }));
+
       try {
         // First increment the view count
         await fetch('/api/stats', {
@@ -324,9 +345,22 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         if (response.ok) {
           const data = await response.json();
           setStats(data);
+        } else {
+          // Reload stats if failed
+          const reloadResponse = await fetch(`/api/stats?postId=${post.id}`);
+          if (reloadResponse.ok) {
+            const reloadData = await reloadResponse.json();
+            setStats(reloadData);
+          }
         }
       } catch (error) {
         console.error('Failed to load stats:', error);
+        // Reload stats if failed
+        const reloadResponse = await fetch(`/api/stats?postId=${post.id}`);
+        if (reloadResponse.ok) {
+          const reloadData = await reloadResponse.json();
+          setStats(reloadData);
+        }
       }
     };
 
@@ -334,6 +368,15 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
   }, [post.id]);
 
   const handleLike = async () => {
+    const newIsLiked = !isLiked;
+    const newLikes = newIsLiked ? stats.likes + 1 : stats.likes - 1;
+
+    setIsLiked(newIsLiked);
+    setStats(prev => ({
+      ...prev,
+      likes: newLikes
+    }));
+
     try {
       const response = await fetch('/api/stats', {
         method: 'POST',
@@ -346,21 +389,33 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         }),
       });
 
-      if (response.ok) {
-        setIsLiked(!isLiked);
+      if (!response.ok) {
+        setIsLiked(!newIsLiked);
         setStats(prev => ({
           ...prev,
-          likes: isLiked ? prev.likes - 1 : prev.likes + 1
+          likes: stats.likes
         }));
       }
     } catch (error) {
       console.error('Error updating like:', error);
+      setIsLiked(!newIsLiked);
+      setStats(prev => ({
+        ...prev,
+        likes: stats.likes
+      }));
     }
   };
 
   const generateAISummary = async (content: string) => {
     setIsLoading(true);
     setError('');
+
+    const previousStats = stats;
+    setStats(prev => ({
+      ...prev,
+      ai_summaries: (prev.ai_summaries || 0) + 1
+    }));
+
     try {
       const response = await fetch('/api/ai-summary', {
         method: 'POST',
@@ -373,20 +428,16 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
       if (response.ok) {
         const data = await response.json();
         setSummary(data.summary);
-
-        // Update local stats
-        setStats(prev => ({
-          ...prev,
-          ai_summaries: (prev.ai_summaries || 0) + 1
-        }));
       } else {
         setSummary(originalSummary);
         setError('Generation failed, please try again later');
+        setStats(previousStats);
       }
     } catch (error) {
       console.error('Error generating AI summary:', error);
       setSummary(originalSummary);
       setError('Generation failed, please try again later');
+      setStats(previousStats);
     } finally {
       setIsLoading(false);
     }
@@ -502,18 +553,16 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 
             <div className="mb-6 lg:mb-8">
               <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 rounded-lg border border-blue-700 shadow-lg">
+                <button
+                  onClick={() => generateAISummary(post.content)}
+                  disabled={isLoading}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 rounded-lg border border-blue-700 shadow-lg text-sm font-semibold text-white hover:text-blue-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                >
                   <svg className={`w-5 h-5 ${isLoading ? 'text-blue-200 animate-pulse' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
-                  <button
-                    onClick={() => generateAISummary(post.content)}
-                    disabled={isLoading}
-                    className="text-sm font-semibold text-white hover:text-blue-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? 'Generating...' : 'AI Summary'}
-                  </button>
-                </div>
+                  <span>{isLoading ? 'Generating...' : 'AI Summary'}</span>
+                </button>
               </div>
               {error && (
                 <div className="mb-2 text-sm text-red-700 bg-red-50 px-4 py-2 rounded-lg border border-red-300 shadow-sm">
@@ -576,7 +625,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         <CommentsSection postId={post.id} />
 
         {/* AI Chatbot */}
-        <AIChatbot postContent={post.content} postId={post.id} />
+        <AIChatbot postContent={post.content} postId={post.id} setStats={setStats} stats={stats} />
       </Box>
       <Footer />
     </>
