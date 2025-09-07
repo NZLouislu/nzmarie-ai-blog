@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Box, Avatar } from '@radix-ui/themes';
@@ -9,6 +9,14 @@ import TableOfContents from '@/components/TableOfContents';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Post } from '@/lib/types';
+
+interface FeatureToggles {
+  totalViews: boolean;
+  totalLikes: boolean;
+  totalComments: boolean;
+  aiSummaries: boolean;
+  aiQuestions: boolean;
+}
 
 interface Comment {
   id: string;
@@ -317,7 +325,30 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
   const [error, setError] = useState('');
   const [stats, setStats] = useState({ views: 1200, likes: 24, comments: 8, ai_questions: 1, ai_summaries: 0 });
   const [isLiked, setIsLiked] = useState(false);
+  const [toggles, setToggles] = useState<FeatureToggles>({
+    totalViews: true,
+    totalLikes: true,
+    totalComments: true,
+    aiSummaries: true,
+    aiQuestions: true,
+  });
   const originalSummary = post?.description || '';
+
+  useEffect(() => {
+    const loadToggles = async () => {
+      try {
+        const response = await fetch('/api/admin/toggles');
+        if (response.ok) {
+          const data = await response.json();
+          setToggles(data);
+        }
+      } catch (error) {
+        console.error('Failed to load toggles:', error);
+      }
+    };
+
+    loadToggles();
+  }, []);
 
   // Load stats and increment view count on component mount
   React.useEffect(() => {
@@ -493,47 +524,57 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
                   </div>
                 </div>
                 <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span>{stats.views.toLocaleString()}</span>
-                  </div>
-                  <button
-                    onClick={handleLike}
-                    className={`flex items-center gap-1 transition-colors ${
-                      isLiked ? 'text-red-500' : 'hover:text-red-500'
-                    }`}
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill={isLiked ? "currentColor" : "none"}
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  {toggles.totalViews && (
+                    <div className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span>{stats.views.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {toggles.totalLikes && (
+                    <button
+                      onClick={handleLike}
+                      className={`flex items-center gap-1 transition-colors ${
+                        isLiked ? 'text-red-500' : 'hover:text-red-500'
+                      }`}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    <span>{stats.likes}</span>
-                  </button>
-                  <div className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    <span>{stats.comments}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                    <span>{stats.ai_questions}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span>{stats.ai_summaries}</span>
-                  </div>
+                      <svg
+                        className="w-4 h-4"
+                        fill={isLiked ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                      <span>{stats.likes}</span>
+                    </button>
+                  )}
+                  {toggles.totalComments && (
+                    <div className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      <span>{stats.comments}</span>
+                    </div>
+                  )}
+                  {toggles.aiQuestions && (
+                    <div className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                      <span>{stats.ai_questions}</span>
+                    </div>
+                  )}
+                  {toggles.aiSummaries && (
+                    <div className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span>{stats.ai_summaries}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -551,40 +592,42 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
               )}
             </div>
 
-            <div className="mb-6 lg:mb-8">
-              <div className="flex items-center gap-3 mb-3">
-                <button
-                  onClick={() => generateAISummary(post.content)}
-                  disabled={isLoading}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 rounded-lg border border-blue-700 shadow-lg text-sm font-semibold text-white hover:text-blue-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  <svg className={`w-5 h-5 ${isLoading ? 'text-blue-200 animate-pulse' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                  <span>{isLoading ? 'Generating...' : 'AI Summary'}</span>
-                </button>
-              </div>
-              {error && (
-                <div className="mb-2 text-sm text-red-700 bg-red-50 px-4 py-2 rounded-lg border border-red-300 shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            {toggles.aiSummaries && (
+              <div className="mb-6 lg:mb-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <button
+                    onClick={() => generateAISummary(post.content)}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 rounded-lg border border-blue-700 shadow-lg text-sm font-semibold text-white hover:text-blue-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    <svg className={`w-5 h-5 ${isLoading ? 'text-blue-200 animate-pulse' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    {error}
-                  </div>
+                    <span>{isLoading ? 'Generating...' : 'AI Summary'}</span>
+                  </button>
                 </div>
-              )}
-              <div id="summary-content" className="p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-blue-500 min-h-[80px] flex items-center shadow-sm">
-                {isLoading ? (
-                  <div className="flex items-center gap-3 w-full">
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
-                    <span className="text-blue-700 font-medium">Generating Summary, please wait...</span>
+                {error && (
+                  <div className="mb-2 text-sm text-red-700 bg-red-50 px-4 py-2 rounded-lg border border-red-300 shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {error}
+                    </div>
                   </div>
-                ) : (
-                  <p className="text-base lg:text-lg text-gray-700 leading-relaxed w-full">{summary}</p>
                 )}
+                <div id="summary-content" className="p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-blue-500 min-h-[80px] flex items-center shadow-sm">
+                  {isLoading ? (
+                    <div className="flex items-center gap-3 w-full">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
+                      <span className="text-blue-700 font-medium">Generating Summary, please wait...</span>
+                    </div>
+                  ) : (
+                    <p className="text-base lg:text-lg text-gray-700 leading-relaxed w-full">{summary}</p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="prose prose-base lg:prose-lg max-w-none">
               <Markdown content={post.content} />
@@ -598,34 +641,40 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         </div>
 
         {/* Like Section */}
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <div className="flex items-center justify-center gap-4">
-            <button
-              onClick={handleLike}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-200 ${
-                isLiked
-                  ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <svg
-                className="w-6 h-6"
-                fill={isLiked ? "currentColor" : "none"}
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        {toggles.totalLikes && (
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <div className="flex items-center justify-center gap-4">
+              <button
+                onClick={handleLike}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-200 ${
+                  isLiked
+                    ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              <span className="text-lg font-medium">{stats.likes}</span>
-            </button>
+                <svg
+                  className="w-6 h-6"
+                  fill={isLiked ? "currentColor" : "none"}
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <span className="text-lg font-medium">{stats.likes}</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Comments Section */}
-        <CommentsSection postId={post.id} />
+        {toggles.totalComments && (
+          <CommentsSection postId={post.id} />
+        )}
 
         {/* AI Chatbot */}
-        <AIChatbot postContent={post.content} postId={post.id} setStats={setStats} stats={stats} />
+        {toggles.aiQuestions && (
+          <AIChatbot postContent={post.content} postId={post.id} setStats={setStats} stats={stats} />
+        )}
       </Box>
       <Footer />
     </>
