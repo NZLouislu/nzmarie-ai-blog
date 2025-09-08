@@ -82,30 +82,35 @@ export default function Navbar() {
                   {language === 'en' ? 'Archive' : '归档'}
                 </Link>
               </NavigationMenu.Item>
+              <NavigationMenu.Item>
+                <a
+                  href="https://nzlouis.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                >
+                  {language === 'en' ? 'About me' : '关于我'}
+                </a>
+              </NavigationMenu.Item>
+              <NavigationMenu.Item>
+                <Link
+                  href="/search"
+                  className="flex items-center justify-center -mt-1 p-2 text-gray-700 hover:text-blue-600 focus:outline-none transition-colors"
+                  title="Search"
+                >
+                  <Search size={20} />
+                </Link>
+              </NavigationMenu.Item>
+              <NavigationMenu.Item>
+                <button
+                  onClick={() => setLanguage(language === 'en' ? 'zh' : 'en')}
+                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                >
+                  {language === 'en' ? '中文' : 'English'}
+                </button>
+              </NavigationMenu.Item>
             </NavigationMenu.List>
           </NavigationMenu.Root>
-
-            <a
-              href="https://nzlouis.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              {language === 'en' ? 'About me' : '关于我'}
-            </a>
-            <Link
-              href="/search"
-              className="flex items-center justify-center p-2 text-gray-700 hover:text-blue-600 focus:outline-none transition-colors"
-              title="Search"
-            >
-              <Search size={20} />
-            </Link>
-            <button
-              onClick={() => setLanguage(language === 'en' ? 'zh' : 'en')}
-              className="text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              {language === 'en' ? '中文' : 'English'}
-            </button>
           </div>
 
           <button
@@ -172,6 +177,26 @@ export default function Navbar() {
                     onClick={() => setOpen(false)}
                   >
                     {language === 'en' ? 'Archive' : '归档'}
+                  </Link>
+                </NavigationMenu.Item>
+                <NavigationMenu.Item>
+                  <a
+                    href="https://nzlouis.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-sm font-medium hover:text-blue-600"
+                    onClick={() => setOpen(false)}
+                  >
+                    {language === 'en' ? 'About me' : '关于我'}
+                  </a>
+                </NavigationMenu.Item>
+                <NavigationMenu.Item>
+                  <Link
+                    href="/search"
+                    className="block text-sm font-medium hover:text-blue-600"
+                    onClick={() => setOpen(false)}
+                  >
+                    {language === 'en' ? 'Search' : '搜索'}
                   </Link>
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
