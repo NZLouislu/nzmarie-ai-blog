@@ -3,10 +3,13 @@ import matter from "gray-matter";
 import fs from "fs";
 import path from "path";
 
-const postsDirectory = path.join(process.cwd(), "lib/post");
+function getPostsDirectory(language: 'en' | 'zh' = 'en') {
+  return path.join(process.cwd(), "lib/post", language);
+}
 
-function getPostSlugs() {
+function getPostSlugs(language: 'en' | 'zh' = 'en') {
   try {
+    const postsDirectory = getPostsDirectory(language);
     return fs.readdirSync(postsDirectory)
       .filter((file: string) => file.endsWith(".md"));
   } catch (error) {
@@ -15,9 +18,10 @@ function getPostSlugs() {
   }
 }
 
-function getPostBySlug(slug: string): Post | null {
+function getPostBySlug(slug: string, language: 'en' | 'zh' = 'en'): Post | null {
   try {
     const realSlug = slug.replace(/\.md$/, "");
+    const postsDirectory = getPostsDirectory(language);
     const fullPath = path.join(postsDirectory, `${realSlug}.md`);
 
     if (!fs.existsSync(fullPath)) {
@@ -59,10 +63,10 @@ function getPostBySlug(slug: string): Post | null {
   }
 }
 
-export function getAllPosts(): Post[] {
-  const slugs = getPostSlugs();
+export function getAllPosts(language: 'en' | 'zh' = 'en'): Post[] {
+  const slugs = getPostSlugs(language);
   const posts = slugs
-    .map((slug: string) => getPostBySlug(slug.replace(/\.md$/, "")))
+    .map((slug: string) => getPostBySlug(slug.replace(/\.md$/, ""), language))
     .filter((post: Post | null): post is Post => post !== null)
     .sort(
       (a: Post, b: Post) =>
@@ -72,33 +76,39 @@ export function getAllPosts(): Post[] {
   return posts;
 }
 
-export function listPublished(): Post[] {
-  return getAllPosts().filter((p) => p.status === "published");
+export function listPublished(language: 'en' | 'zh' = 'en'): Post[] {
+  return getAllPosts(language).filter((p) => p.status === "published");
 }
 
-export function getPostsByCategory(category: string): Post[] {
-  return listPublished().filter((p) =>
+export function getPostsByCategory(category: string, language: 'en' | 'zh' = 'en'): Post[] {
+  return listPublished(language).filter((p) =>
     p.categories.some((cat) => cat.toLowerCase() === category.toLowerCase())
   );
 }
 
-export function getAllCategories(): string[] {
+export function getPostsByTag(tag: string, language: 'en' | 'zh' = 'en'): Post[] {
+  return listPublished(language).filter((p) =>
+    p.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
+  );
+}
+
+export function getAllCategories(language: 'en' | 'zh' = 'en'): string[] {
   const categories = new Set<string>();
-  getAllPosts().forEach((post) => {
+  listPublished(language).forEach((post) => {
     post.categories.forEach((category) => categories.add(category));
   });
   return Array.from(categories).sort();
 }
 
-export function getAllTags(): string[] {
+export function getAllTags(language: 'en' | 'zh' = 'en'): string[] {
   const tags = new Set<string>();
-  getAllPosts().forEach((post) => {
+  listPublished(language).forEach((post) => {
     post.tags.forEach((tag) => tags.add(tag));
   });
   return Array.from(tags).sort();
 }
 
-export function getBySlug(slug: string): Post | null {
-  const post = getPostBySlug(slug);
+export function getBySlug(slug: string, language: 'en' | 'zh' = 'en'): Post | null {
+  const post = getPostBySlug(slug, language);
   return post && post.status === "published" ? post : null;
 }

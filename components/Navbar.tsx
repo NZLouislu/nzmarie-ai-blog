@@ -5,9 +5,11 @@ import { useState } from "react";
 import { Menu, X, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useLanguageStore } from "@/lib/stores/languageStore";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { language, setLanguage } = useLanguageStore();
 
 
   return (
@@ -37,7 +39,7 @@ export default function Navbar() {
                   href="/"
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
-                  All Posts
+                  {language === 'en' ? 'All Posts' : '所有文章'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
@@ -45,7 +47,7 @@ export default function Navbar() {
                   href="/blog/category/backend"
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
-                  Backend
+                  {language === 'en' ? 'Backend' : '后端'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
@@ -53,7 +55,7 @@ export default function Navbar() {
                   href="/blog/category/frontend"
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
-                  Frontend
+                  {language === 'en' ? 'Frontend' : '前端'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
@@ -61,7 +63,7 @@ export default function Navbar() {
                   href="/blog/category/life"
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
-                  Life
+                  {language === 'en' ? 'Life' : '生活'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
@@ -69,7 +71,7 @@ export default function Navbar() {
                   href="/blog/category/tech"
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
-                  Tech
+                  {language === 'en' ? 'Tech' : '科技'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
@@ -77,7 +79,7 @@ export default function Navbar() {
                   href="/archive"
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
-                  Archive
+                  {language === 'en' ? 'Archive' : '归档'}
                 </Link>
               </NavigationMenu.Item>
             </NavigationMenu.List>
@@ -89,7 +91,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               className="text-sm font-medium hover:text-blue-600 transition-colors"
             >
-              About me
+              {language === 'en' ? 'About me' : '关于我'}
             </a>
             <Link
               href="/search"
@@ -98,6 +100,12 @@ export default function Navbar() {
             >
               <Search size={20} />
             </Link>
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'zh' : 'en')}
+              className="text-sm font-medium hover:text-blue-600 transition-colors"
+            >
+              {language === 'en' ? '中文' : 'English'}
+            </button>
           </div>
 
           <button
@@ -118,7 +126,7 @@ export default function Navbar() {
                     className="block text-sm font-medium hover:text-blue-600"
                     onClick={() => setOpen(false)}
                   >
-                    Home
+                    {language === 'en' ? 'Home' : '首页'}
                   </Link>
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
@@ -127,7 +135,7 @@ export default function Navbar() {
                     className="block text-sm font-medium hover:text-blue-600"
                     onClick={() => setOpen(false)}
                   >
-                    Backend
+                    {language === 'en' ? 'Backend' : '后端'}
                   </Link>
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
@@ -136,7 +144,7 @@ export default function Navbar() {
                     className="block text-sm font-medium hover:text-blue-600"
                     onClick={() => setOpen(false)}
                   >
-                    Frontend
+                    {language === 'en' ? 'Frontend' : '前端'}
                   </Link>
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
@@ -145,7 +153,7 @@ export default function Navbar() {
                     className="block text-sm font-medium hover:text-blue-600"
                     onClick={() => setOpen(false)}
                   >
-                    Life
+                    {language === 'en' ? 'Life' : '生活'}
                   </Link>
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
@@ -154,7 +162,7 @@ export default function Navbar() {
                     className="block text-sm font-medium hover:text-blue-600"
                     onClick={() => setOpen(false)}
                   >
-                    Tech
+                    {language === 'en' ? 'Tech' : '科技'}
                   </Link>
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
@@ -163,8 +171,19 @@ export default function Navbar() {
                     className="block text-sm font-medium hover:text-blue-600"
                     onClick={() => setOpen(false)}
                   >
-                    Archive
+                    {language === 'en' ? 'Archive' : '归档'}
                   </Link>
+                </NavigationMenu.Item>
+                <NavigationMenu.Item>
+                  <button
+                    onClick={() => {
+                      setLanguage(language === 'en' ? 'zh' : 'en');
+                      setOpen(false);
+                    }}
+                    className="block text-sm font-medium hover:text-blue-600 text-left"
+                  >
+                    {language === 'en' ? '中文' : 'English'}
+                  </button>
                 </NavigationMenu.Item>
               </NavigationMenu.List>
             </NavigationMenu.Root>

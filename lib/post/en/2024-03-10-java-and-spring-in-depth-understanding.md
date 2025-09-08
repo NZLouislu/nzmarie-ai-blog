@@ -16,6 +16,7 @@ tags:
   - Spring Framework
   - Technology Trends
   - Python
+lang: "en"
 URL: "/2024/03/10/java-and-spring-in-depth-understanding"
 categories: [Backend]
 ---

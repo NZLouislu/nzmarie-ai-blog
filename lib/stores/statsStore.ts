@@ -1,0 +1,166 @@
+import { create } from 'zustand';
+
+interface TotalStats {
+  totalViews: number;
+  totalLikes: number;
+  totalComments: number;
+  totalAiQuestions: number;
+  totalAiSummaries: number;
+}
+
+interface PostStats {
+  views: number;
+  likes: number;
+  comments: number;
+  ai_questions: number;
+  ai_summaries: number;
+}
+
+interface StatsState {
+  totalStats: TotalStats;
+  postStats: Record<string, PostStats>;
+  isLoading: boolean;
+  error: string | null;
+
+  setTotalStats: (stats: TotalStats) => void;
+  setPostStats: (postId: string, stats: PostStats) => void;
+  updatePostViews: (postId: string, views: number) => void;
+  updatePostLikes: (postId: string, likes: number) => void;
+  incrementPostViews: (postId: string) => void;
+  togglePostLike: (postId: string) => void;
+  incrementComments: (postId: string, decrement?: boolean) => void;
+  incrementAiQuestions: (postId: string, decrement?: boolean) => void;
+  incrementAiSummaries: (postId: string, decrement?: boolean) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  fetchTotalStats: () => Promise<void>;
+  fetchPostStats: (postId: string) => Promise<void>;
+}
+
+export const useStatsStore = create<StatsState>((set, get) => ({
+  totalStats: {
+    totalViews: 0,
+    totalLikes: 0,
+    totalComments: 0,
+    totalAiQuestions: 0,
+    totalAiSummaries: 0,
+  },
+  postStats: {},
+  isLoading: false,
+  error: null,
+
+  setTotalStats: (stats) => set({ totalStats: stats }),
+
+  setPostStats: (postId, stats) =>
+    set((state) => ({
+      postStats: { ...state.postStats, [postId]: stats },
+    })),
+
+  updatePostViews: (postId, views) =>
+    set((state) => ({
+      postStats: {
+        ...state.postStats,
+        [postId]: { ...state.postStats[postId], views },
+      },
+    })),
+
+  updatePostLikes: (postId, likes) =>
+    set((state) => ({
+      postStats: {
+        ...state.postStats,
+        [postId]: { ...state.postStats[postId], likes },
+      },
+    })),
+
+  incrementPostViews: (postId) =>
+    set((state) => {
+      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, aiQuestions: 0, aiSummaries: 0 };
+      return {
+        postStats: {
+          ...state.postStats,
+          [postId]: { ...currentStats, views: currentStats.views + 1 },
+        },
+      };
+    }),
+
+  togglePostLike: (postId) =>
+    set((state) => {
+      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
+      const newLikes = currentStats.likes + 1;
+      return {
+        postStats: {
+          ...state.postStats,
+          [postId]: { ...currentStats, likes: newLikes },
+        },
+      };
+    }),
+
+  incrementComments: (postId, decrement = false) =>
+    set((state) => {
+      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
+      const increment = decrement ? -1 : 1;
+      return {
+        postStats: {
+          ...state.postStats,
+          [postId]: { ...currentStats, comments: Math.max(0, currentStats.comments + increment) },
+        },
+      };
+    }),
+
+  incrementAiQuestions: (postId, decrement = false) =>
+    set((state) => {
+      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
+      const increment = decrement ? -1 : 1;
+      return {
+        postStats: {
+          ...state.postStats,
+          [postId]: { ...currentStats, ai_questions: Math.max(0, currentStats.ai_questions + increment) },
+        },
+      };
+    }),
+
+  incrementAiSummaries: (postId, decrement = false) =>
+    set((state) => {
+      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
+      const increment = decrement ? -1 : 1;
+      return {
+        postStats: {
+          ...state.postStats,
+          [postId]: { ...currentStats, ai_summaries: Math.max(0, currentStats.ai_summaries + increment) },
+        },
+      };
+    }),
+
+  setLoading: (loading) => set({ isLoading: loading }),
+
+  setError: (error) => set({ error }),
+
+  fetchTotalStats: async () => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await fetch('/api/stats');
+      if (response.ok) {
+        const data = await response.json();
+        set({ totalStats: data });
+      } else {
+        set({ error: 'Failed to fetch total stats' });
+      }
+    } catch (error) {
+      set({ error: 'Failed to fetch total stats' });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  fetchPostStats: async (postId) => {
+    try {
+      const response = await fetch(`/api/stats?postId=${postId}`);
+      if (response.ok) {
+        const stats = await response.json();
+        get().setPostStats(postId, stats);
+      }
+    } catch (error) {
+      console.error('Failed to fetch post stats:', error);
+    }
+  },
+}));

@@ -25,7 +25,7 @@ featuredTags:
   - Outdoor Activities
   - Welfare For Children
   - Kiwi Lifestyle
-
+lang: "en"
 URL: "/2024/01/20/new_zealand_paradise_for_children/"
 
 categories: [Life]

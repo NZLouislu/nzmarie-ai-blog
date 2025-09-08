@@ -3,69 +3,18 @@
 import { Box, Heading, Text, Flex } from "@radix-ui/themes";
 import BlogList from "@/components/BlogList";
 import Sidebar from "./Sidebar";
-import { useEffect, useState } from "react";
-
-interface TotalStats {
-  totalViews: number;
-  totalLikes: number;
-  totalComments: number;
-  totalAiQuestions: number;
-  totalAiSummaries: number;
-}
-
-interface FeatureToggles {
-  totalViews: boolean;
-  totalLikes: boolean;
-  totalComments: boolean;
-  aiSummaries: boolean;
-  aiQuestions: boolean;
-}
+import { useEffect } from "react";
+import { useStatsStore } from "@/lib/stores/statsStore";
+import { useTogglesStore } from "@/lib/stores/togglesStore";
 
 export default function HomePage() {
-  const [totalStats, setTotalStats] = useState<TotalStats>({
-    totalViews: 0,
-    totalLikes: 0,
-    totalComments: 0,
-    totalAiQuestions: 0,
-    totalAiSummaries: 0
-  });
-
-  const [toggles, setToggles] = useState<FeatureToggles>({
-    totalViews: true,
-    totalLikes: true,
-    totalComments: true,
-    aiSummaries: true,
-    aiQuestions: true,
-  });
+  const { totalStats, fetchTotalStats } = useStatsStore();
+  const { toggles, fetchToggles } = useTogglesStore();
 
   useEffect(() => {
-    const loadTotalStats = async () => {
-      try {
-        const response = await fetch('/api/stats');
-        if (response.ok) {
-          const data = await response.json();
-          setTotalStats(data);
-        }
-      } catch (error) {
-        console.error('Failed to load total stats:', error);
-      }
-    };
-
-    const loadToggles = async () => {
-      try {
-        const response = await fetch('/api/admin/toggles');
-        if (response.ok) {
-          const data = await response.json();
-          setToggles(data);
-        }
-      } catch (error) {
-        console.error('Failed to load toggles:', error);
-      }
-    };
-
-    loadTotalStats();
-    loadToggles();
-  }, []);
+    fetchTotalStats();
+    fetchToggles();
+  }, [fetchTotalStats, fetchToggles]);
   return (
     <Box className="w-full px-6 py-12">
       <div className="flex flex-col items-center mb-20">

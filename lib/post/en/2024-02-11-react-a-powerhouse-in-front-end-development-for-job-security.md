@@ -19,6 +19,7 @@ tags:
   - TypeScript
   - Hooks
   - Server-Side Rendering
+lang: "en"
 categories: [Frontend]
 ---
 

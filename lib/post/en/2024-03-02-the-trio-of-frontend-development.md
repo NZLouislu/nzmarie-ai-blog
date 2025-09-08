@@ -18,6 +18,7 @@ tags:
   - Web Design
   - Web Technologies
   - Software Development
+lang: "en"
 URL: "/2024/03/02/the-trio-of-frontend-development"
 categories: [Frontend]
 ---

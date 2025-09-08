@@ -17,6 +17,7 @@ tags:
   - Java
   - C#
   - Node.js
+lang: "en"
 URL: "/2024/02/24/backend-tech-the-foundation-of-software"
 categories: [Backend]
 ---

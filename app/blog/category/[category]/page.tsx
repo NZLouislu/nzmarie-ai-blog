@@ -1,6 +1,5 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getPostsByCategory, getAllCategories } from '@/lib/posts';
 import CategoryContent from './CategoryContent';
 
 interface CategoryPageProps {
@@ -11,19 +10,38 @@ interface CategoryPageProps {
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
-  const posts = getPostsByCategory(decodeURIComponent(category));
 
-  if (posts.length === 0) {
-    notFound();
+  try {
+    const { getPostsByCategory } = await import('@/lib/posts');
+    const posts = getPostsByCategory(category, 'en');
+    if (posts.length === 0) {
+      notFound();
+    }
+    return <CategoryContent category={category} posts={posts} />;
+  } catch (error) {
+    console.error('Failed to get posts:', error);
   }
 
-  return <CategoryContent category={category} posts={posts} />;
+  notFound();
 }
 
 export async function generateStaticParams() {
-  const categories = getAllCategories();
+  try {
+    const { getAllCategories, getPostsByCategory } = await import('@/lib/posts');
+    const categories = getAllCategories('en');
 
-  return categories.map((category) => ({
-    category: category.toLowerCase(),
-  }));
+    // Only generate categories that have content
+    const validCategories = categories.filter((category: string) => {
+      const posts = getPostsByCategory(category, 'en');
+      return posts.length > 0;
+    });
+
+    return validCategories.map((category: string) => ({
+      category: category.toLowerCase(),
+    }));
+  } catch (error) {
+    console.error('Failed to get categories:', error);
+  }
+
+  return [];
 }

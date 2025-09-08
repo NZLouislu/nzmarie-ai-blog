@@ -9,14 +9,8 @@ import TableOfContents from '@/components/TableOfContents';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Post } from '@/lib/types';
-
-interface FeatureToggles {
-  totalViews: boolean;
-  totalLikes: boolean;
-  totalComments: boolean;
-  aiSummaries: boolean;
-  aiQuestions: boolean;
-}
+import { useStatsStore } from '@/lib/stores/statsStore';
+import { useTogglesStore } from '@/lib/stores/togglesStore';
 
 interface Comment {
   id: string;
@@ -30,6 +24,7 @@ interface Comment {
 
 // Comments Section Component
 function CommentsSection({ postId }: { postId: string }) {
+  const { postStats, incrementComments } = useStatsStore();
   const [comments, setComments] = useState<Comment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -61,6 +56,25 @@ function CommentsSection({ postId }: { postId: string }) {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Optimistic update
+    incrementComments(postId);
+
+    // Create optimistic comment
+    const optimisticComment: Comment = {
+      id: `temp-${Date.now()}`,
+      post_id: postId,
+      name: formData.name,
+      email: formData.email,
+      comment: formData.comment,
+      is_anonymous: formData.isAnonymous,
+      created_at: new Date().toISOString()
+    };
+
+    setComments(prev => [optimisticComment, ...prev]);
+    setShowForm(false);
+    const currentFormData = { ...formData };
+    setFormData({ name: '', email: '', comment: '', isAnonymous: false });
+
     try {
       const response = await fetch('/api/comments', {
         method: 'POST',
@@ -69,20 +83,43 @@ function CommentsSection({ postId }: { postId: string }) {
         },
         body: JSON.stringify({
           postId,
-          ...formData
+          ...currentFormData
         }),
       });
 
       if (response.ok) {
         const newComment = await response.json();
-        setComments(prev => [newComment, ...prev]);
-        setShowForm(false);
-        setFormData({ name: '', email: '', comment: '', isAnonymous: false });
+        // Replace optimistic comment with real comment
+        setComments(prev => prev.map(comment =>
+          comment.id === optimisticComment.id ? newComment : comment
+        ));
+
+        // Track comment in database
+        await fetch('/api/stats', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            postId: postId,
+            action: 'comment'
+          }),
+        });
       } else {
+        // Revert optimistic update on failure
+        incrementComments(postId, true);
+        setComments(prev => prev.filter(comment => comment.id !== optimisticComment.id));
+        setShowForm(true);
+        setFormData(currentFormData);
         const errorData = await response.json();
         alert(`Failed to submit comment: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
+      // Revert optimistic update on failure
+      incrementComments(postId, true);
+      setComments(prev => prev.filter(comment => comment.id !== optimisticComment.id));
+      setShowForm(true);
+      setFormData(currentFormData);
       console.error('Comment submission error:', error);
       alert('Network error: Failed to submit comment. Please try again.');
     } finally {
@@ -199,7 +236,9 @@ interface Stats {
   ai_summaries: number;
 }
 
-function AIChatbot({ postContent, postId, setStats, stats }: { postContent: string; postId: string; setStats: React.Dispatch<React.SetStateAction<Stats>>; stats: Stats }) {
+function AIChatbot({ postContent, postId }: { postContent: string; postId: string }) {
+  const { postStats, incrementAiQuestions } = useStatsStore();
+  const stats = postStats[postId] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
   const [messages, setMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -209,15 +248,13 @@ function AIChatbot({ postContent, postId, setStats, stats }: { postContent: stri
     if (!input.trim()) return;
 
     const userMessage = { role: 'user' as const, content: input };
+    const currentInput = input;
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
-    const previousStats = stats;
-    setStats(prev => ({
-      ...prev,
-      ai_questions: (prev.ai_questions || 0) + 1
-    }));
+    // Optimistic update
+    incrementAiQuestions(postId);
 
     try {
       const response = await fetch('/api/ai-assistant', {
@@ -226,7 +263,7 @@ function AIChatbot({ postContent, postId, setStats, stats }: { postContent: stri
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question: input,
+          question: currentInput,
           context: postContent,
           postId: postId
         }),
@@ -236,7 +273,7 @@ function AIChatbot({ postContent, postId, setStats, stats }: { postContent: stri
         const data = await response.json();
         setMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
 
-        // Track AI question
+        // Track AI question in database
         await fetch('/api/stats', {
           method: 'POST',
           headers: {
@@ -249,12 +286,14 @@ function AIChatbot({ postContent, postId, setStats, stats }: { postContent: stri
         });
       } else {
         setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
-        setStats(previousStats);
+        // Revert optimistic update on failure
+        incrementAiQuestions(postId, true);
       }
     } catch (error) {
       console.error('AI assistant error:', error);
       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
-      setStats(previousStats);
+      // Revert optimistic update on failure
+      incrementAiQuestions(postId, true);
     } finally {
       setIsLoading(false);
     }
@@ -323,40 +362,25 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
   const [summary, setSummary] = useState(post?.description || '');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [stats, setStats] = useState({ views: 1200, likes: 24, comments: 8, ai_questions: 1, ai_summaries: 0 });
   const [isLiked, setIsLiked] = useState(false);
-  const [toggles, setToggles] = useState<FeatureToggles>({
-    totalViews: true,
-    totalLikes: true,
-    totalComments: true,
-    aiSummaries: true,
-    aiQuestions: true,
-  });
+
+  const { postStats, incrementPostViews, togglePostLike, fetchPostStats, incrementAiSummaries } = useStatsStore();
+  const { toggles, fetchToggles } = useTogglesStore();
+
+  const stats = postStats[post.id] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
   const originalSummary = post?.description || '';
 
   useEffect(() => {
-    const loadToggles = async () => {
-      try {
-        const response = await fetch('/api/admin/toggles');
-        if (response.ok) {
-          const data = await response.json();
-          setToggles(data);
-        }
-      } catch (error) {
-        console.error('Failed to load toggles:', error);
-      }
-    };
-
-    loadToggles();
-  }, []);
+    fetchToggles();
+    if (!postStats[post.id]) {
+      fetchPostStats(post.id);
+    }
+  }, [fetchToggles, fetchPostStats, post.id, postStats]);
 
   // Load stats and increment view count on component mount
   React.useEffect(() => {
     const loadStatsAndIncrementView = async () => {
-      setStats(prev => ({
-        ...prev,
-        views: prev.views + 1
-      }));
+      incrementPostViews(post.id);
 
       try {
         // First increment the view count
@@ -372,41 +396,21 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         });
 
         // Then load the updated stats
-        const response = await fetch(`/api/stats?postId=${post.id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setStats(data);
-        } else {
-          // Reload stats if failed
-          const reloadResponse = await fetch(`/api/stats?postId=${post.id}`);
-          if (reloadResponse.ok) {
-            const reloadData = await reloadResponse.json();
-            setStats(reloadData);
-          }
-        }
+        fetchPostStats(post.id);
       } catch (error) {
         console.error('Failed to load stats:', error);
-        // Reload stats if failed
-        const reloadResponse = await fetch(`/api/stats?postId=${post.id}`);
-        if (reloadResponse.ok) {
-          const reloadData = await reloadResponse.json();
-          setStats(reloadData);
-        }
+        fetchPostStats(post.id);
       }
     };
 
     loadStatsAndIncrementView();
-  }, [post.id]);
+  }, [post.id, incrementPostViews, fetchPostStats]);
 
   const handleLike = async () => {
     const newIsLiked = !isLiked;
-    const newLikes = newIsLiked ? stats.likes + 1 : stats.likes - 1;
 
     setIsLiked(newIsLiked);
-    setStats(prev => ({
-      ...prev,
-      likes: newLikes
-    }));
+    togglePostLike(post.id);
 
     try {
       const response = await fetch('/api/stats', {
@@ -422,18 +426,12 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 
       if (!response.ok) {
         setIsLiked(!newIsLiked);
-        setStats(prev => ({
-          ...prev,
-          likes: stats.likes
-        }));
+        togglePostLike(post.id);
       }
     } catch (error) {
       console.error('Error updating like:', error);
       setIsLiked(!newIsLiked);
-      setStats(prev => ({
-        ...prev,
-        likes: stats.likes
-      }));
+      togglePostLike(post.id);
     }
   };
 
@@ -441,11 +439,8 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
     setIsLoading(true);
     setError('');
 
-    const previousStats = stats;
-    setStats(prev => ({
-      ...prev,
-      ai_summaries: (prev.ai_summaries || 0) + 1
-    }));
+    // Optimistic update
+    incrementAiSummaries(post.id);
 
     try {
       const response = await fetch('/api/ai-summary', {
@@ -459,16 +454,30 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
       if (response.ok) {
         const data = await response.json();
         setSummary(data.summary);
+
+        // Track AI summary in database
+        await fetch('/api/stats', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            postId: post.id,
+            action: 'ai_summary'
+          }),
+        });
       } else {
         setSummary(originalSummary);
         setError('Generation failed, please try again later');
-        setStats(previousStats);
+        // Revert optimistic update on failure
+        incrementAiSummaries(post.id, true);
       }
     } catch (error) {
       console.error('Error generating AI summary:', error);
       setSummary(originalSummary);
       setError('Generation failed, please try again later');
-      setStats(previousStats);
+      // Revert optimistic update on failure
+      incrementAiSummaries(post.id, true);
     } finally {
       setIsLoading(false);
     }
@@ -673,7 +682,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 
         {/* AI Chatbot */}
         {toggles.aiQuestions && (
-          <AIChatbot postContent={post.content} postId={post.id} setStats={setStats} stats={stats} />
+          <AIChatbot postContent={post.content} postId={post.id} />
         )}
       </Box>
       <Footer />

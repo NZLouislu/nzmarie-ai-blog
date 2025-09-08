@@ -1,12 +1,32 @@
-import React from 'react';
-import { listPublished } from '@/lib/posts';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Sidebar from '@/components/Sidebar';
+import { useLanguageStore } from '@/lib/stores/languageStore';
+import { Post } from '@/lib/types';
 
 export default function ArchivePage() {
-  const posts = listPublished();
+  const { language } = useLanguageStore();
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        const response = await fetch(`/api/posts/language?action=published&language=${language}`);
+        if (response.ok) {
+          const newPosts = await response.json();
+          setPosts(newPosts);
+        }
+      } catch (error) {
+        console.error('Failed to load posts:', error);
+      }
+    };
+
+    loadPosts();
+  }, [language]);
 
   // Group posts by year
   const postsByYear = posts.reduce((acc, post) => {
@@ -30,9 +50,11 @@ export default function ArchivePage() {
         <div className="flex flex-col md:flex-row gap-12 md:justify-center">
           <div className="md:flex-[7] w-full max-w-[900px]">
             <div className="mb-12">
-              <h1 className="text-4xl font-bold mb-4">Archive</h1>
+              <h1 className="text-4xl font-bold mb-4">
+                {language === 'en' ? 'Archive' : '归档'}
+              </h1>
               <p className="text-xl text-gray-600">
-                All posts organized by year and date.
+                {language === 'en' ? 'All posts organized by year and date.' : '按年份和日期组织的所有文章。'}
               </p>
             </div>
 

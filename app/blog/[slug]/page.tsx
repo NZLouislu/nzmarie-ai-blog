@@ -1,6 +1,5 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getBySlug, listPublished } from '@/lib/posts';
 import { Post } from '@/lib/types';
 import BlogPostClient from './BlogPostClient';
 
@@ -12,19 +11,31 @@ interface PageProps {
 
 export default async function BlogPost({ params }: PageProps) {
   const { slug } = await params;
-  const post = getBySlug(slug);
 
-  if (!post) {
-    notFound();
+  try {
+    const { getBySlug } = await import('@/lib/posts');
+    const post = getBySlug(slug, 'en');
+    if (!post) {
+      notFound();
+    }
+    return <BlogPostClient post={post} />;
+  } catch (error) {
+    console.error('Failed to get post:', error);
   }
 
-  return <BlogPostClient post={post} />;
+  notFound();
 }
 
 export async function generateStaticParams() {
-  const posts = listPublished();
+  try {
+    const { listPublished } = await import('@/lib/posts');
+    const posts = listPublished('en');
+    return posts.map((post: Post) => ({
+      slug: post.slug,
+    }));
+  } catch (error) {
+    console.error('Failed to get posts:', error);
+  }
 
-  return posts.map((post: Post) => ({
-    slug: post.slug,
-  }));
+  return [];
 }

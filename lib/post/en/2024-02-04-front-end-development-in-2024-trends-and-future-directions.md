@@ -19,7 +19,7 @@ tags:
   - Node.js
   - Next.js
   - React Trends
-
+lang: "en"
 URL: "/2024/02/04/front-end-development-in-2024-trends-and-future-directions/"
 categories: [Frontend]
 ---

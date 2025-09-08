@@ -26,7 +26,7 @@ tags:
   - AI Limitations
   - Current AI Capabilities
   - Developer Roles in the Future
-
+lang: "en"
 URL: "/2024/01/10/will-ai-replace-human-developers/"
 categories: [Tech]
 ---

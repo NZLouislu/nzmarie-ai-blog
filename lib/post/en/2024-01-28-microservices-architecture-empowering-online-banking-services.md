@@ -18,6 +18,7 @@ tags:
   - Challenges
   - Technological Solution
   - Future Trends
+lang: "en"
 URL: "/2024/01/28/microservices-architecture-empowering-online-banking-services/"
 categories: [Tech]
 ---
