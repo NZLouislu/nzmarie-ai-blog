@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS feature_toggles (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+ALTER TABLE feature_toggles DISABLE ROW LEVEL SECURITY;
+
 -- Insert default values
 INSERT INTO feature_toggles (total_views, total_likes, total_comments, ai_summaries, ai_questions)
 VALUES (true, true, true, true, true)

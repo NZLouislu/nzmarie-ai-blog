@@ -53,6 +53,8 @@ CREATE TABLE comments (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+ALTER TABLE comments DISABLE ROW LEVEL SECURITY;
+
 -- Create post_stats table
 CREATE TABLE post_stats (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -75,3 +77,33 @@ CREATE TABLE daily_stats (
   ai_summaries INTEGER DEFAULT 0,
   UNIQUE(post_id, date)
 );
+i
+-- Insert sample post stats data
+INSERT INTO post_stats (post_id, title, views, likes, ai_questions, ai_summaries) VALUES
+('2024-03-10-java-and-spring-in-depth-understanding', 'Java and Spring: In-Depth Analysis and Comprehensive Understanding', 150, 25, 8, 12),
+('2024-03-02-the-trio-of-frontend-development', 'The Trio of Frontend Development', 120, 18, 6, 9),
+('2024-02-24-backend-tech-the-foundation-of-software', 'Backend Tech: The Foundation of Software', 95, 15, 4, 7),
+('2024-02-17-react-18-typescript-powerful-combination-frontend', 'React 18 & TypeScript: Powerful Combination for Frontend', 110, 22, 7, 10),
+('2024-02-11-react-a-powerhouse-in-front-end-development-for-job-security', 'React: A Powerhouse in Front-End Development for Job Security', 85, 12, 3, 5),
+('2024-02-04-front-end-development-in-2024-trends-and-future-directions', 'Front-End Development in 2024: Trends and Future Directions', 140, 28, 9, 14),
+('2024-01-28-microservices-architecture-empowering-online-banking-services', 'Microservices Architecture: Empowering Online Banking Services', 75, 10, 2, 4),
+('2024-01-20-new_zealand_paradise_for_children', 'New Zealand: Paradise for Children', 200, 35, 15, 20),
+('2024-01-10-will-ai-replace-human-developers', 'Will AI Replace Human Developers?', 180, 30, 12, 16);
+
+-- Insert sample comments data
+INSERT INTO comments (post_id, name, email, comment, is_anonymous) VALUES
+('2024-03-10-java-and-spring-in-depth-understanding', 'John Doe', 'john@example.com', 'Great article! Very comprehensive explanation of Java and Spring.', false),
+('2024-03-10-java-and-spring-in-depth-understanding', 'Jane Smith', 'jane@example.com', 'Thanks for sharing this detailed guide. Helped me a lot!', false),
+('2024-03-02-the-trio-of-frontend-development', NULL, NULL, 'Excellent overview of frontend technologies!', true),
+('2024-02-24-backend-tech-the-foundation-of-software', 'Mike Johnson', 'mike@example.com', 'Backend development is indeed the foundation. Well explained!', false),
+('2024-01-20-new_zealand_paradise_for_children', 'Sarah Wilson', 'sarah@example.com', 'Beautiful article about New Zealand. The photos are amazing!', false),
+('2024-01-10-will-ai-replace-human-developers', NULL, NULL, 'Interesting perspective on AI and development. Looking forward to more articles!', true);
+
+-- Insert sample daily stats data
+INSERT INTO daily_stats (post_id, date, views, likes, ai_questions, ai_summaries) VALUES
+('2024-03-10-java-and-spring-in-depth-understanding', CURRENT_DATE, 15, 3, 1, 2),
+('2024-03-02-the-trio-of-frontend-development', CURRENT_DATE, 12, 2, 1, 1),
+('2024-02-24-backend-tech-the-foundation-of-software', CURRENT_DATE, 9, 2, 0, 1),
+('2024-02-17-react-18-typescript-powerful-combination-frontend', CURRENT_DATE, 11, 2, 1, 1),
+('2024-01-20-new_zealand_paradise_for_children', CURRENT_DATE, 20, 4, 2, 3),
+('2024-01-10-will-ai-replace-human-developers', CURRENT_DATE, 18, 3, 1, 2);

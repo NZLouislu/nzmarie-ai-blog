@@ -103,7 +103,7 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
   },
 
   deleteComment: async (id: string) => {
-    const { comments, selectedPost, loadCommentsForPost, setComments } = get();
+    const { selectedPost, loadCommentsForPost } = get();
 
     try {
       const response = await fetch(`/api/admin/comments?id=${id}`, {
@@ -114,11 +114,8 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
         throw new Error('Failed to delete comment');
       }
 
-      const updatedComments = comments.filter(comment => comment.id !== id);
-      setComments(updatedComments);
-
       if (selectedPost) {
-        loadCommentsForPost(selectedPost);
+        await loadCommentsForPost(selectedPost);
       }
     } catch (err) {
       console.error('Failed to delete comment:', err);

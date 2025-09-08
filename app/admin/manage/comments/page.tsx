@@ -39,14 +39,11 @@ export default function CommentsManagementPage() {
     selectPost(postId);
   };
 
-  const postIdsWithComments = Array.from(new Set(comments.map((comment) => comment.post_id)));
-  const postsWithComments = posts.filter((post) => postIdsWithComments.includes(post.id));
-
   useEffect(() => {
-    if (postsWithComments.length > 0 && !selectedPost) {
-      selectPost(postsWithComments[0].id);
+    if (posts.length > 0 && !selectedPost) {
+      selectPost(posts[0].id);
     }
-  }, [postsWithComments, selectedPost, selectPost]);
+  }, [posts, selectedPost, selectPost]);
 
   return (
     <AuthCheck>
@@ -85,26 +82,22 @@ export default function CommentsManagementPage() {
                 <div className="lg:w-1/3">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h3 className="text-md font-medium text-gray-900 mb-3">Blog Posts</h3>
-                    {postsWithComments.length > 0 ? (
-                      <ul className="space-y-2 max-h-96 overflow-y-auto">
-                        {postsWithComments.map((post) => (
-                          <li key={post.id}>
-                            <button
-                              onClick={() => handlePostSelect(post.id)}
-                              className={`w-full text-left px-3 py-2 rounded-md text-sm ${
-                                selectedPost === post.id
-                                  ? 'bg-indigo-100 text-indigo-700'
-                                  : 'text-gray-700 hover:bg-gray-100'
-                              }`}
-                            >
-                              {post.title}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-gray-500">No posts with comments found</p>
-                    )}
+                    <ul className="space-y-2 max-h-96 overflow-y-auto">
+                      {posts.map((post) => (
+                        <li key={post.id}>
+                          <button
+                            onClick={() => handlePostSelect(post.id)}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm ${
+                              selectedPost === post.id
+                                ? 'bg-indigo-100 text-indigo-700'
+                                : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                          >
+                            {post.title}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
 

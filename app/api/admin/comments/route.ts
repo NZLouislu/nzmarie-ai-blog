@@ -51,6 +51,10 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       console.error('Supabase error:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Error details:', error.details);
+      console.error('Error hint:', error.hint);
       return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
     }
 
