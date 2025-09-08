@@ -1,162 +1,57 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useEffect } from 'react';
 import AuthCheck from '../auth-check';
-
-interface Comment {
-  id: string;
-  post_id: string;
-  name: string | null;
-  email: string | null;
-  comment: string;
-  is_anonymous: boolean;
-  created_at: string;
-}
-
-interface Post {
-  id: string;
-  title: string;
-}
+import AdminNavbar from '../../../../components/AdminNavbar';
+import { useCommentsStore } from '../../../../lib/stores/commentsStore';
 
 export default function CommentsManagementPage() {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [selectedPost, setSelectedPost] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const {
+    comments,
+    posts,
+    selectedPost,
+    isLoading,
+    error,
+    loadComments,
+    loadPosts,
+    deleteComment,
+    selectPost
+  } = useCommentsStore();
 
   useEffect(() => {
     loadComments();
     loadPosts();
-  }, []);
+  }, [loadComments, loadPosts]);
 
-  const loadComments = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/admin/comments');
-      if (!response.ok) {
-        throw new Error('Failed to fetch comments');
-      }
-      const data = await response.json();
-      setComments(data);
-    } catch (err) {
-      console.error('Failed to load comments:', err);
-      setError('Failed to load comments');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadPosts = async () => {
-    try {
-      const response = await fetch('/api/posts');
-      if (!response.ok) {
-        throw new Error('Failed to fetch posts');
-      }
-      const data = await response.json();
-      setPosts(data);
-    } catch (err) {
-      console.error('Failed to load posts:', err);
-    }
-  };
-
-  const deleteComment = async (id: string) => {
+  const handleDeleteComment = async (id: string) => {
     if (!confirm('Are you sure you want to delete this comment?')) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/admin/comments?id=${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete comment');
-      }
-
-      setComments(comments.filter(comment => comment.id !== id));
-
-      if (selectedPost) {
-        loadCommentsForPost(selectedPost);
-      }
-    } catch (err) {
-      console.error('Failed to delete comment:', err);
+      await deleteComment(id);
+    } catch {
       alert('Failed to delete comment');
     }
   };
 
-  const loadCommentsForPost = async (postId: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/admin/comments?postId=${postId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch comments');
-      }
-      const data = await response.json();
-      setComments(data);
-    } catch (err) {
-      console.error('Failed to load comments:', err);
-      setError('Failed to load comments');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handlePostSelect = (postId: string) => {
-    setSelectedPost(postId);
-    loadCommentsForPost(postId);
+    selectPost(postId);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminAuthenticated');
-    router.push('/admin');
-  };
+  const postIdsWithComments = Array.from(new Set(comments.map((comment) => comment.post_id)));
+  const postsWithComments = posts.filter((post) => postIdsWithComments.includes(post.id));
 
-  const postIdsWithComments = Array.from(new Set(comments.map(comment => comment.post_id)));
-  const postsWithComments = posts.filter(post => postIdsWithComments.includes(post.id));
+  useEffect(() => {
+    if (postsWithComments.length > 0 && !selectedPost) {
+      selectPost(postsWithComments[0].id);
+    }
+  }, [postsWithComments, selectedPost, selectPost]);
 
   return (
     <AuthCheck>
       <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
-              <div className="flex items-center">
-                <h1 className="text-xl font-semibold text-gray-900">NZLouis Blog Admin</h1>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex space-x-4">
-                  <Link
-                    href="/admin/manage"
-                    className="px-3 py-2 text-sm rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  >
-                    Feature Toggles
-                  </Link>
-                  <Link
-                    href="/admin/manage"
-                    className="px-3 py-2 text-sm rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  >
-                    Analytics
-                  </Link>
-                  <span className="px-3 py-2 text-sm rounded-md bg-indigo-100 text-indigo-700">
-                    Comments
-                  </span>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
-        </nav>
+        <AdminNavbar />
 
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="bg-white shadow rounded-lg">
@@ -217,7 +112,7 @@ export default function CommentsManagementPage() {
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h3 className="text-md font-medium text-gray-900 mb-3">
                       {selectedPost
-                        ? `Comments for: ${posts.find(p => p.id === selectedPost)?.title || selectedPost}`
+                        ? `Comments for: ${posts.find((p) => p.id === selectedPost)?.title || selectedPost}`
                         : 'Select a post to view comments'}
                     </h3>
 
@@ -252,7 +147,7 @@ export default function CommentsManagementPage() {
                                   </td>
                                   <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                                     <button
-                                      onClick={() => deleteComment(comment.id)}
+                                      onClick={() => handleDeleteComment(comment.id)}
                                       className="text-red-600 hover:text-red-900"
                                     >
                                       Delete

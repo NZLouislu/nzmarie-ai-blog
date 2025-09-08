@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import AuthCheck from './auth-check';
+import AdminNavbar from '../../../components/AdminNavbar';
 
 interface FeatureToggles {
   totalViews: boolean;
@@ -49,13 +48,23 @@ export default function AdminManagePage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'toggles' | 'analytics'>('toggles');
-  const router = useRouter();
 
   useEffect(() => {
     // Load current toggles
     loadToggles();
     // Load analytics data
     loadAnalytics();
+
+    // Listen for tab change events
+    const handleTabChange = (event: CustomEvent) => {
+      setActiveTab(event.detail.tab);
+    };
+
+    window.addEventListener('tabChange', handleTabChange as EventListener);
+
+    return () => {
+      window.removeEventListener('tabChange', handleTabChange as EventListener);
+    };
   }, []);
 
   const loadToggles = async () => {
@@ -112,60 +121,11 @@ export default function AdminManagePage() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminAuthenticated');
-    router.push('/admin');
-  };
 
   return (
     <AuthCheck>
       <div className="min-h-screen bg-gray-50">
-        {/* Navbar */}
-        <nav className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
-              <div className="flex items-center">
-                <h1 className="text-xl font-semibold text-gray-900">NZLouis Blog Admin</h1>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex space-x-4">
-                  <button
-                    onClick={() => setActiveTab('toggles')}
-                    className={`px-3 py-2 text-sm rounded-md ${
-                      activeTab === 'toggles'
-                        ? 'bg-indigo-100 text-indigo-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    Feature Toggles
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('analytics')}
-                    className={`px-3 py-2 text-sm rounded-md ${
-                      activeTab === 'analytics'
-                        ? 'bg-indigo-100 text-indigo-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    Analytics
-                  </button>
-                  <Link
-                    href="/admin/manage/comments"
-                    className="px-3 py-2 text-sm rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  >
-                    Comments
-                  </Link>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
-        </nav>
+        <AdminNavbar />
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -346,7 +306,7 @@ export default function AdminManagePage() {
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                          {analytics.individualStats.map((post, index) => (
+                          {analytics.individualStats.map((post) => (
                             <tr key={post.postId}>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {post.title.length > 50 ? `${post.title.substring(0, 50)}...` : post.title}
@@ -387,7 +347,7 @@ export default function AdminManagePage() {
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                          {analytics.dailyStats.slice(0, 10).map((day, index) => (
+                          {analytics.dailyStats.slice(0, 10).map((day) => (
                             <tr key={day.date}>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {new Date(day.date).toLocaleDateString()}

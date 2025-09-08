@@ -34,6 +34,10 @@ export async function GET() {
 
       if (createError) {
         console.error('Error creating default toggles:', createError);
+        console.error('Error code:', createError.code);
+        console.error('Error message:', createError.message);
+        console.error('Error details:', createError.details);
+        console.error('Error hint:', createError.hint);
       }
 
       return NextResponse.json({
@@ -103,6 +107,10 @@ export async function POST(request: NextRequest) {
 
       if (error) {
         console.error('Error creating toggles:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        console.error('Error details:', error.details);
+        console.error('Error hint:', error.hint);
         return NextResponse.json({ error: 'Failed to update toggle' }, { status: 500 });
       }
     } else {
