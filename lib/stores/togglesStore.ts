@@ -66,7 +66,7 @@ export const useTogglesStore = create<TogglesState>()(
             const data = await response.json();
             set({ toggles: data });
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to fetch toggles' });
         } finally {
           set({ isLoading: false });
@@ -86,7 +86,7 @@ export const useTogglesStore = create<TogglesState>()(
           } else {
             set({ error: 'Failed to update toggle' });
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to update toggle' });
         } finally {
           set({ isLoading: false });

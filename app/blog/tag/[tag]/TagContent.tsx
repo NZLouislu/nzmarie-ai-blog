@@ -1,9 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Card, Box, Text, Avatar } from '@radix-ui/themes';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Sidebar from '@/components/Sidebar';
@@ -22,7 +19,7 @@ export default function TagContent({ tag, posts: initialPosts }: TagContentProps
   const { language } = useLanguageStore();
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const { postStats, fetchPostStats } = useStatsStore();
-  const { toggles, fetchToggles } = useTogglesStore();
+  const { fetchToggles } = useTogglesStore();
 
   useEffect(() => {
     const loadPosts = async () => {
