@@ -13,7 +13,6 @@ export default function Navbar() {
   const { language, setLanguage } = useLanguageStore();
   const pathname = usePathname();
   
-  // 添加选中效果
   const linkCls = (isActive: boolean) =>
     `relative pb-1 text-sm md:text-base font-medium transition-colors hover:text-indigo-600 ${
       isActive
@@ -115,9 +114,8 @@ export default function Navbar() {
                   onClick={() => {
                      const newLang = language === 'en' ? 'zh' : 'en';
                      setLanguage(newLang);
-                     // 设置cookie，有效期一年
                      document.cookie = `i18n_lang=${newLang}; path=/; max-age=${365 * 24 * 60 * 60}`;
-                     window.location.reload(); // 刷新页面以应用新语言
+                     window.location.reload();
                    }}
                   className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
                 >
@@ -146,7 +144,7 @@ export default function Navbar() {
                     className={linkCls(pathname === '/')}
                     onClick={() => setOpen(false)}
                   >
-                    {language === 'en' ? 'Home' : '首页'}
+                    {language === 'en' ? 'All Posts' : '所有文章'}
                   </Link>
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
