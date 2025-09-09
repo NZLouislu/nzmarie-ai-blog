@@ -8,11 +8,7 @@ import { Post } from "@/lib/types";
 import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
 
-interface BlogListProps {
-  singleColumn?: boolean;
-}
-
-export default function BlogList({ singleColumn = false }: BlogListProps) {
+export default function BlogList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const { postStats, fetchPostStats } = useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
@@ -43,7 +39,7 @@ export default function BlogList({ singleColumn = false }: BlogListProps) {
   }, [posts, postStats, fetchPostStats]);
 
   return (
-    <div className={singleColumn ? "space-y-8" : "grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"}>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
       {posts.map((post) => (
         <Link key={post.id} href={`/blog/${post.slug}`} className="block">
           <Card className="rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 bg-white cursor-pointer h-full">
@@ -66,6 +62,7 @@ export default function BlogList({ singleColumn = false }: BlogListProps) {
                   month: "long",
                   day: "numeric",
                 })}
+                <span className="text-gray-500"> • 5 min read</span>
               </Text>
               <Text size="3" color="gray" className="line-clamp-3 flex-1">
                 {post.excerpt}
@@ -80,10 +77,7 @@ export default function BlogList({ singleColumn = false }: BlogListProps) {
                     className="w-5 h-5 shrink-0"
                   />
                   <span className="text-sm">
-                    {post.author || "Louis Lu"}{" "}
-                    <span className="text-gray-500">
-                      • 5 min read
-                    </span>
+                    {post.author || "Louis Lu"}
                   </span>
                 </div>
                 {postStats[post.id] && (

@@ -95,7 +95,7 @@ export default function HomePage() {
 
       <Flex className="flex flex-col md:flex-row gap-12 md:justify-center mt-12">
         <Box className="md:flex-[7] w-full max-w-[900px]">
-          <BlogList singleColumn={true} />
+          <BlogList />
         </Box>
         <Sidebar />
       </Flex>

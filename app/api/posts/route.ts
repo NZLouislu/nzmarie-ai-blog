@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { getAllPosts } from '@/lib/posts';
 
 export async function GET() {
   try {
-    const posts = getAllPosts();
+    const cookieStore = await cookies();
+    const lang = cookieStore.get('i18n_lang')?.value || 'en';
+    const posts = getAllPosts(lang as 'en' | 'zh');
     
     // Return only the id and title for each post
     const postData = posts.map(post => ({

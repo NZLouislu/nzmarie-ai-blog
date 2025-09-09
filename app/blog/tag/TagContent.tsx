@@ -11,13 +11,13 @@ import { Post } from '@/lib/types';
 import { useStatsStore } from '@/lib/stores/statsStore';
 import { useTogglesStore } from '@/lib/stores/togglesStore';
 
-export interface CategoryContentProps {
-  category: string;
+export interface TagContentProps {
+  tag: string;
   posts: Post[];
   language: 'en' | 'zh';
 }
 
-export default function CategoryContent({ category, posts, language }: CategoryContentProps) {
+export default function TagContent({ tag, posts, language }: TagContentProps) {
   const { postStats, fetchPostStats } = useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
 
@@ -30,8 +30,8 @@ export default function CategoryContent({ category, posts, language }: CategoryC
     });
   }, [posts, postStats, fetchPostStats, fetchToggles]);
 
-  const titleText = language === 'zh' ? `${category} 类别文章` : `${category} Category Posts`;
-  const descriptionText = language === 'zh' ? `发现 ${category} 类别的所有文章。` : `Discover all articles in the ${category} category.`;
+  const titleText = language === 'zh' ? `${tag} 标签文章` : `${tag} Tag Posts`;
+  const descriptionText = language === 'zh' ? `发现 ${tag} 标签的所有文章。` : `Discover all articles with the ${tag} tag.`;
 
   return (
     <>

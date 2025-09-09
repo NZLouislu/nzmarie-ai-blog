@@ -1,5 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { Post } from '@/lib/types';
 import BlogPostClient from './BlogPostClient';
 
@@ -12,9 +13,12 @@ interface PageProps {
 export default async function BlogPost({ params }: PageProps) {
   const { slug } = await params;
 
+  const cookieStore = await cookies();
+  const lang = cookieStore.get('i18n_lang')?.value || 'en';
+
   try {
     const { getBySlug } = await import('@/lib/posts');
-    const post = getBySlug(slug, 'en');
+    const post = getBySlug(slug, lang as 'en' | 'zh');
     if (!post) {
       notFound();
     }
@@ -29,7 +33,10 @@ export default async function BlogPost({ params }: PageProps) {
 export async function generateStaticParams() {
   try {
     const { listPublished } = await import('@/lib/posts');
-    const posts = listPublished('en');
+    // 为所有语言生成静态路径
+    const enPosts = listPublished('en');
+    const zhPosts = listPublished('zh');
+    const posts = [...enPosts, ...zhPosts];
     return posts.map((post: Post) => ({
       slug: post.slug,
     }));

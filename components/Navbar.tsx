@@ -103,7 +103,13 @@ export default function Navbar() {
               </NavigationMenu.Item>
               <NavigationMenu.Item>
                 <button
-                  onClick={() => setLanguage(language === 'en' ? 'zh' : 'en')}
+                  onClick={() => {
+                     const newLang = language === 'en' ? 'zh' : 'en';
+                     setLanguage(newLang);
+                     // 设置cookie，有效期一年
+                     document.cookie = `i18n_lang=${newLang}; path=/; max-age=${365 * 24 * 60 * 60}`;
+                     window.location.reload(); // 刷新页面以应用新语言
+                   }}
                   className="text-sm font-medium hover:text-blue-600 transition-colors"
                 >
                   {language === 'en' ? '中文' : 'English'}
