@@ -4,7 +4,7 @@ subtitle: "深入后端开发的世界"
 description: "深入软件开发的核心，探索微服务、云计算等最新趋势，并解读十大后端语言。在动态的后端开发领域中保持领先，把握行业前沿，塑造技术未来！"
 date: 2024-02-24
 author: "Louis Lu"
-image: "/img/htmlcss.png"
+image: "/img/backend.png"
 published: true
 tags:
   - 后端技术

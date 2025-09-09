@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 import { Post } from '@/lib/types';
 import BlogPostClient from './BlogPostClient';
 
@@ -13,8 +13,8 @@ interface PageProps {
 export default async function BlogPost({ params }: PageProps) {
   const { slug } = await params;
 
-  const cookieStore = await cookies();
-  const lang = cookieStore.get('i18n_lang')?.value || 'en';
+  const h = await headers();
+  const lang = h.get('x-locale') || 'en';
 
   try {
     const { getBySlug } = await import('@/lib/posts');

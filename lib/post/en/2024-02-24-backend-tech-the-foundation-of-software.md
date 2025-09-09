@@ -4,7 +4,7 @@ subtitle: "Navigating the Depths of Backend Development"
 description: "Delve into the backbone of software development, uncover the latest trends such as microservices and cloud computing, and unravel the top 10 backend languages. Navigate the dynamic realm of backend development, stay at the forefront of industry trends, and shape the future of technology!"
 date: 2024-02-24
 author: "Louis Lu"
-image: "/img/htmlcss.png"
+image: "/img/backend.png"
 published: true
 tags:
   - Backend Technology
