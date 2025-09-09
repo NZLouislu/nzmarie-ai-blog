@@ -7,11 +7,13 @@ import { useEffect, useState } from "react";
 import { Post } from "@/lib/types";
 import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
+import { useLanguageStore } from "@/lib/stores/languageStore";
 
 export default function BlogList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const { postStats, fetchPostStats } = useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
+  const { language } = useLanguageStore();
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -57,7 +59,7 @@ export default function BlogList() {
                 {post.title}
               </h3>
               <Text size="3" color="gray">
-                {new Date(post.createdAt).toLocaleDateString("en-US", {
+                {new Date(post.createdAt).toLocaleDateString(language === 'zh' ? "zh-CN" : "en-US", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",

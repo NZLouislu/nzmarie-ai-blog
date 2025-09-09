@@ -84,7 +84,7 @@ export default function TagContent({ tag, posts: initialPosts }: TagContentProps
                         </Text>
                       )}
                       <Text size="3" color="gray">
-                        {new Date(post.createdAt).toLocaleDateString("en-US", {
+                        {new Date(post.createdAt).toLocaleDateString(language === 'zh' ? "zh-CN" : "en-US", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",

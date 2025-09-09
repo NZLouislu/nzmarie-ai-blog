@@ -208,7 +208,10 @@ export default function Navbar() {
                 <NavigationMenu.Item>
                   <button
                     onClick={() => {
-                      setLanguage(language === 'en' ? 'zh' : 'en');
+                      const newLang = language === 'en' ? 'zh' : 'en';
+                      setLanguage(newLang);
+                      document.cookie = `i18n_lang=${newLang}; path=/; max-age=${365 * 24 * 60 * 60}`;
+                      window.location.reload();
                       setOpen(false);
                     }}
                     className="block text-sm font-medium hover:text-blue-600 text-left"
