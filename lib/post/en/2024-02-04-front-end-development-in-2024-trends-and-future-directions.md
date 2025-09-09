@@ -98,7 +98,13 @@ Front-end development and back-end development are the two primary components of
 
 ### HTML
 
-**HTML (Hypertext Markup Language)** is the foundational language for building web pages, responsible for defining the structure and content of web pages. Composed of a series of tags, each tag represents a specific element. For example, the <h1> tag defines the webpage title, the <h2> tag defines a secondary title, and the <p> tag defines paragraph text. Through the clever combination of these tags, developers can create rich, hierarchical webpage layouts. HTML's flexibility and ease of learning make it an introductory language for web development, providing users with a clear and structured browsing experience.
+**HTML (Hypertext Markup Language)** is the backbone of a webpage, responsible for defining its structure and content. It is composed of a series of tags, for example:
+
+- `<h1>` defines a title
+- `<h2>` defines a subtitle
+- `<p>` defines a paragraph
+
+By combining these tags appropriately, developers can create well-structured and hierarchical page layouts.
 
 ### CSS
 

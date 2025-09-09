@@ -6,7 +6,7 @@ description: "This article proposes a novel 'Five Levels of AI-ization' framewor
 excerpt: "Everything about setting up Will AI Completely Replace Human Developers"
 date: 2024-01-10
 author: "Louis Lu"
-image: "/img/ai-human.jpeg"
+image: "/img/ai-human.png"
 published: true
 tags:
   - Technology

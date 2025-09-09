@@ -5,7 +5,7 @@ subtitle: "Technical Guide to Online Banking"
 description: "Exploring the integration of microservices architecture in online banking for enhanced security, efficiency, and scalability."
 date: 2024-01-28
 author: "Louis Lu"
-image: "/img/onlineBanking.jpeg"
+image: "/img/onlineBanking.png"
 published: true
 tags:
   - Online Banking

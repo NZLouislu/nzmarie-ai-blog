@@ -6,7 +6,7 @@ description: "本文提出了一个受自动驾驶启发的全新“五个AI化�
 excerpt: "关于《AI会完全取代人类开发者吗》的全部内容"
 date: 2024-01-10
 author: "Louis Lu"
-image: "/img/ai-human.jpeg"
+image: "/img/ai-human.png"
 published: true
 tags:
   - 科技
