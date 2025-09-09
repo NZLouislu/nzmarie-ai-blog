@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { listPublished } from '@/lib/posts';
 
 export async function GET(request: NextRequest) {
@@ -10,7 +11,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    const posts = listPublished();
+    const cookieStore = await cookies();
+    const lang = cookieStore.get('i18n_lang')?.value || 'en';
+    const posts = listPublished(lang as 'en' | 'zh');
 
     // Filter posts based on search query
     const filteredPosts = posts.filter(post =>

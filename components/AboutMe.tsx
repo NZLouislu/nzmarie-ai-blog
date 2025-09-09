@@ -1,7 +1,10 @@
 import * as Avatar from "@radix-ui/react-avatar";
 import Image from "next/image";
+import { useTranslation } from "@/lib/i18n";
 
 export default function AboutMe() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col items-center text-center">
       <Avatar.Root className="inline-flex h-[280px] w-[200px] select-none items-center justify-center overflow-hidden rounded-2xl mb-6 bg-gray-200 relative">
@@ -16,9 +19,9 @@ export default function AboutMe() {
         </Avatar.Fallback>
       </Avatar.Root>
 
-      <h2 className="text-2xl font-semibold">Louis Lu</h2>
+      <h2 className="text-2xl font-semibold">{t('aboutMeTitle')}</h2>
       <p className="text-gray-600 text-lg mt-3">
-        Full-Stack, AI and ML Engineer, designer, and lifelong learner.
+        {t('aboutMeDescription')}
       </p>
 
       <div className="flex items-center justify-center gap-3 sm:gap-4 mt-6 flex-wrap">

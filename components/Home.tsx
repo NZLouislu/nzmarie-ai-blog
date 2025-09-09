@@ -6,10 +6,12 @@ import Sidebar from "./Sidebar";
 import { useEffect } from "react";
 import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
+import { useTranslation } from "@/lib/i18n";
 
 export default function HomePage() {
   const { totalStats, fetchTotalStats } = useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     fetchTotalStats();
@@ -25,7 +27,7 @@ export default function HomePage() {
           NZLouis&apos; Blog
         </Heading>
         <Text size="3" className="text-xl text-gray-600 text-center max-w-2xl mb-8">
-          If you never try, you will never know.
+          {language === 'zh' ? '自强不息，知行合一' : 'If you never try, you will never know.'}
         </Text>
 
         {/* Statistics Section */}

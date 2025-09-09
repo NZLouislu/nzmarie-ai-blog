@@ -46,7 +46,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
   const { tag } = resolvedParams;
   const lang = resolvedSearchParams.lang;
   const cookieStore = await cookies();
-  const cookieLang = cookieStore.get('language')?.value;
+  const cookieLang = cookieStore.get('i18n_lang')?.value;
   const language = (lang || cookieLang || 'en') as 'en' | 'zh';
 
   try {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import Link from 'next/link';
+import { useLanguageStore } from '@/lib/stores/languageStore';
 
 interface Post {
   id: string;
@@ -19,6 +20,7 @@ interface SearchModalProps {
 }
 
 export default function SearchModal({ isOpen, onClose, posts }: SearchModalProps) {
+  const { language } = useLanguageStore();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Post[]>([]);
 
@@ -104,7 +106,7 @@ export default function SearchModal({ isOpen, onClose, posts }: SearchModalProps
                     {post.excerpt}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {new Date(post.createdAt).toLocaleDateString('en-US', {
+                    {new Date(post.createdAt).toLocaleDateString(language === 'zh' ? "zh-CN" : "en-US", {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'

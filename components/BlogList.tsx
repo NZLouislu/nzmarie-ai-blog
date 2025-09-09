@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -9,28 +9,34 @@ import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
 import { useLanguageStore } from "@/lib/stores/languageStore";
 
-export default function BlogList() {
-  const [posts, setPosts] = useState<Post[]>([]);
+interface BlogListProps {
+  posts?: Post[];
+}
+
+export default function BlogList({ posts: initialPosts }: BlogListProps) {
+  const [posts, setPosts] = useState<Post[]>(initialPosts || []);
   const { postStats, fetchPostStats } = useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
   const { language } = useLanguageStore();
 
   useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        const postsResponse = await fetch('/api/posts/published');
-        if (postsResponse.ok) {
-          const postsData = await postsResponse.json();
-          setPosts(postsData);
+    if (!initialPosts) {
+      const loadPosts = async () => {
+        try {
+          const postsResponse = await fetch(`/api/posts/published?language=${language}`);
+          if (postsResponse.ok) {
+            const postsData = await postsResponse.json();
+            setPosts(postsData);
+          }
+        } catch (error) {
+          console.error('Failed to load posts:', error);
         }
-      } catch (error) {
-        console.error('Failed to load posts:', error);
-      }
-    };
+      };
 
-    loadPosts();
+      loadPosts();
+    }
     fetchToggles();
-  }, [fetchToggles]);
+  }, [fetchToggles, initialPosts, language]);
 
   useEffect(() => {
     posts.forEach((post) => {

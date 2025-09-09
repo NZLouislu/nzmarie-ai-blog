@@ -18,7 +18,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const { category } = resolvedParams;
   const lang = resolvedSearchParams.lang;
   const cookieStore = await cookies();
-  const cookieLang = cookieStore.get('language')?.value;
+  const cookieLang = cookieStore.get('i18n_lang')?.value;
   const language = (lang || cookieLang || 'en') as 'en' | 'zh';
 
   try {
