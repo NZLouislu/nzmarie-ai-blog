@@ -8,6 +8,7 @@ import { Post } from "@/lib/types";
 import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
 import { useLanguageStore } from "@/lib/stores/languageStore";
+import { getLocalizedPath } from "@/lib/utils";
 
 interface BlogListProps {
   posts?: Post[];
@@ -49,7 +50,7 @@ export default function BlogList({ posts: initialPosts }: BlogListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
       {posts.map((post) => (
-        <Link key={post.id} href={`/blog/${post.slug}`} className="block">
+        <Link key={post.id} href={getLocalizedPath(`/blog/${post.slug}`, language)} className="block">
           <Card className="rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 bg-white cursor-pointer h-full">
             <Box className="relative w-full h-48">
               <Image

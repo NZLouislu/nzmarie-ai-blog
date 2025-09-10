@@ -11,7 +11,7 @@ import { useTranslation } from "@/lib/i18n";
 export default function HomePage() {
   const { totalStats, fetchTotalStats } = useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
-  const { t, language } = useTranslation();
+  const { language } = useTranslation();
 
   useEffect(() => {
     fetchTotalStats();

@@ -8,7 +8,7 @@ interface TotalStats {
   totalAiSummaries: number;
 }
 
-interface PostStats {
+export interface PostStats {
   views: number;
   likes: number;
   comments: number;
@@ -145,7 +145,7 @@ export const useStatsStore = create<StatsState>((set, get) => ({
       } else {
         set({ error: 'Failed to fetch total stats' });
       }
-    } catch (error) {
+    } catch {
       set({ error: 'Failed to fetch total stats' });
     } finally {
       set({ isLoading: false });

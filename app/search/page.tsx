@@ -10,11 +10,47 @@ import { useStatsStore } from '@/lib/stores/statsStore';
 import { useTogglesStore } from '@/lib/stores/togglesStore';
 import BlogList from '@/components/BlogList';
 import { Post } from '@/lib/types';
+import { PostStats } from '@/lib/stores/statsStore';
+
+async function performSearch(
+  searchQuery: string,
+  setResults: React.Dispatch<React.SetStateAction<Post[]>>,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  postStats: Record<string, PostStats>,
+  fetchPostStats: (id: string) => void
+) {
+  if (!searchQuery.trim()) {
+    setResults([]);
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const response = await fetch(`/api/posts/search?q=${encodeURIComponent(searchQuery)}`);
+    if (response.ok) {
+      const data = await response.json();
+      setResults(data);
+
+      // Load stats for search results
+      if (data.length > 0) {
+        data.forEach((post: Post) => {
+          if (!postStats[post.id]) {
+            fetchPostStats(post.id);
+          }
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Search failed:', error);
+  } finally {
+    setLoading(false);
+  }
+}
 
 function SearchContent() {
   const { language } = useLanguageStore();
   const { postStats, fetchPostStats } = useStatsStore();
-  const { toggles, fetchToggles } = useTogglesStore();
+  const { fetchToggles } = useTogglesStore();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const [query, setQuery] = useState(initialQuery);
@@ -24,47 +60,29 @@ function SearchContent() {
 
   useEffect(() => {
     if (initialQuery) {
-      performSearch(initialQuery);
+      performSearch(
+        initialQuery,
+        setResults,
+        setLoading,
+        postStats,
+        fetchPostStats
+      );
     }
-
-  }, [initialQuery]);
+  }, [initialQuery, postStats, fetchPostStats]);
 
   useEffect(() => {
     fetchToggles();
   }, [fetchToggles]);
 
-  const performSearch = async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/posts/search?q=${encodeURIComponent(searchQuery)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setResults(data);
-
-        // Load stats for search results
-        if (data.length > 0) {
-          data.forEach((post: Post) => {
-            if (!postStats[post.id]) {
-              fetchPostStats(post.id);
-            }
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Search failed:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    performSearch(query);
+    performSearch(
+      query,
+      setResults,
+      setLoading,
+      postStats,
+      fetchPostStats
+    );
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +97,13 @@ function SearchContent() {
     // Set new timer for debounce
     const timer = setTimeout(() => {
       if (value.trim()) {
-        performSearch(value);
+        performSearch(
+          value,
+          setResults,
+          setLoading,
+          postStats,
+          fetchPostStats
+        );
       } else {
         setResults([]);
       }

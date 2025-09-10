@@ -2,10 +2,11 @@
 
 import React, { useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useLanguageStore } from '@/lib/stores/languageStore';
+import { getLocalizedPath } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Sidebar from '@/components/Sidebar';
-import { useLanguageStore } from '@/lib/stores/languageStore';
 import { useArchiveStore } from '@/lib/stores/archiveStore';
 
 export default function ArchivePage() {
@@ -132,7 +133,7 @@ export default function ArchivePage() {
                               {dateStr} —
                             </span>
                             <Link
-                              href={`/blog/${post.slug}`}
+                              href={getLocalizedPath(`/blog/${post.slug}`, language)}
                               className="text-gray-900 hover:text-blue-600 transition-colors flex-1"
                             >
                               <span className="text-lg font-semibold">{post.title}</span>

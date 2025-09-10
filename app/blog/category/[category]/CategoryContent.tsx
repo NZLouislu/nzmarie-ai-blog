@@ -17,7 +17,7 @@ export interface CategoryContentProps {
 
 export default function CategoryContent({ category, posts, language }: CategoryContentProps) {
   const { postStats, fetchPostStats } = useStatsStore();
-  const { toggles, fetchToggles } = useTogglesStore();
+  const { fetchToggles } = useTogglesStore();
 
   useEffect(() => {
     fetchToggles();

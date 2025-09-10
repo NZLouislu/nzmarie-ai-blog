@@ -235,7 +235,7 @@ function CommentsSection({ postId }: { postId: string }) {
 
 function AIChatbot({ postContent, postId }: { postContent: string; postId: string }) {
   const { t } = useTranslation();
-  const { postStats, incrementAiQuestions } = useStatsStore();
+  const { incrementAiQuestions } = useStatsStore();
   const [messages, setMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

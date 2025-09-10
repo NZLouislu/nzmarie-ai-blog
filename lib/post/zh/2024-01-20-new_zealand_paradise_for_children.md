@@ -16,15 +16,6 @@ tags:
   - 户外活动
   - 儿童福利
   - 奇异鸟生活方式
-featuredTags:
-  - 新西兰
-  - 童年天堂
-  - 家庭冒险
-  - 安全环境
-  - 新西兰教育
-  - 户外活动
-  - 儿童福利
-  - 奇异鸟生活方式
 lang: "zh"
 URL: "/2024/01/20/new_zealand_paradise_for_children/"
 

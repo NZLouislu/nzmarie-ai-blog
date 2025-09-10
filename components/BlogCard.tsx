@@ -6,6 +6,8 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
+import { useLanguageStore } from "@/lib/stores/languageStore";
+import { getLocalizedPath } from "@/lib/utils";
 
 interface BlogCardProps {
   title: string;
@@ -31,6 +33,7 @@ export default function BlogCard({
 }: BlogCardProps) {
   const { postStats, fetchPostStats } = useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
+  const { language } = useLanguageStore();
 
   useEffect(() => {
     fetchToggles();
@@ -56,7 +59,7 @@ export default function BlogCard({
 
       <div className="flex flex-col justify-between flex-1">
         <div>
-          <Link href={`/blog/${slug}`} passHref>
+          <Link href={getLocalizedPath(`/blog/${slug}`, language)} passHref>
             <a className="block">
               <h3 className="text-xl font-bold hover:underline">{title}</h3>
             </a>

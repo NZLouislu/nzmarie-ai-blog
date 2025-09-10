@@ -4,19 +4,30 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { useState } from "react";
 import { Menu, X, Search } from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useLanguageStore } from "@/lib/stores/languageStore";
+import { getLocalizedPath } from "@/lib/utils";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { language, setLanguage } = useLanguageStore();
-
+  const router = useRouter();
+  const pathname = usePathname();
+  const normalizedPath = pathname.replace(/^\/cn/, '');
+  
+  const linkCls = (isActive: boolean) =>
+    `relative pb-1 text-sm md:text-base font-medium transition-colors hover:text-indigo-600 ${
+      isActive
+        ? "text-indigo-600 font-bold after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:bg-indigo-600 after:animate-underline"
+        : "text-gray-700"
+    }`;
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white">
-        <div className="mx-auto flex max-w-[1200px] items-center px-4 py-3 md:px-6">
-          <Link href="/" className="flex items-center flex-shrink-0">
+      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+        <div className="mx-auto flex max-w-[1200px] items-center px-6 py-3">
+          <Link href={getLocalizedPath("/", language)} className="flex items-center flex-shrink-0">
             <div className="flex items-center w-[100px] h-[30px]">
               <Image
                 src="/images/nzlouis-logo.png"
@@ -36,48 +47,48 @@ export default function Navbar() {
             <NavigationMenu.List className="flex gap-6">
               <NavigationMenu.Item>
                 <Link
-                  href="/"
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                  href={getLocalizedPath("/", language)}
+                  className={linkCls(normalizedPath === '/')}
                 >
                   {language === 'en' ? 'All Posts' : '所有文章'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
                 <Link
-                  href="/blog/category/backend"
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                  href={getLocalizedPath("/blog/category/backend", language)}
+                  className={linkCls(normalizedPath.startsWith('/blog/category/backend'))}
                 >
                   {language === 'en' ? 'Backend' : '后端'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
                 <Link
-                  href="/blog/category/frontend"
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                  href={getLocalizedPath("/blog/category/frontend", language)}
+                  className={linkCls(normalizedPath.startsWith('/blog/category/frontend'))}
                 >
                   {language === 'en' ? 'Frontend' : '前端'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
                 <Link
-                  href="/blog/category/life"
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                  href={getLocalizedPath("/blog/category/life", language)}
+                  className={linkCls(normalizedPath.startsWith('/blog/category/life'))}
                 >
                   {language === 'en' ? 'Life' : '生活'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
                 <Link
-                  href="/blog/category/tech"
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                  href={getLocalizedPath("/blog/category/tech", language)}
+                  className={linkCls(normalizedPath.startsWith('/blog/category/tech'))}
                 >
                   {language === 'en' ? 'Tech' : '科技'}
                 </Link>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
                 <Link
-                  href="/archive"
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                  href={getLocalizedPath("/archive", language)}
+                  className={linkCls(normalizedPath.startsWith('/archive'))}
                 >
                   {language === 'en' ? 'Archive' : '归档'}
                 </Link>
@@ -87,15 +98,15 @@ export default function Navbar() {
                   href="https://nzlouis.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                  className="text-sm md:text-base font-medium text-gray-700 hover:text-indigo-600 transition-colors"
                 >
                   {language === 'en' ? 'About me' : '关于我'}
                 </a>
               </NavigationMenu.Item>
               <NavigationMenu.Item>
                 <Link
-                  href="/search"
-                  className="flex items-center justify-center -mt-1 p-2 text-gray-700 hover:text-blue-600 focus:outline-none transition-colors"
+                  href={getLocalizedPath("/search", language)}
+                  className={linkCls(normalizedPath.startsWith('/search'))}
                   title="Search"
                 >
                   <Search size={20} />
@@ -105,12 +116,11 @@ export default function Navbar() {
                 <button
                   onClick={() => {
                      const newLang = language === 'en' ? 'zh' : 'en';
+                     const newPath = newLang === 'zh' ? `/cn${pathname.replace(/^\/cn/, '')}` : pathname.replace(/^\/cn/, '');
                      setLanguage(newLang);
-                     // 设置cookie，有效期一年
-                     document.cookie = `i18n_lang=${newLang}; path=/; max-age=${365 * 24 * 60 * 60}`;
-                     window.location.reload(); // 刷新页面以应用新语言
+                     router.push(newPath);
                    }}
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
                 >
                   {language === 'en' ? '中文' : 'English'}
                 </button>
@@ -128,22 +138,22 @@ export default function Navbar() {
         </div>
 
         {open && (
-          <div className="md:hidden border-t bg-white shadow-md">
+          <div className="md:hidden border-t border-slate-200 bg-white/95">
             <NavigationMenu.Root>
               <NavigationMenu.List className="flex flex-col gap-4 p-4">
                 <NavigationMenu.Item>
                   <Link
-                    href="/"
-                    className="block text-sm font-medium hover:text-blue-600"
+                    href={getLocalizedPath("/", language)}
+                    className={linkCls(normalizedPath === '/')}
                     onClick={() => setOpen(false)}
                   >
-                    {language === 'en' ? 'Home' : '首页'}
+                    {language === 'en' ? 'All Posts' : '所有文章'}
                   </Link>
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <Link
-                    href="/blog/category/backend"
-                    className="block text-sm font-medium hover:text-blue-600"
+                    href={getLocalizedPath("/blog/category/backend", language)}
+                    className={linkCls(normalizedPath.startsWith('/blog/category/backend'))}
                     onClick={() => setOpen(false)}
                   >
                     {language === 'en' ? 'Backend' : '后端'}
@@ -151,8 +161,8 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <Link
-                    href="/blog/category/frontend"
-                    className="block text-sm font-medium hover:text-blue-600"
+                    href={getLocalizedPath("/blog/category/frontend", language)}
+                    className={linkCls(normalizedPath.startsWith('/blog/category/frontend'))}
                     onClick={() => setOpen(false)}
                   >
                     {language === 'en' ? 'Frontend' : '前端'}
@@ -160,8 +170,8 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <Link
-                    href="/blog/category/life"
-                    className="block text-sm font-medium hover:text-blue-600"
+                    href={getLocalizedPath("/blog/category/life", language)}
+                    className={linkCls(normalizedPath.startsWith('/blog/category/life'))}
                     onClick={() => setOpen(false)}
                   >
                     {language === 'en' ? 'Life' : '生活'}
@@ -169,8 +179,8 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <Link
-                    href="/blog/category/tech"
-                    className="block text-sm font-medium hover:text-blue-600"
+                    href={getLocalizedPath("/blog/category/tech", language)}
+                    className={linkCls(normalizedPath.startsWith('/blog/category/tech'))}
                     onClick={() => setOpen(false)}
                   >
                     {language === 'en' ? 'Tech' : '科技'}
@@ -178,8 +188,8 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <Link
-                    href="/archive"
-                    className="block text-sm font-medium hover:text-blue-600"
+                    href={getLocalizedPath("/archive", language)}
+                    className={linkCls(normalizedPath.startsWith('/archive'))}
                     onClick={() => setOpen(false)}
                   >
                     {language === 'en' ? 'Archive' : '归档'}
@@ -190,7 +200,7 @@ export default function Navbar() {
                     href="https://nzlouis.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-sm font-medium hover:text-blue-600"
+                    className="block text-sm font-medium text-gray-700 hover:text-indigo-600"
                     onClick={() => setOpen(false)}
                   >
                     {language === 'en' ? 'About me' : '关于我'}
@@ -198,8 +208,8 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <Link
-                    href="/search"
-                    className="block text-sm font-medium hover:text-blue-600"
+                    href={getLocalizedPath("/search", language)}
+                    className={linkCls(normalizedPath.startsWith('/search'))}
                     onClick={() => setOpen(false)}
                   >
                     {language === 'en' ? 'Search' : '搜索'}
@@ -209,12 +219,12 @@ export default function Navbar() {
                   <button
                     onClick={() => {
                       const newLang = language === 'en' ? 'zh' : 'en';
+                      const newPath = newLang === 'zh' ? `/cn${pathname.replace(/^\/cn/, '')}` : pathname.replace(/^\/cn/, '');
                       setLanguage(newLang);
-                      document.cookie = `i18n_lang=${newLang}; path=/; max-age=${365 * 24 * 60 * 60}`;
-                      window.location.reload();
+                      router.push(newPath);
                       setOpen(false);
                     }}
-                    className="block text-sm font-medium hover:text-blue-600 text-left"
+                    className="block text-sm font-medium text-gray-700 hover:text-indigo-600 text-left"
                   >
                     {language === 'en' ? '中文' : 'English'}
                   </button>
