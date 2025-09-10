@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import AuthCheck from './auth-check';
+import AuthCheck from '../manage/auth-check';
 import AdminNavbar from '../../../components/AdminNavbar';
 import { useStatsStore } from '../../../lib/stores/statsStore';
 
-
-export default function AdminDashboard() {
+export default function AdminHomePage() {
   const [loading, setLoading] = useState(true);
   const { fetchStats, enStats, zhStats, totalStats, fetchTotalStats } = useStatsStore();
 
@@ -53,7 +52,13 @@ export default function AdminDashboard() {
     <AuthCheck>
       <div className="min-h-screen bg-gray-50">
         <AdminNavbar />
+
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="mt-2 text-sm text-gray-600">Welcome to NZLouis blog admin panel</p>
+          </div>
+
           <div className="space-y-6">
             <div className="bg-white shadow rounded-lg">
               <div className="px-6 py-4 border-b border-gray-200">
@@ -129,20 +134,20 @@ export default function AdminDashboard() {
 
             <div className="bg-white shadow rounded-lg">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">Quick Links</h2>
-                <p className="mt-1 text-sm text-gray-600">Navigate to management sections</p>
+                <h2 className="text-lg font-medium text-gray-900">Management Sections</h2>
+                <p className="mt-1 text-sm text-gray-600">Navigate to different management areas</p>
               </div>
               <div className="px-6 py-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <a href="/admin/manage/analytics" className="bg-indigo-50 rounded-lg p-4 text-center">
+                  <a href="/admin/manage/analytics" className="bg-indigo-50 rounded-lg p-4 text-center hover:bg-indigo-100 transition-colors">
                     <h3 className="font-medium text-indigo-900">Analytics</h3>
                     <p className="text-sm text-indigo-700">View detailed statistics</p>
                   </a>
-                  <a href="/admin/manage/comments" className="bg-green-50 rounded-lg p-4 text-center">
+                  <a href="/admin/manage/comments" className="bg-green-50 rounded-lg p-4 text-center hover:bg-green-100 transition-colors">
                     <h3 className="font-medium text-green-900">Comments</h3>
                     <p className="text-sm text-green-700">Manage comments</p>
                   </a>
-                  <a href="/admin/manage/toggles" className="bg-purple-50 rounded-lg p-4 text-center">
+                  <a href="/admin/manage/toggles" className="bg-purple-50 rounded-lg p-4 text-center hover:bg-purple-100 transition-colors">
                     <h3 className="font-medium text-purple-900">Feature Toggles</h3>
                     <p className="text-sm text-purple-700">Control features</p>
                   </a>

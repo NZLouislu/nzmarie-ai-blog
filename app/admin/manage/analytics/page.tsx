@@ -1,52 +1,17 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import AuthCheck from '../auth-check';
 import AdminNavbar from '../../../../components/AdminNavbar';
+import { useAnalyticsStore } from '../../../../lib/stores/analyticsStore';
 
-interface AnalyticsData {
-  totals: {
-    totalViews: number;
-    totalLikes: number;
-    totalComments: number;
-    totalAiQuestions: number;
-    totalAiSummaries: number;
-  };
-  individualStats: Array<{
-    postId: string;
-    title: string;
-    views: number;
-    likes: number;
-    aiQuestions: number;
-    aiSummaries: number;
-  }>;
-  dailyStats: Array<{
-    date: string;
-    views: number;
-    likes: number;
-    aiQuestions: number;
-    aiSummaries: number;
-  }>;
-}
 
 export default function AnalyticsPage() {
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const { analytics, isLoading, fetchAnalytics } = useAnalyticsStore();
 
   useEffect(() => {
-    loadAnalytics();
-  }, []);
-
-  const loadAnalytics = async () => {
-    try {
-      const response = await fetch('/api/admin/analytics');
-      if (response.ok) {
-        const data = await response.json();
-        setAnalytics(data);
-      }
-    } catch (error) {
-      console.error('Failed to load analytics:', error);
-    }
-  };
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   return (
     <AuthCheck>
@@ -60,7 +25,9 @@ export default function AnalyticsPage() {
                 <p className="mt-1 text-sm text-gray-600">Total metrics across all blog posts</p>
               </div>
               <div className="px-6 py-6">
-                {analytics ? (
+                {isLoading ? (
+                  <div className="text-center py-8">Loading analytics...</div>
+                ) : analytics ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600">{analytics.totals.totalViews.toLocaleString()}</div>

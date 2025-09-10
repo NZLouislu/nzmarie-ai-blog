@@ -1,37 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { PrismaClient, Prisma } from '@prisma/client';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const postId = searchParams.get('postId');
+    const language = searchParams.get('language');
 
-    let query = supabase
-      .from('comments')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const where: Prisma.CommentWhereInput = {};
+    if (postId) where.post_id = postId;
+    if (language) where.language = language;
 
-    // If postId is provided, filter by it
-    if (postId) {
-      query = query.eq('post_id', postId);
-    }
-
-    const { data: comments, error } = await query;
-
-    if (error) {
-      console.error('Supabase error:', error);
-      return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
-    }
+    const comments = await prisma.comment.findMany({
+      where,
+      select: {
+        id: true,
+        post_id: true,
+        name: true,
+        email: true,
+        comment: true,
+        is_anonymous: true,
+        created_at: true,
+        language: true,
+      },
+      orderBy: { created_at: 'desc' },
+    });
 
     return NextResponse.json(comments);
   } catch (error) {
-    console.error('Comments API error:', error);
+    console.error('Failed to fetch comments:', error);
     return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
@@ -44,23 +46,15 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Comment ID is required' }, { status: 400 });
     }
 
-    const { error } = await supabase
-      .from('comments')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Supabase error:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
-      console.error('Error details:', error.details);
-      console.error('Error hint:', error.hint);
-      return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
-    }
+    await prisma.comment.delete({
+      where: { id },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Comments API error:', error);
+    console.error('Failed to delete comment:', error);
     return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

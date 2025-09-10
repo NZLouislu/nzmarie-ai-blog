@@ -16,6 +16,12 @@ export interface PostStats {
   ai_summaries: number;
 }
 
+interface LanguageStats {
+  totalViews: number;
+  totalLikes: number;
+  posts: Array<{ slug: string; views: number; likes: number }>;
+}
+
 interface StatsState {
   totalStats: TotalStats;
   postStats: Record<string, PostStats>;
@@ -35,6 +41,9 @@ interface StatsState {
   setError: (error: string | null) => void;
   fetchTotalStats: () => Promise<void>;
   fetchPostStats: (postId: string) => Promise<void>;
+  enStats: LanguageStats;
+  zhStats: LanguageStats;
+  fetchStats: (language: 'en' | 'zh', aggregate?: 'all' | 'single') => Promise<void>;
 }
 
 export const useStatsStore = create<StatsState>((set, get) => ({
@@ -48,6 +57,8 @@ export const useStatsStore = create<StatsState>((set, get) => ({
   postStats: {},
   isLoading: false,
   error: null,
+  enStats: { totalViews: 0, totalLikes: 0, posts: [] as LanguageStats['posts'] },
+  zhStats: { totalViews: 0, totalLikes: 0, posts: [] as LanguageStats['posts'] },
 
   setTotalStats: (stats) => set({ totalStats: stats }),
 
@@ -161,6 +172,28 @@ export const useStatsStore = create<StatsState>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch post stats:', error);
+    }
+  },
+
+  fetchStats: async (language: 'en' | 'zh', aggregate: 'all' | 'single' = 'all') => {
+    try {
+      set({ isLoading: true, error: null });
+      const res = await fetch(`/api/admin/analytics?language=${language}&aggregate=${aggregate}`);
+      if (res.ok) {
+        const data = await res.json();
+        set((state: StatsState) => ({
+          ...state,
+          [`${language}Stats`]: aggregate === 'all'
+            ? { ...data, posts: state[`${language}Stats`].posts }
+            : { ...state[`${language}Stats`], posts: data as LanguageStats['posts'] },
+        }));
+      } else {
+        set({ error: 'Failed to fetch language stats' });
+      }
+    } catch {
+      set({ error: 'Failed to fetch language stats' });
+    } finally {
+      set({ isLoading: false });
     }
   },
 }));

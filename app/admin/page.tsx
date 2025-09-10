@@ -28,7 +28,7 @@ export default function AdminPage() {
 
       if (response.ok && data.success) {
         localStorage.setItem('adminAuthenticated', 'true');
-        router.push('/admin/manage');
+        router.push('/admin/home');
       } else {
         setError(data.error || 'Invalid username or password');
       }

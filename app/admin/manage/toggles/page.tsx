@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import AuthCheck from '../auth-check';
 import AdminNavbar from '../../../../components/AdminNavbar';
+import { useTogglesStore } from '../../../../lib/stores/togglesStore';
 
 interface FeatureToggles {
   totalViews: boolean;
@@ -13,60 +14,13 @@ interface FeatureToggles {
 }
 
 export default function TogglesPage() {
-  const [toggles, setToggles] = useState<FeatureToggles>({
-    totalViews: true,
-    totalLikes: true,
-    totalComments: true,
-    aiSummaries: true,
-    aiQuestions: true,
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const { toggles, isLoading, fetchToggles, updateToggle } = useTogglesStore();
 
   useEffect(() => {
-    loadToggles();
-  }, []);
+    fetchToggles();
+  }, [fetchToggles]);
 
-  const loadToggles = async () => {
-    try {
-      const response = await fetch('/api/admin/toggles');
-      if (response.ok) {
-        const data = await response.json();
-        setToggles(data);
-      }
-    } catch (error) {
-      console.error('Failed to load toggles:', error);
-    }
-  };
 
-  const updateToggle = async (feature: keyof FeatureToggles, value: boolean) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('/api/admin/toggles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          feature,
-          enabled: value,
-        }),
-      });
-
-      if (response.ok) {
-        setToggles(prev => ({
-          ...prev,
-          [feature]: value,
-        }));
-      } else {
-        alert('Failed to update toggle');
-      }
-    } catch (error) {
-      console.error('Failed to update toggle:', error);
-      alert('Failed to update toggle');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <AuthCheck>

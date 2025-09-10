@@ -1,96 +1,75 @@
-import 'dotenv/config';
-import { createClient } from '@supabase/supabase-js';
+import { PrismaClient } from '@prisma/client';
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const prisma = new PrismaClient();
 
 async function main() {
-  // Create sample comments
-  const { error: commentError } = await supabase
-    .from('comments')
-    .insert([
-      {
-        post_id: '2024-03-10-java-and-spring-in-depth-understanding',
-        name: 'John Doe',
-        email: 'john@example.com',
-        comment: 'Great article! Very comprehensive explanation of Java and Spring.',
-        is_anonymous: false
-      },
-      {
-        post_id: '2024-03-10-java-and-spring-in-depth-understanding',
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        comment: 'Thanks for sharing this detailed guide. Helped me a lot!',
-        is_anonymous: false
-      },
-      {
-        post_id: '2024-03-02-the-trio-of-frontend-development',
-        comment: 'Excellent overview of frontend technologies!',
-        is_anonymous: true
-      },
-      {
-        post_id: '2024-02-24-backend-tech-the-foundation-of-software',
-        name: 'Mike Johnson',
-        email: 'mike@example.com',
-        comment: 'Backend development is indeed the foundation. Well explained!',
-        is_anonymous: false
-      }
-    ]);
-
-  if (commentError) {
-    console.error('Error inserting comments:', commentError);
-    return;
-  }
-
+  console.log('Starting seed...');
+  
+  // Clear existing data
+  await prisma.postStat.deleteMany();
+  await prisma.comment.deleteMany();
+  console.log('Cleared existing data');
+  
   // Create sample post stats
   const postStats = [
     {
-      post_id: '2024-03-10-java-and-spring-in-depth-understanding',
-      title: 'Java and Spring In-Depth Understanding',
-      views: 1,
-      likes: 1,
-      ai_questions: 1
+      post_id: '2024-01-10-will-ai-replace-human-developers',
+      title: 'Will AI Replace Human Developers?',
+      language: 'en',
+      views: 150,
+      likes: 25,
+      ai_questions: 5,
+      ai_summaries: 3
     },
     {
-      post_id: '2024-03-02-the-trio-of-frontend-development',
-      title: 'The Trio of Frontend Development',
-      views: 1,
-      likes: 1,
-      ai_questions: 1
-    },
-    {
-      post_id: '2024-02-24-backend-tech-the-foundation-of-software',
-      title: 'Backend Tech: The Foundation of Software',
-      views: 1,
-      likes: 1,
-      ai_questions: 1
-    },
-    {
-      post_id: '2024-02-17-react-18-typescript-powerful-combination-frontend',
-      title: 'React 18 & TypeScript: Powerful Combination for Frontend',
-      views: 1,
-      likes: 1,
-      ai_questions: 1
+      post_id: '2024-01-20-new_zealand_paradise_for_children',
+      title: 'New Zealand: Paradise for Children',
+      language: 'en',
+      views: 200,
+      likes: 30,
+      ai_questions: 7,
+      ai_summaries: 4
     }
   ];
-
+  
   for (const stat of postStats) {
-    const { error: statError } = await supabase
-      .from('post_stats')
-      .upsert(stat, { onConflict: 'post_id' });
-
-    if (statError) {
-      console.error('Error inserting post stat:', statError);
-      return;
-    }
+    const created = await prisma.postStat.create({ data: stat });
+    console.log('Created PostStat:', created);
   }
-
+  
+  // Create sample comments
+  const comments = [
+    {
+      post_id: '2024-01-10-will-ai-replace-human-developers',
+      name: 'John Doe',
+      email: 'john@example.com',
+      comment: 'Great article! Very insightful.',
+      is_anonymous: false,
+      language: 'en'
+    },
+    {
+      post_id: '2024-01-10-will-ai-replace-human-developers',
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      comment: 'Thanks for sharing this perspective!',
+      is_anonymous: false,
+      language: 'en'
+    }
+  ];
+  
+  for (const comment of comments) {
+    const created = await prisma.comment.create({ data: comment });
+    console.log('Created Comment:', created);
+  }
+  
   console.log('Database seeded successfully!');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Seed error:', e);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

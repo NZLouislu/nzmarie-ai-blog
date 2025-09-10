@@ -14,6 +14,7 @@ export default function AdminNavbar() {
   const pathname = usePathname();
 
   const navigation: NavItem[] = [
+    { name: 'Admin home', href: '/admin/home', current: pathname === '/admin/home' },
     { name: 'Feature Toggles', href: '/admin/manage/toggles', current: pathname === '/admin/manage/toggles' },
     { name: 'Analytics', href: '/admin/manage/analytics', current: pathname === '/admin/manage/analytics' },
     { name: 'Comments', href: '/admin/manage/comments', current: pathname === '/admin/manage/comments' },
