@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface TotalStats {
   totalViews: number;
@@ -6,6 +6,9 @@ interface TotalStats {
   totalComments: number;
   totalAiQuestions: number;
   totalAiSummaries: number;
+  totalPosts: number;
+  totalPostsEnglish: number;
+  totalPostsChinese: number;
 }
 
 export interface PostStats {
@@ -19,6 +22,9 @@ export interface PostStats {
 interface LanguageStats {
   totalViews: number;
   totalLikes: number;
+  totalComments: number;
+  totalAiQuestions: number;
+  totalAiSummaries: number;
   posts: Array<{ slug: string; views: number; likes: number }>;
 }
 
@@ -43,7 +49,10 @@ interface StatsState {
   fetchPostStats: (postId: string) => Promise<void>;
   enStats: LanguageStats;
   zhStats: LanguageStats;
-  fetchStats: (language: 'en' | 'zh', aggregate?: 'all' | 'single') => Promise<void>;
+  fetchStats: (
+    language: "en" | "zh",
+    aggregate?: "all" | "single"
+  ) => Promise<void>;
 }
 
 export const useStatsStore = create<StatsState>((set, get) => ({
@@ -53,12 +62,29 @@ export const useStatsStore = create<StatsState>((set, get) => ({
     totalComments: 0,
     totalAiQuestions: 0,
     totalAiSummaries: 0,
+    totalPosts: 0,
+    totalPostsEnglish: 0,
+    totalPostsChinese: 0,
   },
   postStats: {},
   isLoading: false,
   error: null,
-  enStats: { totalViews: 0, totalLikes: 0, posts: [] as LanguageStats['posts'] },
-  zhStats: { totalViews: 0, totalLikes: 0, posts: [] as LanguageStats['posts'] },
+  enStats: {
+    totalViews: 0,
+    totalLikes: 0,
+    totalComments: 0,
+    totalAiQuestions: 0,
+    totalAiSummaries: 0,
+    posts: [] as LanguageStats["posts"],
+  },
+  zhStats: {
+    totalViews: 0,
+    totalLikes: 0,
+    totalComments: 0,
+    totalAiQuestions: 0,
+    totalAiSummaries: 0,
+    posts: [] as LanguageStats["posts"],
+  },
 
   setTotalStats: (stats) => set({ totalStats: stats }),
 
@@ -85,7 +111,13 @@ export const useStatsStore = create<StatsState>((set, get) => ({
 
   incrementPostViews: (postId) =>
     set((state) => {
-      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, aiQuestions: 0, aiSummaries: 0 };
+      const currentStats = state.postStats[postId] || {
+        views: 0,
+        likes: 0,
+        comments: 0,
+        aiQuestions: 0,
+        aiSummaries: 0,
+      };
       return {
         postStats: {
           ...state.postStats,
@@ -96,7 +128,13 @@ export const useStatsStore = create<StatsState>((set, get) => ({
 
   togglePostLike: (postId) =>
     set((state) => {
-      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
+      const currentStats = state.postStats[postId] || {
+        views: 0,
+        likes: 0,
+        comments: 0,
+        ai_questions: 0,
+        ai_summaries: 0,
+      };
       const newLikes = currentStats.likes + 1;
       return {
         postStats: {
@@ -108,36 +146,63 @@ export const useStatsStore = create<StatsState>((set, get) => ({
 
   incrementComments: (postId, decrement = false) =>
     set((state) => {
-      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
+      const currentStats = state.postStats[postId] || {
+        views: 0,
+        likes: 0,
+        comments: 0,
+        ai_questions: 0,
+        ai_summaries: 0,
+      };
       const increment = decrement ? -1 : 1;
       return {
         postStats: {
           ...state.postStats,
-          [postId]: { ...currentStats, comments: Math.max(0, currentStats.comments + increment) },
+          [postId]: {
+            ...currentStats,
+            comments: Math.max(0, currentStats.comments + increment),
+          },
         },
       };
     }),
 
   incrementAiQuestions: (postId, decrement = false) =>
     set((state) => {
-      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
+      const currentStats = state.postStats[postId] || {
+        views: 0,
+        likes: 0,
+        comments: 0,
+        ai_questions: 0,
+        ai_summaries: 0,
+      };
       const increment = decrement ? -1 : 1;
       return {
         postStats: {
           ...state.postStats,
-          [postId]: { ...currentStats, ai_questions: Math.max(0, currentStats.ai_questions + increment) },
+          [postId]: {
+            ...currentStats,
+            ai_questions: Math.max(0, currentStats.ai_questions + increment),
+          },
         },
       };
     }),
 
   incrementAiSummaries: (postId, decrement = false) =>
     set((state) => {
-      const currentStats = state.postStats[postId] || { views: 0, likes: 0, comments: 0, ai_questions: 0, ai_summaries: 0 };
+      const currentStats = state.postStats[postId] || {
+        views: 0,
+        likes: 0,
+        comments: 0,
+        ai_questions: 0,
+        ai_summaries: 0,
+      };
       const increment = decrement ? -1 : 1;
       return {
         postStats: {
           ...state.postStats,
-          [postId]: { ...currentStats, ai_summaries: Math.max(0, currentStats.ai_summaries + increment) },
+          [postId]: {
+            ...currentStats,
+            ai_summaries: Math.max(0, currentStats.ai_summaries + increment),
+          },
         },
       };
     }),
@@ -149,15 +214,15 @@ export const useStatsStore = create<StatsState>((set, get) => ({
   fetchTotalStats: async () => {
     try {
       set({ isLoading: true, error: null });
-      const response = await fetch('/api/stats');
+      const response = await fetch("/api/admin/analytics");
       if (response.ok) {
         const data = await response.json();
-        set({ totalStats: data });
+        set({ totalStats: data.totals });
       } else {
-        set({ error: 'Failed to fetch total stats' });
+        set({ error: "Failed to fetch total stats" });
       }
     } catch {
-      set({ error: 'Failed to fetch total stats' });
+      set({ error: "Failed to fetch total stats" });
     } finally {
       set({ isLoading: false });
     }
@@ -171,27 +236,31 @@ export const useStatsStore = create<StatsState>((set, get) => ({
         get().setPostStats(postId, stats);
       }
     } catch (error) {
-      console.error('Failed to fetch post stats:', error);
+      console.error("Failed to fetch post stats:", error);
     }
   },
 
-  fetchStats: async (language: 'en' | 'zh', aggregate: 'all' | 'single' = 'all') => {
+  fetchStats: async (
+    language: "en" | "zh",
+    aggregate: "all" | "single" = "all"
+  ) => {
     try {
       set({ isLoading: true, error: null });
-      const res = await fetch(`/api/admin/analytics?language=${language}&aggregate=${aggregate}`);
+      const res = await fetch(
+        `/api/stats?language=${language}&aggregate=${aggregate}`
+      );
       if (res.ok) {
         const data = await res.json();
+        console.log(`Fetched ${language} stats:`, data);
         set((state: StatsState) => ({
           ...state,
-          [`${language}Stats`]: aggregate === 'all'
-            ? { ...data, posts: state[`${language}Stats`].posts }
-            : { ...state[`${language}Stats`], posts: data as LanguageStats['posts'] },
+          [`${language}Stats`]: data,
         }));
       } else {
-        set({ error: 'Failed to fetch language stats' });
+        set({ error: "Failed to fetch language stats" });
       }
     } catch {
-      set({ error: 'Failed to fetch language stats' });
+      set({ error: "Failed to fetch language stats" });
     } finally {
       set({ isLoading: false });
     }

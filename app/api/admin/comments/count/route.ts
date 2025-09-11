@@ -1,34 +1,54 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { getPostBySlug } from '@/lib/posts';
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import { listPublished } from "@/lib/posts";
 
-const prisma = new PrismaClient();
+const supabaseUrl = process.env.SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET() {
   try {
-    const commentCounts = await prisma.postStat.findMany({
-      select: {
-        id: true,
-        post_id: true,
-        language: true,
-        _count: { select: { comments: true } },
-      },
-    });
-    console.log('PostStats with comment counts:', JSON.stringify(commentCounts, null, 2));
+    // Get all published posts from both languages
+    const enPosts = listPublished("en");
+    const zhPosts = listPublished("zh");
 
-    const postsWithTitles = commentCounts.map(stat => {
-      const post = getPostBySlug(stat.post_id, stat.language as 'en' | 'zh');
-      return {
-        ...stat,
-        title: post ? post.title : `Post ${stat.post_id}`,
-      };
-    });
-    console.log('Posts with titles for frontend:', JSON.stringify(postsWithTitles, null, 2));
-    return NextResponse.json(postsWithTitles);
+    const allPosts = [
+      ...enPosts.map((post) => ({ ...post, language: "en" })),
+      ...zhPosts.map((post) => ({ ...post, language: "zh" })),
+    ];
+
+    console.log(
+      `Found ${enPosts.length} English posts and ${zhPosts.length} Chinese posts`
+    );
+
+    const postsWithCommentCounts = await Promise.all(
+      allPosts.map(async (post) => {
+        const { count: commentCount } = await supabase
+          .from("comments")
+          .select("*", { count: "exact", head: true })
+          .eq("post_id", post.id)
+          .eq("language", post.language);
+
+        return {
+          id: post.id,
+          post_id: post.id,
+          title: post.title,
+          language: post.language,
+          _count: { comments: commentCount || 0 },
+        };
+      })
+    );
+
+    console.log(
+      "Posts with comment counts:",
+      JSON.stringify(postsWithCommentCounts, null, 2)
+    );
+    return NextResponse.json(postsWithCommentCounts);
   } catch (error) {
-    console.error('Failed to fetch comment counts:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
+    console.error("Failed to fetch comment counts:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import { listPublished } from "@/lib/posts";
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -8,25 +9,30 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const postId = searchParams.get('postId');
+    const postId = searchParams.get("postId");
+    const language = searchParams.get("language");
+    const aggregate = searchParams.get("aggregate");
 
     if (postId) {
-      // Get stats for a specific post
       const { data: stats, error: statsError } = await supabase
-        .from('post_stats')
-        .select('*')
-        .eq('post_id', postId)
+        .from("post_stats")
+        .select("*")
+        .eq("post_id", postId)
+        .eq("language", language || "en")
         .single();
 
-      // Get comment count
       const { count: commentCount } = await supabase
-        .from('comments')
-        .select('*', { count: 'exact', head: true })
-        .eq('post_id', postId);
+        .from("comments")
+        .select("*", { count: "exact", head: true })
+        .eq("post_id", postId)
+        .eq("language", language || "en");
 
-      if (statsError && statsError.code !== 'PGRST116') {
-        console.error('Stats error:', statsError);
-        return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
+      if (statsError && statsError.code !== "PGRST116") {
+        console.error("Stats error:", statsError);
+        return NextResponse.json(
+          { error: "Failed to fetch stats" },
+          { status: 500 }
+        );
       }
 
       const defaultStats = {
@@ -34,23 +40,23 @@ export async function GET(request: NextRequest) {
         likes: 1,
         comments: commentCount || 0,
         ai_questions: 1,
-        ai_summaries: 0
+        ai_summaries: 0,
       };
 
       if (!stats) {
-        // Create default stats if they don't exist
         const { error: createError } = await supabase
-          .from('post_stats')
+          .from("post_stats")
           .insert({
             post_id: postId,
-            title: 'Blog Post',
+            title: "Blog Post",
             views: defaultStats.views,
             likes: defaultStats.likes,
-            ai_questions: 0
+            ai_questions: 0,
+            language: language || "en",
           });
 
         if (createError) {
-          console.error('Create stats error:', createError);
+          console.error("Create stats error:", createError);
         }
 
         return NextResponse.json(defaultStats);
@@ -61,291 +67,384 @@ export async function GET(request: NextRequest) {
         likes: stats.likes,
         comments: commentCount || 0,
         ai_questions: stats.ai_questions,
-        ai_summaries: stats.ai_summaries || 0
+        ai_summaries: stats.ai_summaries || 0,
       });
-    } else {
-      // Get total stats for all posts
-      const { data: stats, error: statsError } = await supabase
-        .from('post_stats')
-        .select('views, likes, ai_questions, ai_summaries');
+    } else if (language && aggregate === "all") {
+      const posts = listPublished(language as "en" | "zh");
+      const postIds = posts.map((p) => p.id);
 
-      if (statsError) {
-        console.error('Total stats error:', statsError);
+      if (postIds.length === 0) {
         return NextResponse.json({
           totalViews: 0,
           totalLikes: 0,
           totalComments: 0,
-          totalAiQuestions: 0
+          totalAiQuestions: 0,
+          totalAiSummaries: 0,
+          posts: [],
         });
       }
 
-      const totalViews = stats?.reduce((sum, stat) => sum + (stat.views || 0), 0) || 0;
-      const totalLikes = stats?.reduce((sum, stat) => sum + (stat.likes || 0), 0) || 0;
-      const totalAiQuestions = stats?.reduce((sum, stat) => sum + (stat.ai_questions || 0), 0) || 0;
-      const totalAiSummaries = stats?.reduce((sum, stat) => sum + (stat.ai_summaries || 0), 0) || 0;
+      const { data: stats, error: statsError } = await supabase
+        .from("post_stats")
+        .select("*")
+        .in("post_id", postIds)
+        .eq("language", language);
+
+      if (statsError) {
+        console.error("Language stats error:", statsError);
+        return NextResponse.json({
+          totalViews: 0,
+          totalLikes: 0,
+          totalComments: 0,
+          totalAiQuestions: 0,
+          totalAiSummaries: 0,
+          posts: [],
+        });
+      }
 
       const { count: totalComments } = await supabase
-        .from('comments')
-        .select('*', { count: 'exact', head: true });
+        .from("comments")
+        .select("*", { count: "exact", head: true })
+        .in("post_id", postIds)
+        .eq("language", language);
+
+      const totalViews =
+        stats?.reduce((sum, stat) => sum + (stat.views || 0), 0) || 0;
+      const totalLikes =
+        stats?.reduce((sum, stat) => sum + (stat.likes || 0), 0) || 0;
+      const totalAiQuestions =
+        stats?.reduce((sum, stat) => sum + (stat.ai_questions || 0), 0) || 0;
+      const totalAiSummaries =
+        stats?.reduce((sum, stat) => sum + (stat.ai_summaries || 0), 0) || 0;
+
+      const postsWithStats = posts.map((post) => {
+        const stat = stats?.find((s) => s.post_id === post.id);
+        return {
+          slug: post.slug,
+          views: stat?.views || 0,
+          likes: stat?.likes || 0,
+        };
+      });
 
       return NextResponse.json({
         totalViews,
         totalLikes,
         totalComments: totalComments || 0,
         totalAiQuestions,
-        totalAiSummaries
+        totalAiSummaries,
+        posts: postsWithStats,
+      });
+    } else {
+      const { data: stats, error: statsError } = await supabase
+        .from("post_stats")
+        .select("views, likes, ai_questions, ai_summaries");
+
+      if (statsError) {
+        console.error("Total stats error:", statsError);
+        return NextResponse.json({
+          totalViews: 0,
+          totalLikes: 0,
+          totalComments: 0,
+          totalAiQuestions: 0,
+          totalAiSummaries: 0,
+        });
+      }
+
+      const totalViews =
+        stats?.reduce((sum, stat) => sum + (stat.views || 0), 0) || 0;
+      const totalLikes =
+        stats?.reduce((sum, stat) => sum + (stat.likes || 0), 0) || 0;
+      const totalAiQuestions =
+        stats?.reduce((sum, stat) => sum + (stat.ai_questions || 0), 0) || 0;
+      const totalAiSummaries =
+        stats?.reduce((sum, stat) => sum + (stat.ai_summaries || 0), 0) || 0;
+
+      const { count: totalComments } = await supabase
+        .from("comments")
+        .select("*", { count: "exact", head: true });
+
+      const enPosts = listPublished("en");
+      const zhPosts = listPublished("zh");
+      const totalPosts = enPosts.length + zhPosts.length;
+
+      return NextResponse.json({
+        totalViews,
+        totalLikes,
+        totalComments: totalComments || 0,
+        totalAiQuestions,
+        totalAiSummaries,
+        totalPosts,
       });
     }
   } catch (error) {
-    console.error('Stats API error:', error);
-    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
+    console.error("Stats API error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch stats" },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { postId, action } = await request.json();
+    const { postId, action, language = "en" } = await request.json();
 
     if (!postId || !action) {
-      return NextResponse.json({ error: 'Post ID and action are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Post ID and action are required" },
+        { status: 400 }
+      );
     }
 
-    if (action === 'like') {
+    if (action === "like") {
       // Increment likes
-      const { error: likeError } = await supabase.rpc('increment_likes', { post_id_param: postId });
+      const { error: likeError } = await supabase.rpc("increment_likes", {
+        post_id_param: postId,
+      });
 
       if (likeError) {
         // Fallback: manual update
         const { data: existing } = await supabase
-          .from('post_stats')
-          .select('likes')
-          .eq('post_id', postId)
+          .from("post_stats")
+          .select("likes")
+          .eq("post_id", postId)
+          .eq("language", language)
           .single();
 
         if (existing) {
           await supabase
-            .from('post_stats')
+            .from("post_stats")
             .update({ likes: (existing.likes || 0) + 1 })
-            .eq('post_id', postId);
+            .eq("post_id", postId)
+            .eq("language", language);
         } else {
-          await supabase
-            .from('post_stats')
-            .insert({
-              post_id: postId,
-              title: 'Blog Post',
-              likes: 1,
-              views: 0,
-              ai_questions: 0
-            });
+          await supabase.from("post_stats").insert({
+            post_id: postId,
+            title: "Blog Post",
+            likes: 1,
+            views: 0,
+            ai_questions: 0,
+            language: language,
+          });
         }
       }
 
       // Update daily stats
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
 
       const { data: existingDaily } = await supabase
-        .from('daily_stats')
-        .select('likes')
-        .eq('post_id', postId)
-        .eq('date', today)
+        .from("daily_stats")
+        .select("likes")
+        .eq("post_id", postId)
+        .eq("date", today)
+        .eq("language", language)
         .single();
 
       if (existingDaily) {
         await supabase
-          .from('daily_stats')
+          .from("daily_stats")
           .update({ likes: (existingDaily.likes || 0) + 1 })
-          .eq('post_id', postId)
-          .eq('date', today);
+          .eq("post_id", postId)
+          .eq("date", today)
+          .eq("language", language);
       } else {
-        await supabase
-          .from('daily_stats')
-          .insert({
-            post_id: postId,
-            date: today,
-            views: 0,
-            likes: 1,
-            ai_questions: 0
-          });
+        await supabase.from("daily_stats").insert({
+          post_id: postId,
+          date: today,
+          views: 0,
+          likes: 1,
+          ai_questions: 0,
+          language: language,
+        });
       }
 
       return NextResponse.json({ success: true });
     }
 
-    if (action === 'view') {
+    if (action === "view") {
       // Increment views
       const { data: existing } = await supabase
-        .from('post_stats')
-        .select('views')
-        .eq('post_id', postId)
+        .from("post_stats")
+        .select("views")
+        .eq("post_id", postId)
+        .eq("language", language)
         .single();
 
       if (existing) {
         await supabase
-          .from('post_stats')
+          .from("post_stats")
           .update({ views: (existing.views || 0) + 1 })
-          .eq('post_id', postId);
+          .eq("post_id", postId)
+          .eq("language", language);
       } else {
-        await supabase
-          .from('post_stats')
-          .insert({
-            post_id: postId,
-            title: 'Blog Post',
-            views: 1,
-            likes: 0,
-            ai_questions: 0
-          });
+        await supabase.from("post_stats").insert({
+          post_id: postId,
+          title: "Blog Post",
+          views: 1,
+          likes: 0,
+          ai_questions: 0,
+          language: language,
+        });
       }
 
       // Update daily stats
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
 
       const { data: existingDaily } = await supabase
-        .from('daily_stats')
-        .select('views')
-        .eq('post_id', postId)
-        .eq('date', today)
+        .from("daily_stats")
+        .select("views")
+        .eq("post_id", postId)
+        .eq("date", today)
+        .eq("language", language)
         .single();
 
       if (existingDaily) {
         await supabase
-          .from('daily_stats')
+          .from("daily_stats")
           .update({ views: (existingDaily.views || 0) + 1 })
-          .eq('post_id', postId)
-          .eq('date', today);
+          .eq("post_id", postId)
+          .eq("date", today)
+          .eq("language", language);
       } else {
-        await supabase
-          .from('daily_stats')
-          .insert({
-            post_id: postId,
-            date: today,
-            views: 1,
-            likes: 0,
-            ai_questions: 0
-          });
+        await supabase.from("daily_stats").insert({
+          post_id: postId,
+          date: today,
+          views: 1,
+          likes: 0,
+          ai_questions: 0,
+          language: language,
+        });
       }
 
       return NextResponse.json({ success: true });
     }
 
-    if (action === 'ai_question') {
+    if (action === "ai_question") {
       // Increment AI questions
       const { data: existing } = await supabase
-        .from('post_stats')
-        .select('ai_questions')
-        .eq('post_id', postId)
+        .from("post_stats")
+        .select("ai_questions")
+        .eq("post_id", postId)
+        .eq("language", language)
         .single();
 
       if (existing) {
         await supabase
-          .from('post_stats')
+          .from("post_stats")
           .update({ ai_questions: (existing.ai_questions || 0) + 1 })
-          .eq('post_id', postId);
+          .eq("post_id", postId)
+          .eq("language", language);
       } else {
-        await supabase
-          .from('post_stats')
-          .insert({
-            post_id: postId,
-            title: 'Blog Post',
-            views: 0,
-            likes: 0,
-            ai_questions: 1,
-            ai_summaries: 0
-          });
+        await supabase.from("post_stats").insert({
+          post_id: postId,
+          title: "Blog Post",
+          views: 0,
+          likes: 0,
+          ai_questions: 1,
+          ai_summaries: 0,
+          language: language,
+        });
       }
 
       // Update daily stats
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
 
       const { data: existingDaily } = await supabase
-        .from('daily_stats')
-        .select('ai_questions')
-        .eq('post_id', postId)
-        .eq('date', today)
+        .from("daily_stats")
+        .select("ai_questions")
+        .eq("post_id", postId)
+        .eq("date", today)
+        .eq("language", language)
         .single();
 
       if (existingDaily) {
         await supabase
-          .from('daily_stats')
+          .from("daily_stats")
           .update({ ai_questions: (existingDaily.ai_questions || 0) + 1 })
-          .eq('post_id', postId)
-          .eq('date', today);
+          .eq("post_id", postId)
+          .eq("date", today)
+          .eq("language", language);
       } else {
-        await supabase
-          .from('daily_stats')
-          .insert({
-            post_id: postId,
-            date: today,
-            views: 0,
-            likes: 0,
-            ai_questions: 1,
-            ai_summaries: 0
-          });
+        await supabase.from("daily_stats").insert({
+          post_id: postId,
+          date: today,
+          views: 0,
+          likes: 0,
+          ai_questions: 1,
+          ai_summaries: 0,
+          language: language,
+        });
       }
 
       return NextResponse.json({ success: true });
     }
 
-    if (action === 'ai_summary') {
+    if (action === "ai_summary") {
       // Increment AI summaries
       const { data: existing } = await supabase
-        .from('post_stats')
-        .select('ai_summaries')
-        .eq('post_id', postId)
+        .from("post_stats")
+        .select("ai_summaries")
+        .eq("post_id", postId)
+        .eq("language", language)
         .single();
 
       if (existing) {
         await supabase
-          .from('post_stats')
+          .from("post_stats")
           .update({ ai_summaries: (existing.ai_summaries || 0) + 1 })
-          .eq('post_id', postId);
+          .eq("post_id", postId)
+          .eq("language", language);
       } else {
-        await supabase
-          .from('post_stats')
-          .insert({
-            post_id: postId,
-            title: 'Blog Post',
-            views: 0,
-            likes: 0,
-            ai_questions: 0,
-            ai_summaries: 1
-          });
+        await supabase.from("post_stats").insert({
+          post_id: postId,
+          title: "Blog Post",
+          views: 0,
+          likes: 0,
+          ai_questions: 0,
+          ai_summaries: 1,
+          language: language,
+        });
       }
 
       // Update daily stats
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
 
       const { data: existingDaily } = await supabase
-        .from('daily_stats')
-        .select('ai_summaries')
-        .eq('post_id', postId)
-        .eq('date', today)
+        .from("daily_stats")
+        .select("ai_summaries")
+        .eq("post_id", postId)
+        .eq("date", today)
+        .eq("language", language)
         .single();
 
       if (existingDaily) {
         await supabase
-          .from('daily_stats')
+          .from("daily_stats")
           .update({ ai_summaries: (existingDaily.ai_summaries || 0) + 1 })
-          .eq('post_id', postId)
-          .eq('date', today);
+          .eq("post_id", postId)
+          .eq("date", today)
+          .eq("language", language);
       } else {
-        await supabase
-          .from('daily_stats')
-          .insert({
-            post_id: postId,
-            date: today,
-            views: 0,
-            likes: 0,
-            ai_questions: 0,
-            ai_summaries: 1
-          });
+        await supabase.from("daily_stats").insert({
+          post_id: postId,
+          date: today,
+          views: 0,
+          likes: 0,
+          ai_questions: 0,
+          ai_summaries: 1,
+          language: language,
+        });
       }
 
       return NextResponse.json({ success: true });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Stats API error:', error);
-    return NextResponse.json({ error: 'Failed to update stats' }, { status: 500 });
+    console.error("Stats API error:", error);
+    return NextResponse.json(
+      { error: "Failed to update stats" },
+      { status: 500 }
+    );
   }
 }

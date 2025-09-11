@@ -5,8 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Check if we're in IDX environment (Nix-based)
-const isIdxEnvironment = process.env.TERM_PROGRAM === 'vscode' ||
-                        process.env.SHELL?.includes('idx') ||
+const isIdxEnvironment = (process.env.TERM_PROGRAM === 'vscode' && process.env.SHELL?.includes('idx')) ||
                         fs.existsSync('/google/idx');
 
 // Check if we're in Vercel environment

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface AuthCheckProps {
   children: React.ReactNode;
@@ -13,12 +13,12 @@ export default function AuthCheck({ children }: AuthCheckProps) {
 
   useEffect(() => {
     const checkAuth = () => {
-      const authStatus = localStorage.getItem('adminAuthenticated');
-      if (authStatus === 'true') {
+      const authStatus = localStorage.getItem("adminAuthenticated");
+      if (authStatus === "true") {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        router.push('/admin');
+        router.push("/admin");
       }
     };
 
@@ -30,7 +30,9 @@ export default function AuthCheck({ children }: AuthCheckProps) {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
-          <p className="mt-2 text-sm text-gray-600">Checking authentication...</p>
+          <p className="mt-2 text-sm text-gray-600">
+            Checking authentication...
+          </p>
         </div>
       </div>
     );
@@ -40,11 +42,15 @@ export default function AuthCheck({ children }: AuthCheckProps) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h2>
-          <p className="text-gray-600 mb-4">You need to be logged in to access this page.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Access Denied
+          </h2>
+          <p className="text-gray-600 mb-4">
+            You need to be logged in to access this page.
+          </p>
           <button
-            onClick={() => router.push('/admin')}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            onClick={() => router.push("/admin")}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
           >
             Go to Login
           </button>

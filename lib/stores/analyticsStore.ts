@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface AnalyticsData {
   totals: {
@@ -7,12 +7,16 @@ interface AnalyticsData {
     totalComments: number;
     totalAiQuestions: number;
     totalAiSummaries: number;
+    totalPosts: number;
+    totalPostsEnglish: number;
+    totalPostsChinese: number;
   };
   individualStats: Array<{
     postId: string;
     title: string;
     views: number;
     likes: number;
+    comments: number;
     aiQuestions: number;
     aiSummaries: number;
   }>;
@@ -20,6 +24,7 @@ interface AnalyticsData {
     date: string;
     views: number;
     likes: number;
+    comments: number;
     aiQuestions: number;
     aiSummaries: number;
   }>;
@@ -50,16 +55,16 @@ export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/admin/analytics');
+      const response = await fetch("/api/admin/analytics");
       if (response.ok) {
         const data = await response.json();
         setAnalytics(data);
       } else {
-        throw new Error('Failed to fetch analytics');
+        throw new Error("Failed to fetch analytics");
       }
     } catch (err) {
-      console.error('Failed to fetch analytics:', err);
-      setError('Failed to load analytics');
+      console.error("Failed to fetch analytics:", err);
+      setError("Failed to load analytics");
     } finally {
       setLoading(false);
     }

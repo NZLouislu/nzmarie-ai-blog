@@ -17,16 +17,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const language = searchParams.get('language');
-    const aggregate = searchParams.get('aggregate');
+    const language = searchParams.get("language");
+    const aggregate = searchParams.get("aggregate");
 
-    if (aggregate === 'all') {
-      let query = supabase
-        .from("post_stats")
-        .select("views, likes");
+    if (aggregate === "all") {
+      let query = supabase.from("post_stats").select("views, likes");
 
       if (language) {
-        query = query.eq('language', language);
+        query = query.eq("language", language);
       }
 
       const { data: stats, error: totalError } = await query;
@@ -47,30 +45,35 @@ export async function GET(request: NextRequest) {
       };
 
       return NextResponse.json(totals);
-    } else if (aggregate === 'single') {
+    } else if (aggregate === "single") {
       if (!language) {
-        return NextResponse.json({ error: "Language required for single" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Language required for single" },
+          { status: 400 }
+        );
       }
 
-      const posts = listPublished(language as 'en' | 'zh');
-      const postStats = await Promise.all(posts.map(async (post) => {
-        const { data: stat, error: statError } = await supabase
-          .from('post_stats')
-          .select('views, likes')
-          .eq('post_id', post.id)
-          .eq('language', language)
-          .single();
+      const posts = listPublished(language as "en" | "zh");
+      const postStats = await Promise.all(
+        posts.map(async (post) => {
+          const { data: stat, error: statError } = await supabase
+            .from("post_stats")
+            .select("views, likes")
+            .eq("post_id", post.id)
+            .eq("language", language)
+            .single();
 
-        if (statError && statError.code !== 'PGRST116') {
-          console.error("Error fetching post stats:", statError);
-        }
+          if (statError && statError.code !== "PGRST116") {
+            console.error("Error fetching post stats:", statError);
+          }
 
-        return {
-          slug: post.slug,
-          views: stat ? stat.views || 0 : 0,
-          likes: stat ? stat.likes || 0 : 0,
-        };
-      }));
+          return {
+            slug: post.slug,
+            views: stat ? stat.views || 0 : 0,
+            likes: stat ? stat.likes || 0 : 0,
+          };
+        })
+      );
 
       return NextResponse.json(postStats);
     } else {
@@ -93,21 +96,31 @@ export async function GET(request: NextRequest) {
         totalLikes:
           totalStats?.reduce((sum, stat) => sum + (stat.likes || 0), 0) || 0,
         totalAiQuestions:
-          totalStats?.reduce((sum, stat) => sum + (stat.ai_questions || 0), 0) ||
-          0,
+          totalStats?.reduce(
+            (sum, stat) => sum + (stat.ai_questions || 0),
+            0
+          ) || 0,
         totalAiSummaries:
-          totalStats?.reduce((sum, stat) => sum + (stat.ai_summaries || 0), 0) ||
-          0,
+          totalStats?.reduce(
+            (sum, stat) => sum + (stat.ai_summaries || 0),
+            0
+          ) || 0,
       };
 
-      // Get total comments
       const { count: totalComments } = await supabase
         .from("comments")
         .select("*", { count: "exact", head: true });
 
-      const totalsWithComments = {
+      const enPosts = listPublished("en");
+      const zhPosts = listPublished("zh");
+      const totalPosts = enPosts.length + zhPosts.length;
+
+      const totalsWithCommentsAndPosts = {
         ...totals,
         totalComments: totalComments || 0,
+        totalPosts,
+        totalPostsEnglish: enPosts.length,
+        totalPostsChinese: zhPosts.length,
       };
 
       // Get individual post stats
@@ -125,7 +138,10 @@ export async function GET(request: NextRequest) {
 
       const individualStats =
         postStats?.map((stat) => {
-          const post = stat.language === 'zh' ? getBySlug(stat.post_id, 'zh') : getBySlug(stat.post_id, 'en');
+          const post =
+            stat.language === "zh"
+              ? getBySlug(stat.post_id, "zh")
+              : getBySlug(stat.post_id, "en");
           return {
             postId: stat.post_id,
             title: post ? post.title : "Unknown Post",
@@ -135,6 +151,20 @@ export async function GET(request: NextRequest) {
             aiSummaries: stat.ai_summaries || 0,
           };
         }) || [];
+
+      const individualStatsWithComments = await Promise.all(
+        individualStats.map(async (stat) => {
+          const { count: commentCount } = await supabase
+            .from("comments")
+            .select("*", { count: "exact", head: true })
+            .eq("post_id", stat.postId);
+
+          return {
+            ...stat,
+            comments: commentCount || 0,
+          };
+        })
+      );
 
       // Get daily stats for time-based analysis
       const { data: dailyStats, error: dailyError } = await supabase
@@ -151,6 +181,7 @@ export async function GET(request: NextRequest) {
         date: string;
         views: number;
         likes: number;
+        comments: number;
         aiQuestions: number;
         aiSummaries: number;
       }
@@ -163,6 +194,7 @@ export async function GET(request: NextRequest) {
               date,
               views: 0,
               likes: 0,
+              comments: 0,
               aiQuestions: 0,
               aiSummaries: 0,
             };
@@ -179,10 +211,25 @@ export async function GET(request: NextRequest) {
           new Date(b.date).getTime() - new Date(a.date).getTime()
       );
 
+      const dailyStatsWithComments = await Promise.all(
+        dailyStatsArray.map(async (dayStat) => {
+          const { count: dayComments } = await supabase
+            .from("comments")
+            .select("*", { count: "exact", head: true })
+            .gte("created_at", `${dayStat.date}T00:00:00.000Z`)
+            .lt("created_at", `${dayStat.date}T23:59:59.999Z`);
+
+          return {
+            ...dayStat,
+            comments: dayComments || 0,
+          };
+        })
+      );
+
       return NextResponse.json({
-        totals: totalsWithComments,
-        individualStats,
-        dailyStats: dailyStatsArray,
+        totals: totalsWithCommentsAndPosts,
+        individualStats: individualStatsWithComments,
+        dailyStats: dailyStatsWithComments,
       });
     }
   } catch (error) {
@@ -191,7 +238,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error: "Failed to fetch analytics data",
-        ...(process.env.NODE_ENV === 'development' && { details: err.message })
       },
       { status: 500 }
     );

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
-import Link from 'next/link';
-import { useLanguageStore } from '@/lib/stores/languageStore';
+import { useState, useEffect } from "react";
+import { Search, X } from "lucide-react";
+import Link from "next/link";
+import { useLanguageStore } from "@/lib/stores/languageStore";
+import { getLocalizedPath } from "@/lib/utils";
 
 interface Post {
   id: string;
@@ -19,20 +20,25 @@ interface SearchModalProps {
   posts: Post[];
 }
 
-export default function SearchModal({ isOpen, onClose, posts }: SearchModalProps) {
+export default function SearchModal({
+  isOpen,
+  onClose,
+  posts,
+}: SearchModalProps) {
   const { language } = useLanguageStore();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<Post[]>([]);
 
   useEffect(() => {
-    if (query.trim() === '') {
+    if (query.trim() === "") {
       setResults([]);
       return;
     }
 
-    const filteredPosts = posts.filter((post: Post) =>
-      post.title.toLowerCase().includes(query.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(query.toLowerCase())
+    const filteredPosts = posts.filter(
+      (post: Post) =>
+        post.title.toLowerCase().includes(query.toLowerCase()) ||
+        post.excerpt.toLowerCase().includes(query.toLowerCase())
     );
 
     setResults(filteredPosts.slice(0, 10)); // Limit to 10 results
@@ -40,9 +46,9 @@ export default function SearchModal({ isOpen, onClose, posts }: SearchModalProps
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       return () => {
-        document.body.style.overflow = 'unset';
+        document.body.style.overflow = "unset";
       };
     }
   }, [isOpen]);
@@ -66,7 +72,10 @@ export default function SearchModal({ isOpen, onClose, posts }: SearchModalProps
         {/* Search Input */}
         <div className="p-6 border-b border-gray-200">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type="text"
               placeholder="Search posts..."
@@ -80,7 +89,7 @@ export default function SearchModal({ isOpen, onClose, posts }: SearchModalProps
 
         {/* Results */}
         <div className="max-h-96 overflow-y-auto">
-          {query.trim() === '' ? (
+          {query.trim() === "" ? (
             <div className="p-6 text-center text-gray-500">
               <Search size={48} className="mx-auto mb-4 text-gray-300" />
               <p>Start typing to search posts...</p>
@@ -95,7 +104,7 @@ export default function SearchModal({ isOpen, onClose, posts }: SearchModalProps
               {results.map((post) => (
                 <Link
                   key={post.id}
-                  href={`/blog/${post.slug}`}
+                  href={getLocalizedPath(`/blog/${post.slug}`, language)}
                   onClick={onClose}
                   className="block p-6 hover:bg-gray-50 transition-colors"
                 >
@@ -106,11 +115,14 @@ export default function SearchModal({ isOpen, onClose, posts }: SearchModalProps
                     {post.excerpt}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {new Date(post.createdAt).toLocaleDateString(language === 'zh' ? "zh-CN" : "en-US", {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    {new Date(post.createdAt).toLocaleDateString(
+                      language === "zh" ? "zh-CN" : "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )}
                   </p>
                 </Link>
               ))}

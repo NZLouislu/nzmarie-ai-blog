@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS feature_toggles (
   total_comments BOOLEAN DEFAULT true,
   ai_summaries BOOLEAN DEFAULT true,
   ai_questions BOOLEAN DEFAULT true,
+  home_statistics BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -15,8 +16,8 @@ CREATE TABLE IF NOT EXISTS feature_toggles (
 ALTER TABLE feature_toggles DISABLE ROW LEVEL SECURITY;
 
 -- Insert default values
-INSERT INTO feature_toggles (total_views, total_likes, total_comments, ai_summaries, ai_questions)
-VALUES (true, true, true, true, true)
+INSERT INTO feature_toggles (total_views, total_likes, total_comments, ai_summaries, ai_questions, home_statistics)
+VALUES (true, true, true, true, true, true)
 ON CONFLICT DO NOTHING;
 
 -- Create updated_at trigger (drop if exists first)

@@ -94,6 +94,8 @@ INSERT INTO post_stats (post_id, title, views, likes, ai_questions, ai_summaries
 INSERT INTO comments (post_id, name, email, comment, is_anonymous) VALUES
 ('2024-03-10-java-and-spring-in-depth-understanding', 'John Doe', 'john@example.com', 'Great article! Very comprehensive explanation of Java and Spring.', false),
 ('2024-03-10-java-and-spring-in-depth-understanding', 'Jane Smith', 'jane@example.com', 'Thanks for sharing this detailed guide. Helped me a lot!', false),
+('2024-03-10-java-and-spring-in-depth-understanding', 'Alex Chen', 'alex@example.com', 'Perfect explanation of Spring framework features. Really helpful for enterprise development.', false),
+('2024-03-10-java-and-spring-in-depth-understanding', 'Maria Rodriguez', 'maria@example.com', 'Excellent breakdown of Java evolution and Spring ecosystem. Bookmarked for reference!', false),
 ('2024-03-02-the-trio-of-frontend-development', NULL, NULL, 'Excellent overview of frontend technologies!', true),
 ('2024-02-24-backend-tech-the-foundation-of-software', 'Mike Johnson', 'mike@example.com', 'Backend development is indeed the foundation. Well explained!', false),
 ('2024-01-20-new_zealand_paradise_for_children', 'Sarah Wilson', 'sarah@example.com', 'Beautiful article about New Zealand. The photos are amazing!', false),

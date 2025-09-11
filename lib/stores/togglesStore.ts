@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface FeatureToggles {
   totalViews: boolean;
@@ -7,6 +7,7 @@ interface FeatureToggles {
   totalComments: boolean;
   aiSummaries: boolean;
   aiQuestions: boolean;
+  homeStatistics: boolean;
 }
 
 interface TogglesState {
@@ -32,6 +33,7 @@ export const useTogglesStore = create<TogglesState>()(
         totalComments: true,
         aiSummaries: true,
         aiQuestions: true,
+        homeStatistics: true,
       },
       isLoading: false,
       error: null,
@@ -61,13 +63,13 @@ export const useTogglesStore = create<TogglesState>()(
       fetchToggles: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await fetch('/api/admin/toggles');
+          const response = await fetch("/api/admin/toggles");
           if (response.ok) {
             const data = await response.json();
             set({ toggles: data });
           }
         } catch {
-          set({ error: 'Failed to fetch toggles' });
+          set({ error: "Failed to fetch toggles" });
         } finally {
           set({ isLoading: false });
         }
@@ -76,25 +78,25 @@ export const useTogglesStore = create<TogglesState>()(
       updateToggle: async (key, value) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await fetch('/api/admin/toggles', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+          const response = await fetch("/api/admin/toggles", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ [key]: value }),
           });
           if (response.ok) {
             get().setToggle(key, value);
           } else {
-            set({ error: 'Failed to update toggle' });
+            set({ error: "Failed to update toggle" });
           }
         } catch {
-          set({ error: 'Failed to update toggle' });
+          set({ error: "Failed to update toggle" });
         } finally {
           set({ isLoading: false });
         }
       },
     }),
     {
-      name: 'feature-toggles',
+      name: "feature-toggles",
       partialize: (state) => ({ toggles: state.toggles }),
     }
   )

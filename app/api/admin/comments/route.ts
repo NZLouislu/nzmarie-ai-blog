@@ -1,60 +1,84 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-const prisma = new PrismaClient();
+const supabaseUrl = process.env.SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const postId = searchParams.get('postId');
-    const language = searchParams.get('language');
+    const postId = searchParams.get("postId");
+    const language = searchParams.get("language");
 
-    const where: Prisma.CommentWhereInput = {};
-    if (postId) where.post_id = postId;
-    if (language) where.language = language;
+    console.log("Fetching comments for:", { postId, language });
 
-    const comments = await prisma.comment.findMany({
-      where,
-      select: {
-        id: true,
-        post_id: true,
-        name: true,
-        email: true,
-        comment: true,
-        is_anonymous: true,
-        created_at: true,
-        language: true,
-      },
-      orderBy: { created_at: 'desc' },
-    });
+    let query = supabase
+      .from("comments")
+      .select(
+        "id, post_id, name, email, comment, is_anonymous, created_at, language"
+      )
+      .order("created_at", { ascending: false });
 
-    return NextResponse.json(comments);
+    if (postId) {
+      query = query.eq("post_id", postId);
+    }
+
+    if (language) {
+      query = query.eq("language", language);
+    }
+
+    const { data: comments, error } = await query;
+
+    if (error) {
+      console.error("Supabase error:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch comments" },
+        { status: 500 }
+      );
+    }
+
+    console.log(`Found ${comments?.length || 0} comments`);
+    return NextResponse.json(comments || []);
   } catch (error) {
-    console.error('Failed to fetch comments:', error);
-    return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
+    console.error("Failed to fetch comments:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch comments" },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+    const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ error: 'Comment ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Comment ID is required" },
+        { status: 400 }
+      );
     }
 
-    await prisma.comment.delete({
-      where: { id },
-    });
+    console.log("Deleting comment:", id);
+
+    const { error } = await supabase.from("comments").delete().eq("id", id);
+
+    if (error) {
+      console.error("Supabase delete error:", error);
+      return NextResponse.json(
+        { error: "Failed to delete comment" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to delete comment:', error);
-    return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
+    console.error("Failed to delete comment:", error);
+    return NextResponse.json(
+      { error: "Failed to delete comment" },
+      { status: 500 }
+    );
   }
 }
