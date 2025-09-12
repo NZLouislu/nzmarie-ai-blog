@@ -14,6 +14,7 @@ interface AnalyticsData {
   individualStats: Array<{
     postId: string;
     title: string;
+    language: string;
     views: number;
     likes: number;
     comments: number;
@@ -22,6 +23,7 @@ interface AnalyticsData {
   }>;
   dailyStats: Array<{
     date: string;
+    language: string;
     views: number;
     likes: number;
     comments: number;

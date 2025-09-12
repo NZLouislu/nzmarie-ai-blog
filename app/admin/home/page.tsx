@@ -79,14 +79,6 @@ export default function AdminHomePage() {
               </div>
               <div className="px-6 py-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6 mb-6">
-                  <div className="bg-purple-50 rounded-lg p-4 sm:p-6">
-                    <h3 className="text-sm sm:text-lg font-medium text-purple-900 mb-1 sm:mb-2">
-                      Total Comments
-                    </h3>
-                    <p className="text-2xl sm:text-3xl font-bold text-purple-600">
-                      {totalStats.totalComments.toLocaleString()}
-                    </p>
-                  </div>
                   <div className="bg-indigo-50 rounded-lg p-4 sm:p-6">
                     <h3 className="text-sm sm:text-lg font-medium text-indigo-900 mb-1 sm:mb-2">
                       Total Posts
@@ -102,6 +94,14 @@ export default function AdminHomePage() {
                     </h3>
                     <p className="text-2xl sm:text-3xl font-bold text-blue-600">
                       {totalStats.totalPostsEnglish}
+                    </p>
+                  </div>
+                  <div className="bg-red-50 rounded-lg p-4 sm:p-6">
+                    <h3 className="text-sm sm:text-lg font-medium text-red-900 mb-1 sm:mb-2">
+                      Posts Chinese
+                    </h3>
+                    <p className="text-2xl sm:text-3xl font-bold text-red-600">
+                      {totalStats.totalPostsChinese}
                     </p>
                   </div>
                 </div>
@@ -122,14 +122,15 @@ export default function AdminHomePage() {
                       {totalStats.totalLikes.toLocaleString()}
                     </p>
                   </div>
-                  <div className="bg-red-50 rounded-lg p-4 sm:p-6">
-                    <h3 className="text-sm sm:text-lg font-medium text-red-900 mb-1 sm:mb-2">
-                      Posts Chinese
+                  <div className="bg-purple-50 rounded-lg p-4 sm:p-6">
+                    <h3 className="text-sm sm:text-lg font-medium text-purple-900 mb-1 sm:mb-2">
+                      Total Comments
                     </h3>
-                    <p className="text-2xl sm:text-3xl font-bold text-red-600">
-                      {totalStats.totalPostsChinese}
+                    <p className="text-2xl sm:text-3xl font-bold text-purple-600">
+                      {totalStats.totalComments.toLocaleString()}
                     </p>
                   </div>
+
                   <div className="bg-yellow-50 rounded-lg p-4 sm:p-6">
                     <h3 className="text-sm sm:text-lg font-medium text-yellow-900 mb-1 sm:mb-2">
                       AI Summaries
@@ -190,6 +191,32 @@ export default function AdminHomePage() {
                           {getStats("en").totalLikes?.toLocaleString() || 0}
                         </span>
                       </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-blue-700">
+                          Total Comments
+                        </span>
+                        <span className="text-xs sm:text-sm font-semibold">
+                          {getStats("en").totalComments?.toLocaleString() || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-blue-700">
+                          AI Questions
+                        </span>
+                        <span className="text-xs sm:text-sm font-semibold">
+                          {getStats("en").totalAiQuestions?.toLocaleString() ||
+                            0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-blue-700">
+                          AI Summaries
+                        </span>
+                        <span className="text-xs sm:text-sm font-semibold">
+                          {getStats("en").totalAiSummaries?.toLocaleString() ||
+                            0}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div className="bg-red-50 rounded-lg p-6">
@@ -219,6 +246,32 @@ export default function AdminHomePage() {
                         </span>
                         <span className="font-semibold">
                           {getStats("zh").totalLikes?.toLocaleString() || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-red-700">
+                          Total Comments
+                        </span>
+                        <span className="text-xs sm:text-sm font-semibold">
+                          {getStats("zh").totalComments?.toLocaleString() || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-red-700">
+                          AI Questions
+                        </span>
+                        <span className="text-xs sm:text-sm font-semibold">
+                          {getStats("zh").totalAiQuestions?.toLocaleString() ||
+                            0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-red-700">
+                          AI Summaries
+                        </span>
+                        <span className="text-xs sm:text-sm font-semibold">
+                          {getStats("zh").totalAiSummaries?.toLocaleString() ||
+                            0}
                         </span>
                       </div>
                     </div>

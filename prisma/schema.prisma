@@ -46,7 +46,8 @@ model DailyStat {
   likes        Int      @default(0)
   ai_questions Int      @default(0)
   ai_summaries Int      @default(0)
+  language     String   @default("en")
 
-  @@unique([post_id, date])
+  @@unique([post_id, date, language])
   @@map("daily_stats")
 }

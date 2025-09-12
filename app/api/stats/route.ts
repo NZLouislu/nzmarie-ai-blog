@@ -161,7 +161,8 @@ export async function GET(request: NextRequest) {
 
       const { count: totalComments } = await supabase
         .from("comments")
-        .select("*", { count: "exact", head: true });
+        .select("*", { count: "exact", head: true })
+        .eq("language", language || "en");
 
       const enPosts = listPublished("en");
       const zhPosts = listPublished("zh");
@@ -200,6 +201,7 @@ export async function POST(request: NextRequest) {
       // Increment likes
       const { error: likeError } = await supabase.rpc("increment_likes", {
         post_id_param: postId,
+        language_param: language
       });
 
       if (likeError) {

@@ -123,10 +123,11 @@ export async function GET(request: NextRequest) {
         totalPostsChinese: zhPosts.length,
       };
 
-      // Get individual post stats
+      // Get individual post stats with language separation
       const { data: postStats, error: postError } = await supabase
         .from("post_stats")
-        .select("*");
+        .select("*")
+        .order("language", { ascending: true });
 
       if (postError) {
         console.error("Error fetching post stats:", postError);
@@ -145,6 +146,7 @@ export async function GET(request: NextRequest) {
           return {
             postId: stat.post_id,
             title: post ? post.title : "Unknown Post",
+            language: stat.language,
             views: stat.views || 0,
             likes: stat.likes || 0,
             aiQuestions: stat.ai_questions || 0,
@@ -166,12 +168,13 @@ export async function GET(request: NextRequest) {
         })
       );
 
-      // Get daily stats for time-based analysis
+      // Get daily stats for time-based analysis with language separation
       const { data: dailyStats, error: dailyError } = await supabase
         .from("daily_stats")
         .select("*")
         .order("date", { ascending: false })
-        .limit(30);
+        .order("language", { ascending: true })
+        .limit(60); // Increased limit to account for language separation
 
       if (dailyError) {
         console.error("Error fetching daily stats:", dailyError);
@@ -179,6 +182,7 @@ export async function GET(request: NextRequest) {
 
       interface DailyAggregate {
         date: string;
+        language: string;
         views: number;
         likes: number;
         comments: number;
@@ -189,9 +193,12 @@ export async function GET(request: NextRequest) {
       const dailyAggregates =
         dailyStats?.reduce((acc: Record<string, DailyAggregate>, stat) => {
           const date = stat.date.split("T")[0];
-          if (!acc[date]) {
-            acc[date] = {
+          const key = `${date}-${stat.language}`;
+          
+          if (!acc[key]) {
+            acc[key] = {
               date,
+              language: stat.language,
               views: 0,
               likes: 0,
               comments: 0,
@@ -199,16 +206,21 @@ export async function GET(request: NextRequest) {
               aiSummaries: 0,
             };
           }
-          acc[date].views += stat.views || 0;
-          acc[date].likes += stat.likes || 0;
-          acc[date].aiQuestions += stat.ai_questions || 0;
-          acc[date].aiSummaries += stat.ai_summaries || 0;
+          acc[key].views += stat.views || 0;
+          acc[key].likes += stat.likes || 0;
+          acc[key].aiQuestions += stat.ai_questions || 0;
+          acc[key].aiSummaries += stat.ai_summaries || 0;
           return acc;
         }, {} as Record<string, DailyAggregate>) || {};
 
       const dailyStatsArray = Object.values(dailyAggregates).sort(
-        (a: DailyAggregate, b: DailyAggregate) =>
-          new Date(b.date).getTime() - new Date(a.date).getTime()
+        (a: DailyAggregate, b: DailyAggregate) => {
+          const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+          if (dateCompare === 0) {
+            return a.language.localeCompare(b.language);
+          }
+          return dateCompare;
+        }
       );
 
       const dailyStatsWithComments = await Promise.all(

@@ -43,7 +43,7 @@ function CommentsSection({ postId }: { postId: string }) {
   React.useEffect(() => {
     const loadComments = async () => {
       try {
-        const response = await fetch(`/api/comments?postId=${postId}`);
+        const response = await fetch(`/api/comments?postId=${postId}&language=${language}`);
         if (response.ok) {
           const data = await response.json();
           setComments(data);
@@ -54,7 +54,7 @@ function CommentsSection({ postId }: { postId: string }) {
     };
 
     loadComments();
-  }, [postId]);
+  }, [postId, language]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +87,7 @@ function CommentsSection({ postId }: { postId: string }) {
         },
         body: JSON.stringify({
           postId,
+          language,
           ...currentFormData
         }),
       });
@@ -106,7 +107,8 @@ function CommentsSection({ postId }: { postId: string }) {
           },
           body: JSON.stringify({
             postId: postId,
-            action: 'comment'
+            action: 'comment',
+            language: language
           }),
         });
       } else {
@@ -234,6 +236,7 @@ function CommentsSection({ postId }: { postId: string }) {
 // AI Chatbot Component
 
 function AIChatbot({ postContent, postId }: { postContent: string; postId: string }) {
+  const { language } = useLanguageStore();
   const { t } = useTranslation();
   const { incrementAiQuestions } = useStatsStore();
   const [messages, setMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
@@ -278,7 +281,8 @@ function AIChatbot({ postContent, postId }: { postContent: string; postId: strin
           },
           body: JSON.stringify({
             postId: postId,
-            action: 'ai_question'
+            action: 'ai_question',
+            language: language
           }),
         });
       } else {
@@ -390,7 +394,8 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
           },
           body: JSON.stringify({
             postId: post.id,
-            action: 'view'
+            action: 'view',
+            language: language
           }),
         });
 
@@ -403,7 +408,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
     };
 
     loadStatsAndIncrementView();
-  }, [post.id, incrementPostViews, fetchPostStats]);
+  }, [post.id, incrementPostViews, fetchPostStats, language]);
 
   const handleLike = async () => {
     const newIsLiked = !isLiked;
@@ -419,7 +424,8 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         },
         body: JSON.stringify({
           postId: post.id,
-          action: 'like'
+          action: 'like',
+          language: language
         }),
       });
 
@@ -462,7 +468,8 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
           },
           body: JSON.stringify({
             postId: post.id,
-            action: 'ai_summary'
+            action: 'ai_summary',
+            language: language
           }),
         });
       } else {

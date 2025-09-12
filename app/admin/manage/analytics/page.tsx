@@ -33,69 +33,73 @@ export default function AnalyticsPage() {
                     Loading analytics...
                   </div>
                 ) : analytics ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3 sm:gap-4 lg:gap-6">
-                    <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600">
-                        {analytics.totals.totalViews.toLocaleString()}
+                  <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-4">
+                      <div className="bg-indigo-50 rounded-lg p-4 sm:p-6">
+                        <h3 className="text-sm sm:text-lg font-medium text-indigo-900 mb-1 sm:mb-2">
+                          Total Posts
+                        </h3>
+                        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-600">
+                          {(analytics.totals.totalPostsEnglish + analytics.totals.totalPostsChinese).toLocaleString()}
+                        </p>
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                        Total Views
+                      <div className="bg-blue-50 rounded-lg p-4 sm:p-6">
+                        <h3 className="text-sm sm:text-lg font-medium text-blue-900 mb-1 sm:mb-2">
+                          Posts English
+                        </h3>
+                        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600">
+                          {analytics.totals.totalPostsEnglish.toLocaleString()}
+                        </p>
                       </div>
-                    </div>
-                    <div className="text-center p-3 sm:p-4 bg-red-50 rounded-lg">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-red-600">
-                        {analytics.totals.totalLikes.toLocaleString()}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                        Total Likes
-                      </div>
-                    </div>
-                    <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600">
-                        {analytics.totals.totalComments.toLocaleString()}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                        Total Comments
-                      </div>
-                    </div>
-                    <div className="text-center p-3 sm:p-4 bg-orange-50 rounded-lg">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-600">
-                        {analytics.totals.totalPosts.toLocaleString()}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                        Total Posts
+                      <div className="bg-red-50 rounded-lg p-4 sm:p-6">
+                        <h3 className="text-sm sm:text-lg font-medium text-red-900 mb-1 sm:mb-2">
+                          Posts Chinese
+                        </h3>
+                        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-red-600">
+                          {analytics.totals.totalPostsChinese.toLocaleString()}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-center p-3 sm:p-4 bg-cyan-50 rounded-lg">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-cyan-600">
-                        {analytics.totals.totalPostsEnglish.toLocaleString()}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+                      <div className="bg-green-50 rounded-lg p-4 sm:p-6">
+                        <h3 className="text-sm sm:text-lg font-medium text-green-900 mb-1 sm:mb-2">
+                          Total Views
+                        </h3>
+                        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600">
+                          {analytics.totals.totalViews.toLocaleString()}
+                        </p>
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                        Posts English
+                      <div className="bg-pink-50 rounded-lg p-4 sm:p-6">
+                        <h3 className="text-sm sm:text-lg font-medium text-pink-900 mb-1 sm:mb-2">
+                          Total Likes
+                        </h3>
+                        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-pink-600">
+                          {analytics.totals.totalLikes.toLocaleString()}
+                        </p>
                       </div>
-                    </div>
-                    <div className="text-center p-3 sm:p-4 bg-pink-50 rounded-lg">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-pink-600">
-                        {analytics.totals.totalPostsChinese.toLocaleString()}
+                      <div className="bg-purple-50 rounded-lg p-4 sm:p-6">
+                        <h3 className="text-sm sm:text-lg font-medium text-purple-900 mb-1 sm:mb-2">
+                          Total Comments
+                        </h3>
+                        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-600">
+                          {analytics.totals.totalComments.toLocaleString()}
+                        </p>
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                        Posts Chinese
+                      <div className="bg-yellow-50 rounded-lg p-4 sm:p-6">
+                        <h3 className="text-sm sm:text-lg font-medium text-yellow-900 mb-1 sm:mb-2">
+                          AI Summaries
+                        </h3>
+                        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-600">
+                          {analytics.totals.totalAiSummaries.toLocaleString()}
+                        </p>
                       </div>
-                    </div>
-                    <div className="text-center p-3 sm:p-4 bg-indigo-50 rounded-lg">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-indigo-600">
-                        {analytics.totals.totalAiSummaries.toLocaleString()}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                        AI Summaries
-                      </div>
-                    </div>
-                    <div className="text-center p-3 sm:p-4 bg-purple-50 rounded-lg">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
-                        {analytics.totals.totalAiQuestions.toLocaleString()}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                        AI Questions
+                      <div className="bg-teal-50 rounded-lg p-4 sm:p-6">
+                        <h3 className="text-sm sm:text-lg font-medium text-teal-900 mb-1 sm:mb-2">
+                          AI Questions
+                        </h3>
+                        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-teal-600">
+                          {analytics.totals.totalAiQuestions.toLocaleString()}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -126,6 +130,9 @@ export default function AnalyticsPage() {
                             Date
                           </th>
                           <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Language
+                          </th>
+                          <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Views
                           </th>
                           <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -144,9 +151,12 @@ export default function AnalyticsPage() {
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {analytics.dailyStats.slice(0, 10).map((day) => (
-                          <tr key={day.date}>
+                          <tr key={`${day.date}-${day.language}`}>
                             <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                               {new Date(day.date).toLocaleDateString()}
+                            </td>
+                            <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                              {day.language === 'en' ? 'English' : 'Chinese'}
                             </td>
                             <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                               {day.views.toLocaleString()}
@@ -195,6 +205,9 @@ export default function AnalyticsPage() {
                             Post Title
                           </th>
                           <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Language
+                          </th>
+                          <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Views
                           </th>
                           <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -213,7 +226,7 @@ export default function AnalyticsPage() {
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {analytics.individualStats.map((post) => (
-                          <tr key={post.postId}>
+                          <tr key={`${post.postId}-${post.language}`}>
                             <td className="px-3 sm:px-6 py-4 text-xs sm:text-sm font-medium text-gray-900">
                               <div className="max-w-xs">
                                 <span className="sm:hidden truncate block">
@@ -227,6 +240,9 @@ export default function AnalyticsPage() {
                                     : post.title}
                                 </span>
                               </div>
+                            </td>
+                            <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                              {post.language === 'en' ? 'English' : 'Chinese'}
                             </td>
                             <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                               {post.views.toLocaleString()}

@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const postId = searchParams.get('postId');
+    const language = searchParams.get('language');
 
     if (!postId) {
       return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
@@ -19,6 +20,7 @@ export async function GET(request: NextRequest) {
       .from('comments')
       .select('*')
       .eq('post_id', postId)
+      .eq('language', language || 'en')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -36,7 +38,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     console.log('Starting comment submission...');
-    const { postId, name, email, comment, isAnonymous } = await request.json();
+    const { postId, language, name, email, comment, isAnonymous } = await request.json();
 
     if (!postId || !comment) {
       return NextResponse.json({ error: 'Post ID and comment are required' }, { status: 400 });
@@ -49,6 +51,7 @@ export async function POST(request: NextRequest) {
       .from('comments')
       .insert({
         post_id: postId,
+        language: language || 'en',
         name: isAnonymous ? null : name,
         email: isAnonymous ? null : email,
         comment,

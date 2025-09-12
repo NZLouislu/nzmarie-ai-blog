@@ -71,6 +71,32 @@ export default function AdminDashboard() {
                 </p>
               </div>
               <div className="px-4 sm:px-6 py-4 sm:py-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-4">
+                  <div className="bg-indigo-50 rounded-lg p-4 sm:p-6">
+                    <h3 className="text-sm sm:text-lg font-medium text-indigo-900 mb-1 sm:mb-2">
+                      Total Posts
+                    </h3>
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-600">
+                      {(totalStats.totalPostsEnglish + totalStats.totalPostsChinese).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-4 sm:p-6">
+                    <h3 className="text-sm sm:text-lg font-medium text-blue-900 mb-1 sm:mb-2">
+                      Posts English
+                    </h3>
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600">
+                      {totalStats.totalPostsEnglish.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="bg-red-50 rounded-lg p-4 sm:p-6">
+                    <h3 className="text-sm sm:text-lg font-medium text-red-900 mb-1 sm:mb-2">
+                      Posts Chinese
+                    </h3>
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-red-600">
+                      {totalStats.totalPostsChinese.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
                   <div className="bg-green-50 rounded-lg p-4 sm:p-6">
                     <h3 className="text-sm sm:text-lg font-medium text-green-900 mb-1 sm:mb-2">
@@ -98,18 +124,18 @@ export default function AdminDashboard() {
                   </div>
                   <div className="bg-orange-50 rounded-lg p-4 sm:p-6">
                     <h3 className="text-sm sm:text-lg font-medium text-orange-900 mb-1 sm:mb-2">
-                      AI Questions
+                      AI Summaries
                     </h3>
                     <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-600">
-                      {totalStats.totalAiQuestions.toLocaleString()}
+                      {totalStats.totalAiSummaries.toLocaleString()}
                     </p>
                   </div>
                   <div className="bg-teal-50 rounded-lg p-4 sm:p-6">
                     <h3 className="text-sm sm:text-lg font-medium text-teal-900 mb-1 sm:mb-2">
-                      AI Summaries
+                      AI Questions
                     </h3>
                     <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-teal-600">
-                      {totalStats.totalAiSummaries.toLocaleString()}
+                      {totalStats.totalAiQuestions.toLocaleString()}
                     </p>
                   </div>
                 </div>

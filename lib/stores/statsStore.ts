@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useLanguageStore } from "./languageStore";
 
 interface TotalStats {
   totalViews: number;
@@ -230,7 +231,8 @@ export const useStatsStore = create<StatsState>((set, get) => ({
 
   fetchPostStats: async (postId) => {
     try {
-      const response = await fetch(`/api/stats?postId=${postId}`);
+      const { language } = useLanguageStore.getState();
+      const response = await fetch(`/api/stats?postId=${postId}&language=${language}`);
       if (response.ok) {
         const stats = await response.json();
         get().setPostStats(postId, stats);
