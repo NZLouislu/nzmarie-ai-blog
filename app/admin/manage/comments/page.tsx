@@ -305,11 +305,11 @@ export default function CommentsManagementPage() {
                                   <span className="font-medium text-gray-900 text-xs sm:text-sm">
                                     {comment.is_anonymous
                                       ? "Anonymous"
-                                      : comment.name || "N/A"}
+                                      : comment.authorName || "N/A"}
                                   </span>
                                   <span className="text-xs text-gray-500">
                                     {new Date(
-                                      comment.created_at
+                                      comment.createdAt
                                     ).toLocaleDateString()}
                                   </span>
                                 </div>
@@ -323,7 +323,7 @@ export default function CommentsManagementPage() {
                                 </button>
                               </div>
                               <p className="text-gray-700 text-xs sm:text-sm leading-relaxed">
-                                {comment.comment}
+                                {comment.content}
                               </p>
                             </div>
                           ))}

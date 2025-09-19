@@ -16,12 +16,14 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("comments")
       .select(
-        "id, post_id, name, email, comment, is_anonymous, created_at, language"
+        "id, postId, authorName, authorEmail, content, is_anonymous, createdAt, language"
       )
-      .order("created_at", { ascending: false });
+      .order("createdAt", { ascending: false });
 
     if (postId) {
-      query = query.eq("post_id", postId);
+      // Convert postId to match database format with language suffix
+      const dbPostId = `${postId}-${language || 'en'}`;
+      query = query.eq("postId", dbPostId);
     }
 
     if (language) {

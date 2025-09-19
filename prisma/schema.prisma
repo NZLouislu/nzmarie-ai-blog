@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,44 +7,124 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Comment {
-  id          String   @id @default(cuid())
-  post_id     String
-  name        String?
-  email       String?
-  comment     String
-  is_anonymous Boolean  @default(false)
-  created_at  DateTime @default(now())
-  language    String   @default("en")
-  postStat    PostStat @relation(fields: [post_id], references: [post_id])
+enum Role {
+  admin
+  user
+}
 
+enum Language {
+  en
+  zh
+}
+
+enum PostStatus {
+  draft
+  published
+  archived
+}
+
+enum CommentStatus {
+  pending
+  approved
+  rejected
+}
+
+model User {
+  id                  String @id @default(cuid())
+  email               String @unique
+  name                String
+  role                Role   @default(user)
+  avatarUrl           String?
+  languagePreferences String @default("both")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  posts               Post[]
+  dailyStats          DailyStat[]
+  featureToggles      FeatureToggle[]
+
+  @@map("users")
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  authorId    String
+  author      User       @relation(fields: [authorId], references: [id])
+  slug        String
+  title       String
+  content     String
+  language    Language
+  status      PostStatus @default(draft)
+  publishedAt DateTime?
+  coverImage  String?
+  tags        String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  comments    Comment[]
+  postStats   PostStat[]
+
+  @@unique([authorId, slug])
+  @@index([authorId, language])
+  @@index([authorId, status])
+  @@map("posts")
+}
+
+model Comment {
+  id          String        @id @default(cuid())
+  postId      String
+  post        Post          @relation(fields: [postId], references: [id])
+  authorName  String
+  authorEmail String
+  content     String
+  status      CommentStatus @default(pending)
+  createdAt   DateTime      @default(now())
+
+  @@index([postId, status])
   @@map("comments")
 }
 
 model PostStat {
   id           String @id @default(cuid())
-  post_id      String @unique
+  post_id      String
+  post         Post   @relation(fields: [post_id], references: [id])
   title        String @default("Blog Post")
   views        Int    @default(0)
   likes        Int    @default(0)
   ai_questions Int    @default(0)
   ai_summaries Int    @default(0)
-  language    String   @default("en")
-  comments    Comment[]
+  language     String @default("en")
 
+  @@unique([post_id])
   @@map("post_stats")
 }
 
 model DailyStat {
-  id           String   @id @default(cuid())
-  post_id      String
-  date         DateTime @default(now())
-  views        Int      @default(0)
-  likes        Int      @default(0)
-  ai_questions Int      @default(0)
-  ai_summaries Int      @default(0)
-  language     String   @default("en")
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  date           DateTime
+  language       Language
+  pageViews      Int      @default(0)
+  uniqueVisitors Int      @default(0)
+  reads          Int      @default(0)
+  likes          Int      @default(0)
+  comments       Int      @default(0)
 
-  @@unique([post_id, date, language])
+  @@unique([userId, date, language])
+  @@index([userId, date])
   @@map("daily_stats")
+}
+
+model FeatureToggle {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  key     String
+  enabled Boolean @default(false)
+  payload String?
+
+  @@unique([userId, key])
+  @@index([userId])
+  @@map("feature_toggles")
 }

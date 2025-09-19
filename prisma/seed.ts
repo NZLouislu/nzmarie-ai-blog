@@ -40,20 +40,18 @@ async function main() {
   // Create sample comments
   const comments = [
     {
-      post_id: '2024-01-10-will-ai-replace-human-developers',
-      name: 'John Doe',
-      email: 'john@example.com',
-      comment: 'Great article! Very insightful.',
-      is_anonymous: false,
-      language: 'en'
+      postId: '2024-01-10-will-ai-replace-human-developers',
+      authorName: 'John Doe',
+      authorEmail: 'john@example.com',
+      content: 'Great article! Very insightful.',
+      status: 'approved' as const
     },
     {
-      post_id: '2024-01-10-will-ai-replace-human-developers',
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      comment: 'Thanks for sharing this perspective!',
-      is_anonymous: false,
-      language: 'en'
+      postId: '2024-01-10-will-ai-replace-human-developers',
+      authorName: 'Jane Smith',
+      authorEmail: 'jane@example.com',
+      content: 'Thanks for sharing this perspective!',
+      status: 'approved' as const
     }
   ];
   

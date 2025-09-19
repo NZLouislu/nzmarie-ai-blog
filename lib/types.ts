@@ -1,4 +1,4 @@
-export type PostStatus = 'draft' | 'published';
+export type PostStatus = 'draft' | 'published' | 'archived';
 
 export type PostMeta = {
   id: string;
@@ -19,4 +19,7 @@ export type Post = PostMeta & {
   content: string; // markdown
   image?: string;
   author?: string;
+  authorId?: string;
+  language?: string;
+  coverImage?: string;
 };

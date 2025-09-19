@@ -2,12 +2,12 @@ import { create } from "zustand";
 
 interface Comment {
   id: string;
-  post_id: string;
-  name: string | null;
-  email: string | null;
-  comment: string;
+  postId: string;
+  authorName: string | null;
+  authorEmail: string | null;
+  content: string;
   is_anonymous: boolean;
-  created_at: string;
+  createdAt: string;
   language?: string;
 }
 
@@ -82,21 +82,21 @@ const mockCommentCounts: CommentCount[] = [
 const mockComments: Comment[] = [
   {
     id: "101",
-    post_id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    comment: "Great article! Very insightful.",
+    postId: "1",
+    authorName: "John Doe",
+    authorEmail: "john@example.com",
+    content: "Great article! Very insightful.",
     is_anonymous: false,
-    created_at: "2025-09-01T10:30:00Z",
+    createdAt: "2025-09-01T10:30:00Z",
   },
   {
     id: "102",
-    post_id: "1",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    comment: "Thanks for sharing this perspective!",
+    postId: "1",
+    authorName: "Jane Smith",
+    authorEmail: "jane@example.com",
+    content: "Thanks for sharing this perspective!",
     is_anonymous: false,
-    created_at: "2025-09-02T11:45:00Z",
+    createdAt: "2025-09-02T11:45:00Z",
   },
 ];
 
@@ -236,14 +236,14 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
         console.error("Comments API error:", errorText);
         console.log("Using mock comments");
         const fallbackComments = mockComments.filter(
-          (c) => c.post_id === postId
+          (c) => c.postId === postId
         );
         setComments(fallbackComments);
       }
     } catch (err) {
       console.error("Failed to load comments:", err);
       setError("Failed to load comments");
-      const fallbackComments = mockComments.filter((c) => c.post_id === postId);
+      const fallbackComments = mockComments.filter((c) => c.postId === postId);
       setComments(fallbackComments);
     } finally {
       setLoadingComments(false);

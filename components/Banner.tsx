@@ -7,7 +7,7 @@ export default function Banner() {
     <div className="w-full px-6 py-12">
       <div className="relative w-full mt-8 h-96 rounded-3xl overflow-hidden">
         <Image
-          src="/images/duck-pack.jpg"
+          src="/img/background.png"
           alt="Banner"
           fill
           priority

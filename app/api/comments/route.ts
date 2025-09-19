@@ -16,12 +16,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
     }
 
+    // Convert postId to match database format with language suffix
+    const dbPostId = `${postId}-${language || 'en'}`;
+    
     const { data: comments, error } = await supabase
       .from('comments')
       .select('*')
-      .eq('post_id', postId)
+      .eq('postId', dbPostId)
       .eq('language', language || 'en')
-      .order('created_at', { ascending: false });
+      .order('createdAt', { ascending: false });
 
     if (error) {
       console.error('Supabase error:', error);
@@ -47,14 +50,17 @@ export async function POST(request: NextRequest) {
     console.log('Attempting to save to Supabase...');
     const startTime = Date.now();
 
+    // Convert postId to match database format with language suffix
+    const dbPostId = `${postId}-${language || 'en'}`;
+    
     const { data: newComment, error } = await supabase
       .from('comments')
       .insert({
-        post_id: postId,
+        postId: dbPostId,
         language: language || 'en',
-        name: isAnonymous ? null : name,
-        email: isAnonymous ? null : email,
-        comment,
+        authorName: isAnonymous ? null : name,
+        authorEmail: isAnonymous ? null : email,
+        content: comment,
         is_anonymous: isAnonymous
       })
       .select()

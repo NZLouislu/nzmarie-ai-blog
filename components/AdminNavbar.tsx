@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useAuthStore } from "../lib/store/auth";
+import { getAllUsers } from "../lib/auth/users";
 
 interface NavItem {
   name: string;
@@ -13,18 +15,14 @@ interface NavItem {
 export default function AdminNavbar() {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const { user, selectedUserId, selectUser, logout, isAdmin } = useAuthStore();
+  const [users, setUsers] = useState<Array<{ id: string; name: string; username: string }>>([]);
 
   useEffect(() => {
-    const userData = localStorage.getItem("adminUser");
-    if (userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-      }
+    if (isAdmin()) {
+      setUsers(getAllUsers().filter(u => u.role === 'user'));
     }
-  }, []);
+  }, [user, isAdmin]);
 
   const navigation: NavItem[] = [
     {
@@ -70,11 +68,19 @@ export default function AdminNavbar() {
     }
   };
 
+  const handleUserSwitch = (userId: string) => {
+    selectUser(userId);
+    router.push(`/admin/manage?uid=${userId}`);
+  };
+
   const handleLogout = () => {
-    localStorage.removeItem("adminAuthenticated");
-    localStorage.removeItem("adminUser");
+    logout();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("adminAuthenticated");
+    }
     router.push("/admin");
   };
+
 
   return (
     <nav className="bg-white shadow-sm border-b">
@@ -102,9 +108,24 @@ export default function AdminNavbar() {
               ))}
             </div>
             <div className="flex items-center space-x-3">
+              {isAdmin() && users.length > 0 && (
+                <div className="relative">
+                  <select
+                    value={selectedUserId || users[0]?.id || ''}
+                    onChange={(e) => handleUserSwitch(e.target.value)}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               {user && (
                 <span className="text-sm text-gray-600">
-                  Welcome, {user.username}
+                  Welcome, {user.name}
                 </span>
               )}
               <button

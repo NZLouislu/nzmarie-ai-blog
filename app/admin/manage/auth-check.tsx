@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "../../../lib/store/auth";
 
 interface AuthCheckProps {
   children: React.ReactNode;
@@ -10,20 +11,27 @@ interface AuthCheckProps {
 export default function AuthCheck({ children }: AuthCheckProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const router = useRouter();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     const checkAuth = () => {
-      const authStatus = localStorage.getItem("adminAuthenticated");
-      if (authStatus === "true") {
+      if (user) {
         setIsAuthenticated(true);
       } else {
-        setIsAuthenticated(false);
-        router.push("/admin");
+        const authStatus = localStorage.getItem("adminAuthenticated");
+        const authStorage = localStorage.getItem("auth-storage");
+        
+        if (authStatus === "true" || (authStorage && JSON.parse(authStorage).state?.user)) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+          router.push("/admin");
+        }
       }
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, user]);
 
   if (isAuthenticated === null) {
     return (

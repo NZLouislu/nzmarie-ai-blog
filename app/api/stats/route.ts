@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { listPublished } from "@/lib/posts";
+// removed unused imports
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -438,6 +439,12 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      return NextResponse.json({ success: true });
+    }
+
+    if (action === "comment") {
+      // Comment action doesn't need to update post_stats or daily_stats
+      // Comments are counted separately via the comments table
       return NextResponse.json({ success: true });
     }
 

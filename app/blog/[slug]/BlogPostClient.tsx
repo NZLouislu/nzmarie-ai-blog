@@ -16,12 +16,12 @@ import { useTranslation } from '@/lib/i18n';
 
 interface Comment {
   id: string;
-  post_id: string;
-  name?: string;
-  email?: string;
-  comment: string;
+  postId: string;
+  authorName?: string;
+  authorEmail?: string;
+  content: string;
   is_anonymous: boolean;
-  created_at: string;
+  createdAt: string;
 }
 
 // Comments Section Component
@@ -54,7 +54,7 @@ function CommentsSection({ postId }: { postId: string }) {
     };
 
     loadComments();
-  }, [postId, language]);
+  }, [postId, language, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,12 +66,12 @@ function CommentsSection({ postId }: { postId: string }) {
     // Create optimistic comment
     const optimisticComment: Comment = {
       id: `temp-${Date.now()}`,
-      post_id: postId,
-      name: formData.name,
-      email: formData.email,
-      comment: formData.comment,
+      postId: postId,
+      authorName: formData.name,
+      authorEmail: formData.email,
+      content: formData.comment,
       is_anonymous: formData.isAnonymous,
-      created_at: new Date().toISOString()
+      createdAt: new Date().toISOString()
     };
 
     setComments(prev => [optimisticComment, ...prev]);
@@ -211,20 +211,20 @@ function CommentsSection({ postId }: { postId: string }) {
               <div className="flex items-center gap-3 mb-2">
                 <Avatar
                   src=""
-                  fallback={comment.is_anonymous ? "A" : (comment.name || "U")[0]}
+                  fallback={comment.is_anonymous ? "A" : (comment.authorName || "U")[0]}
                   radius="full"
                   className="w-8 h-8"
                 />
                 <div>
                   <span className="font-medium text-gray-900">
-                    {comment.is_anonymous ? t('anonymous') : comment.name}
+                    {comment.is_anonymous ? t('anonymous') : comment.authorName}
                   </span>
                   <span className="text-sm text-gray-500 ml-2">
-                    {new Date(comment.created_at).toLocaleDateString(language === 'zh' ? "zh-CN" : "en-US")}
+                    {new Date(comment.createdAt).toLocaleDateString(language === 'zh' ? "zh-CN" : "en-US")}
                   </span>
                 </div>
               </div>
-              <p className="text-gray-700">{comment.comment}</p>
+              <p className="text-gray-700">{comment.content}</p>
             </div>
           ))
         )}

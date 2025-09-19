@@ -26,7 +26,7 @@ export async function GET() {
         const { count: commentCount } = await supabase
           .from("comments")
           .select("*", { count: "exact", head: true })
-          .eq("post_id", post.id)
+          .eq("postId", `${post.id}-${post.language}`)
           .eq("language", post.language);
 
         return {

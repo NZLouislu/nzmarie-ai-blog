@@ -69,15 +69,20 @@ export function getPostBySlug(slug: string, language: 'en' | 'zh' = 'en'): Post 
   }
 }
 
-export function getAllPosts(language: 'en' | 'zh' = 'en'): Post[] {
+export function getAllPosts(language: 'en' | 'zh' = 'en', authorId?: string): Post[] {
   const slugs = getPostSlugs(language);
-  const posts = slugs
+  let posts = slugs
     .map((slug: string) => getPostBySlug(slug.replace(/\.md$/, ""), language))
     .filter((post: Post | null): post is Post => post !== null)
     .sort(
       (a: Post, b: Post) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+
+  // Filter by author if specified
+  if (authorId) {
+    posts = posts.filter(post => post.author === authorId || post.id.includes(authorId));
+  }
 
   return posts;
 }

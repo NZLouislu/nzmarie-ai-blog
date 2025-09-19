@@ -52,7 +52,8 @@ interface StatsState {
   zhStats: LanguageStats;
   fetchStats: (
     language: "en" | "zh",
-    aggregate?: "all" | "single"
+    aggregate?: "all" | "single",
+    userId?: string
   ) => Promise<void>;
 }
 
@@ -244,16 +245,18 @@ export const useStatsStore = create<StatsState>((set, get) => ({
 
   fetchStats: async (
     language: "en" | "zh",
-    aggregate: "all" | "single" = "all"
+    aggregate: "all" | "single" = "all",
+    userId?: string
   ) => {
     try {
       set({ isLoading: true, error: null });
+      const userParam = userId ? `&userId=${userId}` : '';
       const res = await fetch(
-        `/api/stats?language=${language}&aggregate=${aggregate}`
+        `/api/stats?language=${language}&aggregate=${aggregate}${userParam}`
       );
       if (res.ok) {
         const data = await res.json();
-        console.log(`Fetched ${language} stats:`, data);
+        console.log(`Fetched ${language} stats for user ${userId}:`, data);
         set((state: StatsState) => ({
           ...state,
           [`${language}Stats`]: data,

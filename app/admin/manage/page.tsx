@@ -1,24 +1,34 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AuthCheck from "./auth-check";
 import AdminNavbar from "../../../components/AdminNavbar";
 import InitializeChineseData from "../../../components/InitializeChineseData";
 import { useStatsStore } from "../../../lib/stores/statsStore";
+import { useAuthStore } from "../../../lib/store/auth";
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { fetchStats, enStats, zhStats, totalStats, fetchTotalStats } =
     useStatsStore();
+  const { selectUser, selectedUserId } = useAuthStore();
+
+  useEffect(() => {
+    const uid = searchParams.get('uid');
+    if (uid && uid !== selectedUserId) {
+      selectUser(uid);
+    }
+  }, [searchParams, selectUser, selectedUserId]);
 
   useEffect(() => {
     const loadStats = async () => {
       try {
         setLoading(true);
-        const enPromise = fetchStats("en", "all");
-        const zhPromise = fetchStats("zh", "all");
+        const enPromise = fetchStats("en", "all", selectedUserId || undefined);
+        const zhPromise = fetchStats("zh", "all", selectedUserId || undefined);
         const totalPromise = fetchTotalStats();
         await Promise.all([enPromise, zhPromise, totalPromise]);
       } catch (error) {
@@ -29,7 +39,7 @@ export default function AdminDashboard() {
     };
 
     loadStats();
-  }, [fetchStats, fetchTotalStats]);
+  }, [fetchStats, fetchTotalStats, selectedUserId]);
 
   const getStats = (language: "en" | "zh") => {
     return language === "en" ? enStats : zhStats;

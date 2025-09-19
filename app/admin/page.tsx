@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "../../lib/store/auth";
+import { getStoredSession, storeSession } from "../../lib/auth/session";
 
 export default function AdminPage() {
   const [username, setUsername] = useState("");
@@ -9,13 +11,33 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { setUser } = useAuthStore();
 
   useEffect(() => {
-    const authStatus = localStorage.getItem("adminAuthenticated");
-    if (authStatus === "true") {
-      router.push("/admin/home");
+    // Only auto-login if all authentication tokens are present and valid
+    const session = getStoredSession();
+    const adminAuth = localStorage.getItem("adminAuthenticated");
+    
+    // Check if we have a valid session AND the admin flag is set
+    if (session && adminAuth === "true") {
+      // Double check that the auth store also has the user
+      const authStorage = localStorage.getItem("auth-storage");
+      if (authStorage) {
+        try {
+          const parsedAuth = JSON.parse(authStorage);
+          if (parsedAuth.state?.user) {
+            setUser(session);
+            router.push("/admin/home");
+          }
+        } catch {
+          // If parsing fails, clear invalid data
+          localStorage.removeItem("auth-storage");
+          localStorage.removeItem("adminAuthenticated");
+          localStorage.removeItem("userSession");
+        }
+      }
     }
-  }, [router]);
+  }, [router, setUser]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,8 +62,11 @@ export default function AdminPage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        localStorage.setItem("adminAuthenticated", "true");
-        localStorage.setItem("adminUser", JSON.stringify(data.user));
+        setUser(data.session);
+        storeSession(data.session);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem("adminAuthenticated", "true");
+        }
         router.push("/admin/home");
       } else {
         setError(data.error || "Login failed, please try again");

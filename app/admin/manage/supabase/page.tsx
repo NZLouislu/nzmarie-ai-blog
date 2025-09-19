@@ -23,12 +23,6 @@ interface Comment {
   language: string;
 }
 
-interface TableData {
-  table: string;
-  count?: number;
-  data?: Record<string, unknown>[];
-  structure?: Record<string, unknown>[];
-}
 
 export default function SupabaseDashboard() {
   const {
