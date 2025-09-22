@@ -334,8 +334,7 @@ Ready to start your New Zealand property investment journey? Here's what to do n
 
 **Contact Marie Hong**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 marie@nzrealestate.co.nz  
-📱 021 555 0123  
-🏢 Harcourts Auckland Central
+📧 nzmarie.com@gmail.com
+📱 021 0693 089
 
 _Disclaimer: This information is general in nature and should not replace professional financial or legal advice. Tax laws, investment regulations, and market conditions are subject to change. Always consult with qualified professionals before making investment decisions._

@@ -405,8 +405,7 @@ Maximizing property investment returns requires strategic action:
 
 **Contact Marie Hong**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 marie@nzrealestate.co.nz  
-📱 021 555 0123  
-🏢 Harcourts Auckland Central
+📧 nzmarie.com@gmail.com
+📱 021 0693 089
 
 _Disclaimer: This information is general in nature and should not replace professional financial or investment advice. Property markets are dynamic and returns are not guaranteed. Past performance does not indicate future results. Always consult with qualified professionals before making investment decisions._

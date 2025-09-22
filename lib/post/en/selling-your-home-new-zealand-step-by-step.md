@@ -268,9 +268,8 @@ If you're considering selling your home, I'd love to help you achieve the best p
 
 **Contact Marie Hong**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 marie@nzrealestate.co.nz  
-📱 021 555 0123  
-🏢 Harcourts Auckland Central
+📧 nzmarie.com@gmail.com
+📱 021 0693 089
 
 **Recent Success Stories:**
 

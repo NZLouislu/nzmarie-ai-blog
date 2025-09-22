@@ -386,8 +386,7 @@ categories: [买房]
 
 **联系 Marie Hong**  
 持牌房地产经纪人 (REAA 2008)  
-📧 marie@nzrealestate.co.nz  
-📱 021 555 0123  
-🏢 Harcourts 奥克兰中央
+📧 nzmarie.com@gmail.com
+📱 021 0693 089
 
 _免责声明：此信息为一般性质，不应替代专业法律建议。房产法复杂且因情况而异。在做出影响您房产购买的决策之前，请始终咨询合格的法律专业人士。_

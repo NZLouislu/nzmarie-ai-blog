@@ -153,8 +153,7 @@ Remember, buying property is one of life's biggest investments. Having the right
 
 **Contact Marie Hong**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 marie@nzrealestate.co.nz  
-📱 021 555 0123  
-🏢 Harcourts Auckland Central
+📧 nzmarie.com@gmail.com
+📱 021 0693 089
 
 _Disclaimer: This information is general in nature and should not replace professional financial or legal advice._

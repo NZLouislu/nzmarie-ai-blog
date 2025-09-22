@@ -97,7 +97,10 @@ function CommentsSection({ postId }: { postId: string }) {
         body: JSON.stringify({
           postId,
           language,
-          ...currentFormData,
+          content: currentFormData.comment,
+          authorName: currentFormData.name,
+          authorEmail: currentFormData.email,
+          isAnonymous: currentFormData.isAnonymous,
         }),
       });
 

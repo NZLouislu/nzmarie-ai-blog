@@ -148,9 +148,13 @@ export async function POST(request: NextRequest) {
     // Create comment
     const comment = await prisma.comment.create({
       data: {
-        postId: realPostId, // Use the real database ID
-        authorName: isAnonymous ? null : authorName,
-        authorEmail: isAnonymous ? null : authorEmail,
+        post: {
+          connect: {
+            id: realPostId,
+          },
+        },
+        authorName: isAnonymous ? "Anonymous" : authorName,
+        authorEmail: isAnonymous ? "anonymous@example.com" : authorEmail,
         content,
         is_anonymous: isAnonymous || false, // Correct field name
         status: "pending",
