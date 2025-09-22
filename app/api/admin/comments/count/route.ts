@@ -23,10 +23,13 @@ export async function GET() {
 
     const postsWithCommentCounts = await Promise.all(
       allPosts.map(async (post) => {
+        // Use the actual post id without language suffix
+        const dbPostId = post.id;
+
         const { count: commentCount } = await supabase
           .from("comments")
           .select("*", { count: "exact", head: true })
-          .eq("postId", `${post.id}-${post.language}`)
+          .eq("postId", dbPostId)
           .eq("language", post.language);
 
         return {

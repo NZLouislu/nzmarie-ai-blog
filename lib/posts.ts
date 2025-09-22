@@ -146,3 +146,29 @@ export function getBySlug(
   const post = getPostBySlug(slug, language);
   return post && post.status === "published" ? post : null;
 }
+
+// New function to get post metadata from database (minimal data)
+export function getPostMetadataBySlug(
+  slug: string,
+  language: "en" | "zh" = "en"
+): Partial<Post> | null {
+  try {
+    // This function would fetch minimal post data from database
+    // For now, we'll just return the basic structure
+    return {
+      id: slug,
+      slug: slug,
+      title: "", // Will be filled from database
+      language: language,
+      status: "published",
+    };
+  } catch (error) {
+    console.error(`Error reading post metadata ${slug}:`, error);
+    return null;
+  }
+}
+
+// Function to get all NZMarie posts with proper language handling
+export function getNZMariePosts(language: "en" | "zh" = "en"): Post[] {
+  return getAllPosts(language, "nzmarie");
+}

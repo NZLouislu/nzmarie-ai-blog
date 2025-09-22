@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
       .order("createdAt", { ascending: false });
 
     if (postId) {
-      // Convert postId to match database format with language suffix
-      const dbPostId = `${postId}-${language || 'en'}`;
+      // Use the actual post id without language suffix
+      const dbPostId = postId;
       query = query.eq("postId", dbPostId);
     }
 

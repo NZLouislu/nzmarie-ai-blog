@@ -1,43 +1,59 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-const prisma = new PrismaClient();
+// Create Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET() {
   try {
-    const statsByLanguage = await prisma.postStat.groupBy({
-      by: ['language'],
-      _sum: {
-        views: true,
-        likes: true,
-      },
-      _count: {
-        id: true,
-      },
-    });
+    // Get stats grouped by language from Supabase
+    const { data: postStats, error } = await supabase
+      .from("post_stats")
+      .select("language, views, likes");
+
+    if (error) {
+      console.error("Supabase error:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch overview" },
+        { status: 500 }
+      );
+    }
 
     const overview = {
       en: { count: 0, views: 0, likes: 0 },
       zh: { count: 0, views: 0, likes: 0 },
     };
 
-    statsByLanguage.forEach((stat) => {
-      if (stat.language === 'en') {
-        overview.en.count = stat._count.id;
-        overview.en.views = stat._sum.views || 0;
-        overview.en.likes = stat._sum.likes || 0;
-      } else if (stat.language === 'zh') {
-        overview.zh.count = stat._count.id;
-        overview.zh.views = stat._sum.views || 0;
-        overview.zh.likes = stat._sum.likes || 0;
+    // Group stats by language
+    const statsByLanguage: Record<
+      string,
+      { count: number; views: number; likes: number }
+    > = {
+      en: { count: 0, views: 0, likes: 0 },
+      zh: { count: 0, views: 0, likes: 0 },
+    };
+
+    postStats?.forEach((stat) => {
+      const lang = stat.language || "en";
+      if (lang in statsByLanguage) {
+        statsByLanguage[lang].count += 1;
+        statsByLanguage[lang].views += stat.views || 0;
+        statsByLanguage[lang].likes += stat.likes || 0;
       }
     });
 
+    overview.en = statsByLanguage.en;
+    overview.zh = statsByLanguage.zh;
+
     return NextResponse.json(overview);
   } catch (error) {
-    console.error('Failed to fetch overview:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
+    console.error("Failed to fetch overview:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

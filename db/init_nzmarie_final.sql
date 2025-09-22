@@ -1,7 +1,13 @@
 -- Initialize NZMarie blog data in the database
 -- Execute this script in Supabase SQL editor manually
 
--- 1. First, clean up all existing data related to nzmarie to ensure clean initialization
+-- 1. Fix database constraints to ensure consistency
+-- Remove old constraint if it exists
+ALTER TABLE post_stats DROP CONSTRAINT IF EXISTS post_stats_post_id_key;
+-- Ensure new constraint exists
+ALTER TABLE post_stats ADD CONSTRAINT post_stats_post_id_language_key UNIQUE (post_id, language);
+
+-- 2. First, clean up all existing data related to nzmarie to ensure clean initialization
 -- Delete post_stats entries for NZMarie's posts
 DELETE FROM post_stats WHERE "post_id" IN (
   SELECT id FROM posts WHERE "authorId" = 'nzmarie'
@@ -17,7 +23,7 @@ DELETE FROM comments WHERE "postId" IN (
   SELECT id FROM posts WHERE "authorId" = 'nzmarie'
 );
 
--- 2. Insert or update NZMarie user
+-- 3. Insert or update NZMarie user
 INSERT INTO users (id, email, name, role, "avatarUrl", "languagePreferences", "createdAt", "updatedAt") VALUES
 ('nzmarie', 'marie@nzrealestate.co.nz', 'Marie Hong', 'user', '/images/authors/marie.jpg', 'both', NOW(), NOW())
 ON CONFLICT (id) DO UPDATE SET
@@ -28,7 +34,7 @@ ON CONFLICT (id) DO UPDATE SET
   "languagePreferences" = EXCLUDED."languagePreferences",
   "updatedAt" = NOW();
 
--- 3. Ensure all NZMarie posts exist in the database
+-- 4. Ensure all NZMarie posts exist in the database
 -- English posts
 INSERT INTO posts (id, "authorId", slug, title, content, "language", status, "createdAt", "updatedAt", tags)
 SELECT 
@@ -155,55 +161,55 @@ WHERE NOT EXISTS (
   SELECT 1 FROM posts WHERE "authorId" = 'nzmarie' AND slug = ps.slug AND "language" = 'zh'
 );
 
--- 4. Insert NZMarie blog post statistics with proper conflict handling
+-- 5. Insert NZMarie blog post statistics with proper conflict handling
 -- English posts
-INSERT INTO post_stats ("post_id", title, views, likes, "ai_questions", "ai_summaries", "language") 
-SELECT p.id, ps.title, ps.views, ps.likes, ps."ai_questions", ps."ai_summaries", ps."language"
+INSERT INTO post_stats ("post_id", title, views, likes, "ai_questions", "ai_summaries", "language", comments) 
+SELECT p.id, ps.title, ps.views, ps.likes, ps."ai_questions", ps."ai_summaries", ps."language", ps.comments
 FROM (
   SELECT 
     'buying-property-new-zealand-complete-guide' as slug,
     'Your Complete Guide to Buying Property in New Zealand' as title,
-    180 as views, 30 as likes, 12 as "ai_questions", 18 as "ai_summaries", 'en' as "language"
+    180 as views, 30 as likes, 12 as "ai_questions", 18 as "ai_summaries", 'en' as "language", 2 as comments
   UNION ALL
   SELECT 
     'first-home-buyer-financing-guide-new-zealand' as slug,
     'First Home Buyer Financing Guide for New Zealand' as title,
-    120 as views, 20 as likes, 6 as "ai_questions", 10 as "ai_summaries", 'en' as "language"
+    120 as views, 20 as likes, 6 as "ai_questions", 10 as "ai_summaries", 'en' as "language", 1 as comments
   UNION ALL
   SELECT 
     'maximizing-property-investment-returns-new-zealand' as slug,
     'Maximizing Property Investment Returns in New Zealand' as title,
-    100 as views, 18 as likes, 6 as "ai_questions", 9 as "ai_summaries", 'en' as "language"
+    100 as views, 18 as likes, 6 as "ai_questions", 9 as "ai_summaries", 'en' as "language", 1 as comments
   UNION ALL
   SELECT 
     'navigating-legal-aspects-property-purchase-new-zealand' as slug,
     'Navigating the Legal Aspects of Property Purchase in New Zealand' as title,
-    95 as views, 15 as likes, 5 as "ai_questions", 8 as "ai_summaries", 'en' as "language"
+    95 as views, 15 as likes, 5 as "ai_questions", 8 as "ai_summaries", 'en' as "language", 1 as comments
   UNION ALL
   SELECT 
     'new-zealand-property-investment-guide-australian-expats' as slug,
     'New Zealand Property Investment Guide for Australian Expats' as title,
-    65 as views, 8 as likes, 2 as "ai_questions", 3 as "ai_summaries", 'en' as "language"
+    65 as views, 8 as likes, 2 as "ai_questions", 3 as "ai_summaries", 'en' as "language", 1 as comments
   UNION ALL
   SELECT 
     'new-zealand-property-market-trends-2024' as slug,
     'New Zealand Property Market Trends 2024: What You Need to Know' as title,
-    140 as views, 22 as likes, 8 as "ai_questions", 12 as "ai_summaries", 'en' as "language"
+    140 as views, 22 as likes, 8 as "ai_questions", 12 as "ai_summaries", 'en' as "language", 1 as comments
   UNION ALL
   SELECT 
     'retirement-planning-new-zealand-property-owners' as slug,
     'Retirement Planning for New Zealand Property Owners' as title,
-    75 as views, 10 as likes, 2 as "ai_questions", 4 as "ai_summaries", 'en' as "language"
+    75 as views, 10 as likes, 2 as "ai_questions", 4 as "ai_summaries", 'en' as "language", 1 as comments
   UNION ALL
   SELECT 
     'selling-your-home-new-zealand-step-by-step' as slug,
     'Selling Your Home in New Zealand: A Step-by-Step Guide for Homeowners' as title,
-    160 as views, 25 as likes, 10 as "ai_questions", 14 as "ai_summaries", 'en' as "language"
+    160 as views, 25 as likes, 10 as "ai_questions", 14 as "ai_summaries", 'en' as "language", 2 as comments
   UNION ALL
   SELECT 
     'understanding-body-corporate-apartment-owners-new-zealand' as slug,
     'Understanding Body Corporate for Apartment Owners in New Zealand' as title,
-    80 as views, 12 as likes, 3 as "ai_questions", 6 as "ai_summaries", 'en' as "language"
+    80 as views, 12 as likes, 3 as "ai_questions", 6 as "ai_summaries", 'en' as "language", 1 as comments
 ) ps
 JOIN posts p ON p.slug = ps.slug AND p."authorId" = 'nzmarie' AND p."language" = 'en'
 ON CONFLICT ("post_id", "language") DO UPDATE SET
@@ -211,56 +217,58 @@ ON CONFLICT ("post_id", "language") DO UPDATE SET
   views = EXCLUDED.views,
   likes = EXCLUDED.likes,
   "ai_questions" = EXCLUDED."ai_questions",
-  "ai_summaries" = EXCLUDED."ai_summaries";
+  "ai_summaries" = EXCLUDED."ai_summaries",
+  language = EXCLUDED.language,
+  comments = EXCLUDED.comments;
 
 -- Chinese posts
-INSERT INTO post_stats ("post_id", title, views, likes, "ai_questions", "ai_summaries", "language") 
-SELECT p.id, ps.title, ps.views, ps.likes, ps."ai_questions", ps."ai_summaries", ps."language"
+INSERT INTO post_stats ("post_id", title, views, likes, "ai_questions", "ai_summaries", "language", comments) 
+SELECT p.id, ps.title, ps.views, ps.likes, ps."ai_questions", ps."ai_summaries", ps."language", ps.comments
 FROM (
   SELECT 
     'buying-property-new-zealand-complete-guide' as slug,
     '在新西兰购房完整指南' as title,
-    180 as views, 30 as likes, 12 as "ai_questions", 18 as "ai_summaries", 'zh' as "language"
+    180 as views, 30 as likes, 12 as "ai_questions", 18 as "ai_summaries", 'zh' as "language", 2 as comments
   UNION ALL
   SELECT 
     'first-home-buyer-financing-guide-new-zealand' as slug,
     '新西兰首次购房者融资指南' as title,
-    120 as views, 20 as likes, 6 as "ai_questions", 10 as "ai_summaries", 'zh' as "language"
+    120 as views, 20 as likes, 6 as "ai_questions", 10 as "ai_summaries", 'zh' as "language", 1 as comments
   UNION ALL
   SELECT 
     'maximizing-property-investment-returns-new-zealand' as slug,
     '最大化新西兰房地产投资回报' as title,
-    100 as views, 18 as likes, 6 as "ai_questions", 9 as "ai_summaries", 'zh' as "language"
+    100 as views, 18 as likes, 6 as "ai_questions", 9 as "ai_summaries", 'zh' as "language", 1 as comments
   UNION ALL
   SELECT 
     'navigating-legal-aspects-property-purchase-new-zealand' as slug,
     '了解新西兰购房的法律问题' as title,
-    95 as views, 15 as likes, 5 as "ai_questions", 8 as "ai_summaries", 'zh' as "language"
+    95 as views, 15 as likes, 5 as "ai_questions", 8 as "ai_summaries", 'zh' as "language", 1 as comments
   UNION ALL
   SELECT 
     'new-zealand-property-investment-guide-australian-expats' as slug,
     '新西兰房地产投资指南：澳洲居民版' as title,
-    65 as views, 8 as likes, 2 as "ai_questions", 3 as "ai_summaries", 'zh' as "language"
+    65 as views, 8 as likes, 2 as "ai_questions", 3 as "ai_summaries", 'zh' as "language", 1 as comments
   UNION ALL
   SELECT 
     'new-zealand-property-market-trends-2024' as slug,
     '2024年新西兰房地产市场趋势：您需要了解的内容' as title,
-    140 as views, 22 as likes, 8 as "ai_questions", 12 as "ai_summaries", 'zh' as "language"
+    140 as views, 22 as likes, 8 as "ai_questions", 12 as "ai_summaries", 'zh' as "language", 1 as comments
   UNION ALL
   SELECT 
     'retirement-planning-new-zealand-property-owners' as slug,
     '新西兰房产所有者的退休规划' as title,
-    75 as views, 10 as likes, 2 as "ai_questions", 4 as "ai_summaries", 'zh' as "language"
+    75 as views, 10 as likes, 2 as "ai_questions", 4 as "ai_summaries", 'zh' as "language", 1 as comments
   UNION ALL
   SELECT 
     'selling-your-home-new-zealand-step-by-step' as slug,
     '在新西兰出售房产：房主分步指南' as title,
-    160 as views, 25 as likes, 10 as "ai_questions", 14 as "ai_summaries", 'zh' as "language"
+    160 as views, 25 as likes, 10 as "ai_questions", 14 as "ai_summaries", 'zh' as "language", 2 as comments
   UNION ALL
   SELECT 
     'understanding-body-corporate-apartment-owners-new-zealand' as slug,
     '了解新西兰公寓业主的业主立案法团' as title,
-    80 as views, 12 as likes, 3 as "ai_questions", 6 as "ai_summaries", 'zh' as "language"
+    80 as views, 12 as likes, 3 as "ai_questions", 6 as "ai_summaries", 'zh' as "language", 1 as comments
 ) ps
 JOIN posts p ON p.slug = ps.slug AND p."authorId" = 'nzmarie' AND p."language" = 'zh'
 ON CONFLICT ("post_id", "language") DO UPDATE SET
@@ -268,9 +276,11 @@ ON CONFLICT ("post_id", "language") DO UPDATE SET
   views = EXCLUDED.views,
   likes = EXCLUDED.likes,
   "ai_questions" = EXCLUDED."ai_questions",
-  "ai_summaries" = EXCLUDED."ai_summaries";
+  "ai_summaries" = EXCLUDED."ai_summaries",
+  language = EXCLUDED.language,
+  comments = EXCLUDED.comments;
 
--- 5. Insert sample comments with proper conflict handling
+-- 6. Insert sample comments with proper conflict handling
 -- English comments
 INSERT INTO comments ("postId", "authorName", "authorEmail", content, status, "language", "createdAt") 
 SELECT p.id, c."authorName", c."authorEmail", c.content, c.status::"CommentStatus", c."language", NOW()
@@ -365,7 +375,7 @@ FROM (
 JOIN posts p ON p.slug = c.slug AND p."authorId" = 'nzmarie' AND p."language" = 'zh'
 ON CONFLICT DO NOTHING;
 
--- 6. Insert daily statistics with proper conflict handling
+-- 7. Insert daily statistics with proper conflict handling
 -- First, delete existing data for today to avoid conflicts
 DELETE FROM daily_stats WHERE "post_id" IN (
   SELECT id FROM posts WHERE "authorId" = 'nzmarie'
@@ -436,152 +446,4 @@ SELECT
         WHEN 'maximizing-property-investment-returns-new-zealand' THEN 8
         WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 7
         WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 5
-        WHEN 'new-zealand-property-market-trends-2024' THEN 12
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 6
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 14
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 7
-        ELSE 5
-    END,
-    CASE p.slug
-        WHEN 'buying-property-new-zealand-complete-guide' THEN 10
-        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 8
-        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 6
-        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 5
-        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 4
-        WHEN 'new-zealand-property-market-trends-2024' THEN 9
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 4
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 11
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 5
-        ELSE 5
-    END,
-    CASE p.slug
-        WHEN 'buying-property-new-zealand-complete-guide' THEN 2
-        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 1
-        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
-        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 0
-        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 0
-        WHEN 'new-zealand-property-market-trends-2024' THEN 1
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 0
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 2
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 1
-        ELSE 0
-    END
-FROM posts p 
-WHERE p."authorId" = 'nzmarie' AND p."language" = 'en'
-ON CONFLICT DO NOTHING;
-
--- Insert daily stats for Chinese posts
-INSERT INTO daily_stats (id, "post_id", date, "pageViews", likes, "ai_questions", "ai_summaries", "language", "uniqueVisitors", reads, comments)
-SELECT 
-    gen_random_uuid(),
-    p.id,  -- This is the post_id field needed in Supabase
-    CURRENT_DATE,
-    CASE p.slug
-        WHEN 'buying-property-new-zealand-complete-guide' THEN 18
-        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 12
-        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 10
-        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 9
-        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 6
-        WHEN 'new-zealand-property-market-trends-2024' THEN 14
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 7
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 16
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 8
-        ELSE 5
-    END,
-    CASE p.slug
-        WHEN 'buying-property-new-zealand-complete-guide' THEN 3
-        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 2
-        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
-        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 1
-        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 1
-        WHEN 'new-zealand-property-market-trends-2024' THEN 2
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 1
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 2
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 1
-        ELSE 1
-    END,
-    CASE p.slug
-        WHEN 'buying-property-new-zealand-complete-guide' THEN 2
-        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 1
-        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
-        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 0
-        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 0
-        WHEN 'new-zealand-property-market-trends-2024' THEN 1
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 0
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 1
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 0
-        ELSE 0
-    END,
-    CASE p.slug
-        WHEN 'buying-property-new-zealand-complete-guide' THEN 3
-        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 1
-        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
-        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 1
-        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 1
-        WHEN 'new-zealand-property-market-trends-2024' THEN 2
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 1
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 2
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 1
-        ELSE 1
-    END,
-    'zh',
-    CASE p.slug
-        WHEN 'buying-property-new-zealand-complete-guide' THEN 15
-        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 10
-        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 8
-        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 7
-        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 5
-        WHEN 'new-zealand-property-market-trends-2024' THEN 12
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 6
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 14
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 7
-        ELSE 5
-    END,
-    CASE p.slug
-        WHEN 'buying-property-new-zealand-complete-guide' THEN 10
-        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 8
-        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 6
-        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 5
-        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 4
-        WHEN 'new-zealand-property-market-trends-2024' THEN 9
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 4
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 11
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 5
-        ELSE 5
-    END,
-    CASE p.slug
-        WHEN 'buying-property-new-zealand-complete-guide' THEN 2
-        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 1
-        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
-        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 0
-        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 0
-        WHEN 'new-zealand-property-market-trends-2024' THEN 1
-        WHEN 'retirement-planning-new-zealand-property-owners' THEN 0
-        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 2
-        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 1
-        ELSE 0
-    END
-FROM posts p 
-WHERE p."authorId" = 'nzmarie' AND p."language" = 'zh'
-ON CONFLICT DO NOTHING;
-
--- 7. Verify the updates
-SELECT 
-  "language",
-  COUNT(*) as post_count,
-  SUM(views) as total_views,
-  SUM(likes) as total_likes,
-  SUM("ai_questions") as total_ai_questions,
-  SUM("ai_summaries") as total_ai_summaries
-FROM post_stats 
-GROUP BY "language" 
-ORDER BY "language";
-
-SELECT 
-  "language",
-  COUNT(*) as comment_count
-FROM comments 
-GROUP BY "language" 
-ORDER BY "language";
-
-SELECT id, "authorId", title, "language" FROM posts WHERE "authorId" = 'nzmarie' ORDER BY "language", "createdAt" DESC;
+        WHEN '

@@ -6,7 +6,6 @@ import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import { Post } from "@/lib/types";
 import { useLanguageStore } from "@/lib/stores/languageStore";
-import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
 import BlogList from "@/components/BlogList";
 
@@ -21,7 +20,6 @@ export default function TagContent({
 }: TagContentProps) {
   const { language } = useLanguageStore();
   const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const { postStats } = useStatsStore();
   const { fetchToggles } = useTogglesStore();
 
   useEffect(() => {

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { createClient } from "@supabase/supabase-js";
 
-// Ensure only one Prisma client instance is created
-const prisma = new PrismaClient();
+// Create Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 // GET /api/stats?postId={postId}&language={language}
 export async function GET(request: NextRequest) {
@@ -18,64 +21,39 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // First, try to find the post by slug to get the real database ID
-    let realPostId = null;
-    try {
-      // Try to find the post in the database by slug
-      const post = await prisma.post.findFirst({
-        where: {
-          slug: postId,
-          language: language as "en" | "zh",
-        },
-      });
+    // Get stats from Supabase
+    const { data: stats, error } = await supabase
+      .from("post_stats")
+      .select("*")
+      .eq("post_id", postId)
+      .eq("language", language)
+      .single();
 
-      if (post) {
-        realPostId = post.id;
-      } else {
-        // If not found in database, return default stats
-        return NextResponse.json({
-          postId,
-          title: "",
-          views: 0,
-          likes: 0,
-          ai_questions: 0,
-          ai_summaries: 0,
-          language: language || "en",
-        });
-      }
-    } catch (error) {
-      console.error("Database error when finding post:", postId, error);
-      // If database error, return default stats
+    if (error) {
+      console.error("Supabase error when fetching stats:", error);
+      // Return default stats if not found
       return NextResponse.json({
-        postId,
+        post_id: postId,
         title: "",
         views: 0,
         likes: 0,
         ai_questions: 0,
         ai_summaries: 0,
+        comments: 0,
         language: language || "en",
       });
     }
 
-    // Get stats using the real database ID
-    const stats = await prisma.postStat.findUnique({
-      where: {
-        post_id_language: {
-          post_id: realPostId!,
-          language: (language || "en") as "en" | "zh",
-        },
-      },
-    });
-
     if (!stats) {
       // Return default stats if not found
       return NextResponse.json({
-        postId,
+        post_id: postId,
         title: "",
         views: 0,
         likes: 0,
         ai_questions: 0,
         ai_summaries: 0,
+        comments: 0,
         language: language || "en",
       });
     }
@@ -84,6 +62,7 @@ export async function GET(request: NextRequest) {
       ...stats,
       ai_questions: stats.ai_questions || 0,
       ai_summaries: stats.ai_summaries || 0,
+      comments: stats.comments || 0,
     });
   } catch (error) {
     console.error("Error in GET /api/stats:", error);
@@ -91,9 +70,6 @@ export async function GET(request: NextRequest) {
       { error: "Failed to fetch stats" },
       { status: 500 }
     );
-  } finally {
-    // Note: In Next.js API routes, it is not recommended to disconnect after each request
-    // await prisma.$disconnect();
   }
 }
 
@@ -109,158 +85,143 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Convert postId to match database format without language suffix
+    // The postId from frontend may include language suffix, but database stores without it
+    const dbPostId = postId.endsWith(`-${language}`)
+      ? postId.slice(0, -(language.length + 1))
+      : postId;
+
     // For now, we'll assume all users are non-admins to avoid the authentication issue
     // In a real application, you would check the user's role from the session/cookie
     const isAdmin = false;
 
-    // First, try to find the post by slug to get the real database ID
-    let realPostId = null;
-    try {
-      // Try to find the post in the database by slug
-      const post = await prisma.post.findFirst({
-        where: {
-          slug: postId,
-          language: language as "en" | "zh",
-        },
-      });
-
-      if (post) {
-        realPostId = post.id;
-        console.log("Found post in database with ID:", realPostId);
-      } else {
-        // If not found in database, check if it exists as a markdown file
-        console.log("Post not found in database, checking markdown files...");
-
-        // We'll create a temporary post record for markdown-based posts
-        const tempPost = await prisma.post.upsert({
-          where: {
-            authorId_slug: {
-              authorId: "cmfstfjsu0000qygwl9cbsayd", // Default author ID
-              slug: postId,
-            },
-          },
-          update: {},
-          create: {
-            authorId: "cmfstfjsu0000qygwl9cbsayd", // Default author ID
-            slug: postId,
-            title: `Post: ${postId}`,
-            content: "Content from markdown file",
-            language: language as "en" | "zh",
-            status: "published",
-            tags: "auto-generated",
-          },
-        });
-
-        realPostId = tempPost.id;
-        console.log("Created temporary post record with ID:", realPostId);
-      }
-    } catch (error) {
-      // If we can't find or create the post in the database, return an error
-      console.error(
-        "Database error when finding/creating post:",
-        postId,
-        error
-      );
-      return NextResponse.json(
-        { error: "Database error when finding/creating post" },
-        { status: 500 }
-      );
+    // Get or create post stats in Supabase
+    const updateData: { [key: string]: { increment: number } } = {};
+    switch (action) {
+      case "view":
+        updateData.views = { increment: 1 };
+        break;
+      case "like":
+        updateData.likes = { increment: 1 };
+        break;
+      case "ai_question":
+        updateData.ai_questions = { increment: 1 };
+        break;
+      case "ai_summary":
+        updateData.ai_summaries = { increment: 1 };
+        break;
+      case "comment":
+        updateData.comments = { increment: 1 };
+        break;
+      default:
+        updateData.views = { increment: 1 };
     }
 
-    // Make sure we have a valid post ID
-    if (!realPostId) {
-      console.error("No valid post ID found or created for slug:", postId);
-      return NextResponse.json(
-        { error: "No valid post ID found or created" },
-        { status: 500 }
-      );
-    }
+    // Try upsert with the correct conflict resolution first
+    const upsertData = {
+      post_id: dbPostId,
+      title: `Post ${dbPostId}`,
+      language: language,
+      views: action === "view" ? 1 : 0,
+      likes: action === "like" ? 1 : 0,
+      ai_questions: action === "ai_question" ? 1 : 0,
+      ai_summaries: action === "ai_summary" ? 1 : 0,
+      comments: action === "comment" ? 1 : 0,
+    };
 
-    // Increment views only if we have a valid post ID
-    const updatedStats = await prisma.postStat.upsert({
-      where: {
-        post_id_language: {
-          post_id: realPostId,
-          language,
-        },
-      },
-      update: {
-        views: {
-          increment: 1,
-        },
-      },
-      create: {
-        post_id: realPostId,
-        title: `Post ${postId}`,
-        views: 1,
-        likes: 0,
-        ai_questions: 0,
-        ai_summaries: 0,
-        language,
-      },
-    });
+    // Upsert stats in Supabase
+    const { data: updatedStats, error } = await supabase
+      .from("post_stats")
+      .upsert(upsertData, {
+        onConflict: "post_id,language", // This should match the unique constraint
+      })
+      .select()
+      .single();
 
-    // Also update daily stats
-    // First, ensure the user exists
-    let user;
-    try {
-      user = await prisma.user.findUnique({
-        where: {
-          id: "nzmarie",
-        },
-      });
+    if (error) {
+      console.error("Supabase error when updating stats:", error);
 
-      if (!user) {
-        // Generate a unique email to avoid constraint violations
-        const email = `nzmarie-${Date.now()}@example.com`;
-        user = await prisma.user.create({
-          data: {
-            id: "nzmarie",
-            email: email,
-            name: "NZ Marie",
-            role: "user",
-            languagePreferences: "both",
-          },
-        });
+      // If the error is due to the old constraint, try to handle it
+      if (
+        error.code === "23505" &&
+        error.message.includes("post_stats_post_id_key")
+      ) {
+        // Conflict due to old constraint, try to update existing record directly
+        const { data: existingStats, error: fetchError } = await supabase
+          .from("post_stats")
+          .select("*")
+          .eq("post_id", dbPostId)
+          .eq("language", language)
+          .single();
+
+        if (fetchError) {
+          console.error("Error fetching existing stats:", fetchError);
+          return NextResponse.json(
+            { error: "Failed to update stats" },
+            { status: 500 }
+          );
+        }
+
+        // Update the existing record
+        const { data: updatedStats, error: updateError } = await supabase
+          .from("post_stats")
+          .update({
+            views: action === "view" ? { increment: 1 } : undefined,
+            likes: action === "like" ? { increment: 1 } : undefined,
+            ai_questions:
+              action === "ai_question" ? { increment: 1 } : undefined,
+            ai_summaries:
+              action === "ai_summary" ? { increment: 1 } : undefined,
+            comments: action === "comment" ? { increment: 1 } : undefined,
+          })
+          .eq("post_id", dbPostId)
+          .eq("language", language)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error("Supabase error when updating stats:", updateError);
+          return NextResponse.json(
+            { error: "Failed to update stats" },
+            { status: 500 }
+          );
+        }
+
+        // Continue with daily stats update
+        await updateDailyStats(dbPostId, language, action, isAdmin);
+        return NextResponse.json(updatedStats);
       }
-    } catch (userError) {
-      console.error("Error ensuring user exists:", userError);
-      // If we can't create the user, we'll skip daily stats update
+
+      // If upsert fails due to conflict, try to update existing record
+      const { data: updatedStats, error: updateError } = await supabase
+        .from("post_stats")
+        .update({
+          views: action === "view" ? { increment: 1 } : undefined,
+          likes: action === "like" ? { increment: 1 } : undefined,
+          ai_questions: action === "ai_question" ? { increment: 1 } : undefined,
+          ai_summaries: action === "ai_summary" ? { increment: 1 } : undefined,
+          comments: action === "comment" ? { increment: 1 } : undefined,
+        })
+        .eq("post_id", dbPostId)
+        .eq("language", language)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Supabase error when updating stats:", updateError);
+        return NextResponse.json(
+          { error: "Failed to update stats" },
+          { status: 500 }
+        );
+      }
+
+      // Continue with daily stats update
+      await updateDailyStats(dbPostId, language, action, isAdmin);
       return NextResponse.json(updatedStats);
     }
 
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0); // Set to start of day in UTC
-    await prisma.dailyStat.upsert({
-      where: {
-        userId_date_language: {
-          userId: user.id,
-          date: today,
-          language,
-        },
-      },
-      update: {
-        pageViews: {
-          increment: 1,
-        },
-        uniqueVisitors: isAdmin
-          ? undefined
-          : {
-              increment: 1,
-            },
-      },
-      create: {
-        userId: user.id,
-        date: today,
-        pageViews: 1,
-        uniqueVisitors: isAdmin ? 0 : 1,
-        reads: 0,
-        likes: 0,
-        comments: 0,
-        language,
-      },
-    });
-
+    // Also update daily stats
+    await updateDailyStats(dbPostId, language, action, isAdmin);
     return NextResponse.json(updatedStats);
   } catch (error) {
     console.error("Error in POST /api/stats:", error);
@@ -268,9 +229,42 @@ export async function POST(request: NextRequest) {
       { error: "Failed to update stats" },
       { status: 500 }
     );
-  } finally {
-    // Note: In Next.js API routes, it is not recommended to disconnect after each request
-    // await prisma.$disconnect();
+  }
+}
+
+// Helper function to update daily stats
+async function updateDailyStats(
+  dbPostId: string,
+  language: string,
+  action: string,
+  isAdmin: boolean
+) {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0); // Set to start of day in UTC
+
+  // Upsert daily stats - include post_id as it's required
+  const { error: dailyError } = await supabase.from("daily_stats").upsert(
+    {
+      post_id: dbPostId,
+      userId: "nzmarie",
+      date: today,
+      language: language,
+      views: action === "view" ? 1 : 0,
+      likes: action === "like" ? 1 : 0,
+      ai_questions: action === "ai_question" ? 1 : 0,
+      ai_summaries: action === "ai_summary" ? 1 : 0,
+      pageViews: action === "view" ? 1 : 0,
+      uniqueVisitors: isAdmin ? 0 : 1,
+      reads: 0,
+      comments: action === "comment" ? 1 : 0,
+    },
+    {
+      onConflict: "userId,date,language",
+    }
+  );
+
+  if (dailyError) {
+    console.error("Supabase error when updating daily stats:", dailyError);
   }
 }
 
@@ -286,148 +280,95 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // First, try to find the post by slug to get the real database ID
-    let realPostId = null;
-    try {
-      // Try to find the post in the database by slug
-      const post = await prisma.post.findFirst({
-        where: {
-          slug: postId,
-          language: language as "en" | "zh",
-        },
-      });
+    // Convert postId to match database format without language suffix
+    // The postId from frontend may include language suffix, but database stores without it
+    const dbPostId = postId.endsWith(`-${language}`)
+      ? postId.slice(0, -(language.length + 1))
+      : postId;
 
-      if (post) {
-        realPostId = post.id;
-        console.log("Found post in database with ID:", realPostId);
-      } else {
-        // If not found in database, check if it exists as a markdown file
-        console.log("Post not found in database, checking markdown files...");
+    // Try upsert with the correct conflict resolution first
+    const upsertData = {
+      post_id: dbPostId,
+      language: language,
+      likes: 1,
+    };
 
-        // We'll create a temporary post record for markdown-based posts
-        const tempPost = await prisma.post.upsert({
-          where: {
-            authorId_slug: {
-              authorId: "cmfstfjsu0000qygwl9cbsayd", // Default author ID
-              slug: postId,
-            },
-          },
-          update: {},
-          create: {
-            authorId: "cmfstfjsu0000qygwl9cbsayd", // Default author ID
-            slug: postId,
-            title: `Post: ${postId}`,
-            content: "Content from markdown file",
-            language: language as "en" | "zh",
-            status: "published",
-            tags: "auto-generated",
-          },
-        });
+    // Increment likes in Supabase
+    const { data: updatedStats, error } = await supabase
+      .from("post_stats")
+      .upsert(upsertData, {
+        onConflict: "post_id,language",
+      })
+      .select()
+      .single();
 
-        realPostId = tempPost.id;
-        console.log("Created temporary post record with ID:", realPostId);
+    if (error) {
+      console.error("Supabase error when updating likes:", error);
+
+      // If the error is due to the old constraint, try to handle it
+      if (
+        error.code === "23505" &&
+        error.message.includes("post_stats_post_id_key")
+      ) {
+        // Conflict due to old constraint, try to update existing record directly
+        const { data: existingStats, error: fetchError } = await supabase
+          .from("post_stats")
+          .select("*")
+          .eq("post_id", dbPostId)
+          .eq("language", language)
+          .single();
+
+        if (fetchError) {
+          console.error("Error fetching existing stats:", fetchError);
+          return NextResponse.json(
+            { error: "Failed to update likes" },
+            { status: 500 }
+          );
+        }
+
+        // Update the existing record
+        const { data: updatedStats, error: updateError } = await supabase
+          .from("post_stats")
+          .update({
+            likes: { increment: 1 },
+          })
+          .eq("post_id", dbPostId)
+          .eq("language", language)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error("Supabase error when updating likes:", updateError);
+          return NextResponse.json(
+            { error: "Failed to update likes" },
+            { status: 500 }
+          );
+        }
+
+        return NextResponse.json(updatedStats);
       }
-    } catch (error) {
-      // If we can't find or create the post in the database, return an error
-      console.error(
-        "Database error when finding/creating post:",
-        postId,
-        error
-      );
-      return NextResponse.json(
-        { error: "Database error when finding/creating post" },
-        { status: 500 }
-      );
-    }
 
-    // Make sure we have a valid post ID
-    if (!realPostId) {
-      console.error("No valid post ID found or created for slug:", postId);
-      return NextResponse.json(
-        { error: "No valid post ID found or created" },
-        { status: 500 }
-      );
-    }
+      // If upsert fails due to conflict, try to update existing record
+      const { data: updatedStats, error: updateError } = await supabase
+        .from("post_stats")
+        .update({
+          likes: { increment: 1 },
+        })
+        .eq("post_id", dbPostId)
+        .eq("language", language)
+        .select()
+        .single();
 
-    // Increment likes only if we have a valid post ID
-    const updatedStats = await prisma.postStat.upsert({
-      where: {
-        post_id_language: {
-          post_id: realPostId,
-          language,
-        },
-      },
-      update: {
-        likes: {
-          increment: 1,
-        },
-      },
-      create: {
-        post_id: realPostId,
-        title: `Post ${postId}`,
-        views: 0,
-        likes: 1,
-        ai_questions: 0,
-        ai_summaries: 0,
-        language,
-      },
-    });
-
-    // Also update daily stats
-    // First, ensure the user exists
-    let user;
-    try {
-      user = await prisma.user.findUnique({
-        where: {
-          id: "nzmarie",
-        },
-      });
-
-      if (!user) {
-        // Generate a unique email to avoid constraint violations
-        const email = `nzmarie-${Date.now()}@example.com`;
-        user = await prisma.user.create({
-          data: {
-            id: "nzmarie",
-            email: email,
-            name: "NZ Marie",
-            role: "user",
-            languagePreferences: "both",
-          },
-        });
+      if (updateError) {
+        console.error("Supabase error when updating likes:", updateError);
+        return NextResponse.json(
+          { error: "Failed to update likes" },
+          { status: 500 }
+        );
       }
-    } catch (userError) {
-      console.error("Error ensuring user exists:", userError);
-      // If we can't create the user, we'll skip daily stats update
+
       return NextResponse.json(updatedStats);
     }
-
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0); // Set to start of day in UTC
-    await prisma.dailyStat.upsert({
-      where: {
-        userId_date_language: {
-          userId: user.id,
-          date: today,
-          language,
-        },
-      },
-      update: {
-        likes: {
-          increment: 1,
-        },
-      },
-      create: {
-        userId: user.id,
-        date: today,
-        pageViews: 0,
-        uniqueVisitors: 0,
-        reads: 0,
-        likes: 1,
-        comments: 0,
-        language,
-      },
-    });
 
     return NextResponse.json(updatedStats);
   } catch (error) {
@@ -436,8 +377,5 @@ export async function PUT(request: NextRequest) {
       { error: "Failed to update likes" },
       { status: 500 }
     );
-  } finally {
-    // Note: In Next.js API routes, it is not recommended to disconnect after each request
-    // await prisma.$disconnect();
   }
 }

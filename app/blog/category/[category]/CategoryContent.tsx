@@ -5,7 +5,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import { Post } from "@/lib/types";
-import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
 import BlogList from "@/components/BlogList";
 
@@ -20,7 +19,6 @@ export default function CategoryContent({
   posts,
   language,
 }: CategoryContentProps) {
-  const { postStats } = useStatsStore();
   const { fetchToggles } = useTogglesStore();
 
   useEffect(() => {

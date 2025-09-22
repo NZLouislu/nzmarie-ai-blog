@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Box, Avatar } from "@radix-ui/themes";
@@ -458,30 +458,29 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
   };
   const originalSummary = post?.description || "";
 
-  // Load toggles and stats on component mount - run only once
-  useEffect(() => {
+  // Load toggles on component mount - run only once
+  React.useEffect(() => {
     let isMounted = true;
 
-    const initializeData = async () => {
+    const loadToggles = async () => {
       try {
-        // Fetch toggles only once
-        await fetchToggles();
-
-        // Only fetch stats if they don't exist for this post
-        if (isMounted && !postStats[post.id]) {
-          fetchPostStats(post.id, {});
+        const response = await fetch("/api/admin/toggles");
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          fetchToggles(); // Use the fetchToggles function from the store instead of setToggles
         }
       } catch (error) {
-        console.error("Failed to initialize data:", error);
+        console.error("Failed to load toggles:", error);
       }
     };
 
-    initializeData();
+    loadToggles();
 
+    // Cleanup function to prevent state updates on unmounted component
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array to run only once
+  }, [fetchToggles]);
 
   // Load stats and increment view count on component mount - run only once
   React.useEffect(() => {
@@ -523,7 +522,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array to run only once
+  }, [fetchPostStats, incrementPostViews, language, post.id, postStats]);
 
   const handleLike = async () => {
     const newIsLiked = !isLiked;

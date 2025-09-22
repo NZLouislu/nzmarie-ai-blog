@@ -6,17 +6,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import { useLanguageStore } from "@/lib/stores/languageStore";
-import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
 import BlogList from "@/components/BlogList";
 import { Post } from "@/lib/types";
-import { PostStats } from "@/lib/stores/statsStore";
 
 async function performSearch(
   searchQuery: string,
   setResults: React.Dispatch<React.SetStateAction<Post[]>>,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  postStats: PostStats
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   if (!searchQuery.trim()) {
     setResults([]);
@@ -44,7 +41,6 @@ async function performSearch(
 
 function SearchContent() {
   const { language } = useLanguageStore();
-  const { postStats } = useStatsStore();
   const { fetchToggles } = useTogglesStore();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
@@ -57,9 +53,9 @@ function SearchContent() {
 
   useEffect(() => {
     if (initialQuery) {
-      performSearch(initialQuery, setResults, setLoading, postStats);
+      performSearch(initialQuery, setResults, setLoading);
     }
-  }, [initialQuery, postStats]);
+  }, [initialQuery]);
 
   useEffect(() => {
     fetchToggles();
@@ -67,7 +63,7 @@ function SearchContent() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    performSearch(query, setResults, setLoading, postStats);
+    performSearch(query, setResults, setLoading);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +78,7 @@ function SearchContent() {
     // Set new timer for debounce
     const timer = setTimeout(() => {
       if (value.trim()) {
-        performSearch(value, setResults, setLoading, postStats);
+        performSearch(value, setResults, setLoading);
       } else {
         setResults([]);
       }
