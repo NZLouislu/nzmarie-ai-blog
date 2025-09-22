@@ -1,36 +1,43 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import Sidebar from '@/components/Sidebar';
-import { Post } from '@/lib/types';
-import { useLanguageStore } from '@/lib/stores/languageStore';
-import { useStatsStore } from '@/lib/stores/statsStore';
-import { useTogglesStore } from '@/lib/stores/togglesStore';
-import BlogList from '@/components/BlogList';
+import React, { useEffect, useState } from "react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import Sidebar from "@/components/Sidebar";
+import { Post } from "@/lib/types";
+import { useLanguageStore } from "@/lib/stores/languageStore";
+import { useStatsStore } from "@/lib/stores/statsStore";
+import { useTogglesStore } from "@/lib/stores/togglesStore";
+import BlogList from "@/components/BlogList";
 
 interface TagContentProps {
   tag: string;
   posts: Post[];
 }
 
-export default function TagContent({ tag, posts: initialPosts }: TagContentProps) {
+export default function TagContent({
+  tag,
+  posts: initialPosts,
+}: TagContentProps) {
   const { language } = useLanguageStore();
   const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const { postStats, fetchPostStats } = useStatsStore();
+  const { postStats } = useStatsStore();
   const { fetchToggles } = useTogglesStore();
 
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const response = await fetch(`/api/posts/language?action=byTag&tag=${encodeURIComponent(tag)}&language=${language}`);
+        const response = await fetch(
+          `/api/posts/language?action=byTag&tag=${encodeURIComponent(
+            tag
+          )}&language=${language}`
+        );
         if (response.ok) {
           const newPosts = await response.json();
           setPosts(newPosts);
         }
       } catch (error) {
-        console.error('Failed to load posts:', error);
+        console.error("Failed to load posts:", error);
       }
     };
 
@@ -39,12 +46,8 @@ export default function TagContent({ tag, posts: initialPosts }: TagContentProps
 
   useEffect(() => {
     fetchToggles();
-    posts.forEach((post) => {
-      if (!postStats[post.id]) {
-        fetchPostStats(post.id);
-      }
-    });
-  }, [posts, postStats, fetchPostStats, fetchToggles]);
+    // Remove the fetchPostStats call since it doesn't exist
+  }, [fetchToggles]);
 
   return (
     <>

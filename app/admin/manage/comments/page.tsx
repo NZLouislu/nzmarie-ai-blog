@@ -38,7 +38,7 @@ export default function CommentsManagementPage() {
 
   useEffect(() => {
     fetchCommentCounts();
-  }, [fetchCommentCounts]);
+  }, [fetchCommentCounts]); // Add fetchCommentCounts to dependencies
 
   const filteredData = commentCounts.filter(
     (item) =>
@@ -58,17 +58,17 @@ export default function CommentsManagementPage() {
   const handleDeleteComment = async (id: string) => {
     const confirmMessage =
       currentLanguage === "zh"
-        ? "确定要删除这条评论吗？"
+        ? "Are you sure you want to delete this comment?"
         : "Are you sure you want to delete this comment?";
 
     const successMessage =
       currentLanguage === "zh"
-        ? "评论删除成功！"
+        ? "Comment deleted successfully!"
         : "Comment deleted successfully!";
 
     const errorMessage =
       currentLanguage === "zh"
-        ? "删除评论失败，请重试。"
+        ? "Failed to delete comment. Please try again."
         : "Failed to delete comment. Please try again.";
 
     if (!window.confirm(confirmMessage)) {
@@ -97,6 +97,7 @@ export default function CommentsManagementPage() {
         (post) => post.language === currentLanguage
       );
       if (filteredPosts.length > 0) {
+        // Only auto-select if no post is currently selected or if the selected post is not in the filtered list
         if (
           !selectedPost ||
           !filteredPosts.find((p) => p.post_id === selectedPost)
@@ -112,10 +113,19 @@ export default function CommentsManagementPage() {
         }
       } else {
         console.log("No posts found for language:", currentLanguage);
-        selectPost("");
+        // Only clear selection if there are no posts for the current language
+        if (selectedPost) {
+          selectPost("");
+        }
       }
     }
-  }, [commentCounts, currentLanguage, selectedPost, selectPost]);
+  }, [
+    commentCounts.length,
+    currentLanguage,
+    selectedPost,
+    selectPost,
+    commentCounts,
+  ]); // Add all dependencies
 
   useEffect(() => {
     if (selectedPost) {
@@ -293,9 +303,11 @@ export default function CommentsManagementPage() {
                             Loading comments...
                           </p>
                         </div>
-                      ) : comments.length > 0 ? (
+                      ) : selectedPost &&
+                        comments[selectedPost] &&
+                        comments[selectedPost].length > 0 ? (
                         <div className="space-y-3 sm:space-y-4 max-h-[300px] lg:max-h-[520px] overflow-y-auto">
-                          {comments.map((comment) => (
+                          {comments[selectedPost].map((comment) => (
                             <div
                               key={comment.id}
                               className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200"

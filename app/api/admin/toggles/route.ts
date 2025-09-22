@@ -1,79 +1,94 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { PrismaClient } from "@prisma/client";
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
-      .from("feature_toggles")
-      .select("*")
-      .single();
+    // Get the admin user
+    const adminUser = await prisma.user.findUnique({
+      where: {
+        email: "nzmarie@example.com",
+      },
+    });
 
-    if (error && error.code !== "PGRST116") {
-      console.error("Error fetching toggles:", error);
+    if (!adminUser) {
       return NextResponse.json(
-        { error: "Failed to fetch toggles" },
+        { error: "Admin user not found" },
         { status: 500 }
       );
     }
 
-    // Default toggles if none exist
-    const defaultToggles = {
-      total_views: true,
-      total_likes: true,
-      total_comments: true,
-      ai_summaries: true,
-      ai_questions: true,
-      home_statistics: true,
+    // Get all feature toggles for the admin user
+    const toggles = await prisma.featureToggle.findMany({
+      where: {
+        userId: adminUser.id,
+      },
+    });
+
+    // Convert to the expected format
+    const result: { [key: string]: boolean } = {
+      totalViews: true,
+      totalLikes: true,
+      totalComments: true,
+      aiSummaries: true,
+      aiQuestions: true,
+      homeStatistics: true,
     };
 
-    if (!data) {
-      // Create default toggles
-      const { error: createError } = await supabase
-        .from("feature_toggles")
-        .insert(defaultToggles);
-
-      if (createError) {
-        console.error("Error creating default toggles:", createError);
-        console.error("Error code:", createError.code);
-        console.error("Error message:", createError.message);
-        console.error("Error details:", createError.details);
-        console.error("Error hint:", createError.hint);
+    // Override with actual values from database
+    for (const toggle of toggles) {
+      switch (toggle.key) {
+        case "total_views":
+          result.totalViews = toggle.enabled;
+          break;
+        case "total_likes":
+          result.totalLikes = toggle.enabled;
+          break;
+        case "total_comments":
+          result.totalComments = toggle.enabled;
+          break;
+        case "ai_summaries":
+          result.aiSummaries = toggle.enabled;
+          break;
+        case "ai_questions":
+          result.aiQuestions = toggle.enabled;
+          break;
+        case "home_statistics":
+          result.homeStatistics = toggle.enabled;
+          break;
       }
-
-      return NextResponse.json({
-        totalViews: defaultToggles.total_views,
-        totalLikes: defaultToggles.total_likes,
-        totalComments: defaultToggles.total_comments,
-        aiSummaries: defaultToggles.ai_summaries,
-        aiQuestions: defaultToggles.ai_questions,
-        homeStatistics: defaultToggles.home_statistics,
-      });
     }
 
-    return NextResponse.json({
-      totalViews: data.total_views,
-      totalLikes: data.total_likes,
-      totalComments: data.total_comments,
-      aiSummaries: data.ai_summaries,
-      aiQuestions: data.ai_questions,
-      homeStatistics: data.home_statistics,
-    });
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Toggles API error:", error);
     return NextResponse.json(
       { error: "Failed to fetch toggles" },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    // Get the admin user
+    const adminUser = await prisma.user.findUnique({
+      where: {
+        email: "nzmarie@example.com",
+      },
+    });
+
+    if (!adminUser) {
+      return NextResponse.json(
+        { error: "Admin user not found" },
+        { status: 500 }
+      );
+    }
 
     // Handle both old format (feature, enabled) and new format (direct key-value pairs)
     let updateData: { [key: string]: boolean } = {};
@@ -93,8 +108,8 @@ export async function POST(request: NextRequest) {
       updateData = body;
     }
 
-    // Map frontend feature names to database column names
-    const columnMap: { [key: string]: string } = {
+    // Map frontend feature names to database keys
+    const keyMap: { [key: string]: string } = {
       totalViews: "total_views",
       totalLikes: "total_likes",
       totalComments: "total_comments",
@@ -103,11 +118,10 @@ export async function POST(request: NextRequest) {
       homeStatistics: "home_statistics",
     };
 
-    // Convert all feature names to column names
-    const dbUpdates: { [key: string]: boolean } = {};
+    // Update each toggle
     for (const [feature, enabled] of Object.entries(updateData)) {
-      const columnName = columnMap[feature];
-      if (!columnName) {
+      const dbKey = keyMap[feature];
+      if (!dbKey) {
         return NextResponse.json(
           { error: `Invalid feature: ${feature}` },
           { status: 400 }
@@ -119,56 +133,24 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      dbUpdates[columnName] = enabled;
-    }
 
-    // Check if toggles exist
-    const { data: existing } = await supabase
-      .from("feature_toggles")
-      .select("*")
-      .single();
-
-    if (!existing) {
-      // Create new toggles record
-      const defaultToggles = {
-        total_views: true,
-        total_likes: true,
-        total_comments: true,
-        ai_summaries: true,
-        ai_questions: true,
-        home_statistics: true,
-        ...dbUpdates,
-      };
-
-      const { error } = await supabase
-        .from("feature_toggles")
-        .insert(defaultToggles);
-
-      if (error) {
-        console.error("Error creating toggles:", error);
-        console.error("Error code:", error.code);
-        console.error("Error message:", error.message);
-        console.error("Error details:", error.details);
-        console.error("Error hint:", error.hint);
-        return NextResponse.json(
-          { error: "Failed to update toggle" },
-          { status: 500 }
-        );
-      }
-    } else {
-      // Update existing toggles
-      const { error } = await supabase
-        .from("feature_toggles")
-        .update(dbUpdates)
-        .eq("id", existing.id);
-
-      if (error) {
-        console.error("Error updating toggle:", error);
-        return NextResponse.json(
-          { error: "Failed to update toggle" },
-          { status: 500 }
-        );
-      }
+      // Upsert the toggle (create if not exists, update if exists)
+      await prisma.featureToggle.upsert({
+        where: {
+          userId_key: {
+            userId: adminUser.id,
+            key: dbKey,
+          },
+        },
+        update: {
+          enabled: enabled,
+        },
+        create: {
+          userId: adminUser.id,
+          key: dbKey,
+          enabled: enabled,
+        },
+      });
     }
 
     return NextResponse.json({ success: true });
@@ -178,5 +160,7 @@ export async function POST(request: NextRequest) {
       { error: "Failed to update toggle" },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

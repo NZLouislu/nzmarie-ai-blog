@@ -1,89 +1,171 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient, Comment } from "@prisma/client";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Ensure only one Prisma client instance is created
+const prisma = new PrismaClient();
 
+// GET /api/comments?postId={postId}
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const postId = searchParams.get('postId');
-    const language = searchParams.get('language');
+    const postId = searchParams.get("postId"); // This is actually the slug
 
     if (!postId) {
-      return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Post ID is required" },
+        { status: 400 }
+      );
     }
 
-    // Convert postId to match database format with language suffix
-    const dbPostId = `${postId}-${language || 'en'}`;
-    
-    const { data: comments, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('postId', dbPostId)
-      .eq('language', language || 'en')
-      .order('createdAt', { ascending: false });
+    // First, try to find the post by slug to get the real database ID
+    let realPostId = null;
+    try {
+      // Try to find the post in the database by slug
+      const post = await prisma.post.findFirst({
+        where: {
+          slug: postId,
+        },
+      });
 
-    if (error) {
-      console.error('Supabase error:', error);
-      return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
+      if (post) {
+        realPostId = post.id;
+      } else {
+        // If not found in database, return empty array
+        return NextResponse.json([]);
+      }
+    } catch (error) {
+      console.error("Database error when finding post:", postId, error);
+      // If database error, return empty array
+      return NextResponse.json([]);
+    }
+
+    // Add error handling when getting comments
+    let comments: Comment[] = [];
+    try {
+      comments = await prisma.comment.findMany({
+        where: {
+          postId: realPostId!,
+          status: "approved",
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    } catch (error) {
+      // Even if getting comments fails, return an empty array instead of an error
+      console.error("Error fetching comments:", error);
+      comments = [];
     }
 
     return NextResponse.json(comments);
   } catch (error) {
-    console.error('Comments API error:', error);
-    return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
+    console.error("Error in GET /api/comments:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch comments" },
+      { status: 500 }
+    );
+  } finally {
+    // Note: In Next.js API routes, it is not recommended to disconnect after each request
+    // await prisma.$disconnect();
   }
 }
 
+// POST /api/comments
 export async function POST(request: NextRequest) {
   try {
-    console.log('Starting comment submission...');
-    const { postId, language, name, email, comment, isAnonymous } = await request.json();
+    const { postId, authorName, authorEmail, content, isAnonymous } =
+      await request.json();
 
-    if (!postId || !comment) {
-      return NextResponse.json({ error: 'Post ID and comment are required' }, { status: 400 });
+    // Validate required fields
+    if (!postId || !content) {
+      return NextResponse.json(
+        { error: "Post ID and content are required" },
+        { status: 400 }
+      );
     }
 
-    console.log('Attempting to save to Supabase...');
-    const startTime = Date.now();
-
-    // Convert postId to match database format with language suffix
-    const dbPostId = `${postId}-${language || 'en'}`;
-    
-    const { data: newComment, error } = await supabase
-      .from('comments')
-      .insert({
-        postId: dbPostId,
-        language: language || 'en',
-        authorName: isAnonymous ? null : name,
-        authorEmail: isAnonymous ? null : email,
-        content: comment,
-        is_anonymous: isAnonymous
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Supabase error:', error);
-      return NextResponse.json({ error: 'Failed to save comment' }, { status: 500 });
-    }
-
-    const endTime = Date.now();
-    console.log(`Database operation completed in ${endTime - startTime}ms`);
-
-    return NextResponse.json(newComment);
-  } catch (error) {
-    console.error('Comments API error:', error);
-    if (error instanceof Error) {
-      console.error('Error details:', {
-        message: error.message,
-        name: error.name,
-        stack: error.stack
+    // First, try to find the post by slug to get the real database ID
+    let realPostId = null;
+    try {
+      // Try to find the post in the database by slug
+      const post = await prisma.post.findFirst({
+        where: {
+          slug: postId,
+        },
       });
+
+      if (post) {
+        realPostId = post.id;
+      } else {
+        // If not found in database, check if it exists as a markdown file
+        console.log("Post not found in database, checking markdown files...");
+
+        // We'll create a temporary post record for markdown-based posts
+        const tempPost = await prisma.post.upsert({
+          where: {
+            authorId_slug: {
+              authorId: "cmfstfjsu0000qygwl9cbsayd", // Default author ID
+              slug: postId,
+            },
+          },
+          update: {},
+          create: {
+            authorId: "cmfstfjsu0000qygwl9cbsayd", // Default author ID
+            slug: postId,
+            title: `Post: ${postId}`,
+            content: "Content from markdown file",
+            language: "en", // Default to English
+            status: "published",
+            tags: "auto-generated",
+          },
+        });
+
+        realPostId = tempPost.id;
+        console.log("Created temporary post record with ID:", realPostId);
+      }
+    } catch (error) {
+      // If we can't find or create the post in the database, return an error
+      console.error(
+        "Database error when finding/creating post:",
+        postId,
+        error
+      );
+      return NextResponse.json(
+        { error: "Database error when finding/creating post" },
+        { status: 500 }
+      );
     }
-    return NextResponse.json({ error: 'Failed to save comment' }, { status: 500 });
+
+    // Make sure we have a valid post ID
+    if (!realPostId) {
+      console.error("No valid post ID found or created for slug:", postId);
+      return NextResponse.json(
+        { error: "No valid post ID found or created" },
+        { status: 500 }
+      );
+    }
+
+    // Create comment
+    const comment = await prisma.comment.create({
+      data: {
+        postId: realPostId, // Use the real database ID
+        authorName: isAnonymous ? null : authorName,
+        authorEmail: isAnonymous ? null : authorEmail,
+        content,
+        is_anonymous: isAnonymous || false, // Correct field name
+        status: "pending",
+      },
+    });
+
+    return NextResponse.json(comment, { status: 201 });
+  } catch (error) {
+    console.error("Error in POST /api/comments:", error);
+    return NextResponse.json(
+      { error: "Failed to create comment" },
+      { status: 500 }
+    );
+  } finally {
+    // Note: In Next.js API routes, it is not recommended to disconnect after each request
+    // await prisma.$disconnect();
   }
 }

@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             postId: postId,
             action: "ai_summary",
+            language: "en", // 添加默认语言
           }),
         });
       } catch (statsError) {

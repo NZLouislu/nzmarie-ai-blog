@@ -9,14 +9,13 @@ import { useTogglesStore } from "@/lib/stores/togglesStore";
 import { useTranslation } from "@/lib/i18n";
 
 export default function HomePage() {
-  const { totalStats, fetchTotalStats } = useStatsStore();
+  const { totalViews, totalLikes, totalComments, aiSummaries, aiQuestions } = useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
   const { language } = useTranslation();
 
   useEffect(() => {
-    fetchTotalStats();
     fetchToggles();
-  }, [fetchTotalStats, fetchToggles]);
+  }, [fetchToggles]);
   return (
     <Box className="w-full px-6 py-12">
       <div className="flex flex-col items-center mb-20">
@@ -24,15 +23,15 @@ export default function HomePage() {
           size="6"
           className="text-5xl font-bold -mt-10 mb-2 leading-loose bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
         >
-          NZLouis&apos; Blog
+          NZMarie&apos;s Blog
         </Heading>
         <Text
           size="3"
           className="text-xl text-gray-600 text-center max-w-2xl mb-8"
         >
           {language === "zh"
-            ? "自强不息，知行合一"
-            : "If you never try, you will never know."}
+            ? "专业服务，诚信为本"
+            : "Professional Service, Integrity First"}
         </Text>
 
         {/* Statistics Section */}
@@ -61,7 +60,7 @@ export default function HomePage() {
                     />
                   </svg>
                   <span className="text-2xl font-bold text-gray-900">
-                    {totalStats.totalViews.toLocaleString()}
+                    {totalViews.toLocaleString()}
                   </span>
                 </div>
                 <p className="text-gray-600">Total Views</p>
@@ -83,7 +82,7 @@ export default function HomePage() {
                     />
                   </svg>
                   <span className="text-2xl font-bold text-gray-900">
-                    {totalStats.totalLikes.toLocaleString()}
+                    {totalLikes.toLocaleString()}
                   </span>
                 </div>
                 <p className="text-gray-600">Total Likes</p>
@@ -101,11 +100,11 @@ export default function HomePage() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03 8 9-8s9 3.582 9 8z"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03 8 9 8s9 3.582 9 8z"
                     />
                   </svg>
                   <span className="text-2xl font-bold text-gray-900">
-                    {totalStats.totalComments.toLocaleString()}
+                    {totalComments.toLocaleString()}
                   </span>
                 </div>
                 <p className="text-gray-600">Total Comments</p>
@@ -127,7 +126,7 @@ export default function HomePage() {
                     />
                   </svg>
                   <span className="text-2xl font-bold text-gray-900">
-                    {totalStats.totalAiSummaries.toLocaleString()}
+                    {aiSummaries.toLocaleString()}
                   </span>
                 </div>
                 <p className="text-gray-600">AI Summaries</p>
@@ -149,7 +148,7 @@ export default function HomePage() {
                     />
                   </svg>
                   <span className="text-2xl font-bold text-gray-900">
-                    {totalStats.totalAiQuestions.toLocaleString()}
+                    {aiQuestions.toLocaleString()}
                   </span>
                 </div>
                 <p className="text-gray-600">AI Questions</p>

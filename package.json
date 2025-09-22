@@ -1,12 +1,13 @@
 {
-  "name": "nzlouis-blog-next",
+  "name": "nzmarie-blog-next",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "node scripts/build.js",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^6.16.1",
@@ -15,6 +16,7 @@
     "@supabase/supabase-js": "^2.57.4",
     "@upstash/redis": "^1.35.3",
     "clsx": "^2.1.1",
+    "cookie": "^1.0.2",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.2",
     "fs": "^0.0.1-security",

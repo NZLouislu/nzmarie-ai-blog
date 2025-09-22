@@ -135,7 +135,7 @@ BEGIN
         
         -- Add userId column if missing
         IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'daily_stats' AND column_name = 'userId') THEN
-            ALTER TABLE "daily_stats" ADD COLUMN "userId" TEXT DEFAULT 'nzlouis';
+            ALTER TABLE "daily_stats" ADD COLUMN "userId" TEXT DEFAULT 'nzmarie';
         END IF;
         
         -- Add missing columns with safe defaults
@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS "feature_toggles" (
 
 -- Step 8: Insert default users safely (only if they don't exist)
 INSERT INTO "users" ("id", "email", "name", "role", "languagePreferences") VALUES 
-('nzlouis', 'nzlouis@example.com', 'NZLouis', 'admin', 'both'),
+('nzmarie', 'nzmarie@example.com', 'NZMarie', 'admin', 'both'),
 ('nzmarite', 'nzmarite@example.com', 'NZMarite', 'user', 'both')
 ON CONFLICT ("id") DO NOTHING;
 
@@ -183,7 +183,7 @@ DO $$
 BEGIN
     -- Update daily_stats userId for existing records without userId
     IF EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'daily_stats' AND column_name = 'userId') THEN
-        UPDATE "daily_stats" SET "userId" = 'nzlouis' WHERE "userId" IS NULL OR "userId" = '';
+        UPDATE "daily_stats" SET "userId" = 'nzmarie' WHERE "userId" IS NULL OR "userId" = '';
     END IF;
 END $$;
 

@@ -9,13 +9,13 @@ export default function AvatarSidebar() {
         <Avatar.Image
           className="h-full w-full object-cover"
           src="/avatar.jpg"
-          alt="NZLouis"
+          alt="NZMarie"
         />
         <Avatar.Fallback className="text-xl font-semibold bg-gray-200 text-gray-600">
           NZ
         </Avatar.Fallback>
       </Avatar.Root>
-      <h2 className="text-lg font-semibold">NZLouis</h2>
+      <h2 className="text-lg font-semibold">NZMarie</h2>
       <p className="text-sm text-gray-600 text-center">
         Software engineer and lifelong learner, sharing code and thoughts.
       </p>

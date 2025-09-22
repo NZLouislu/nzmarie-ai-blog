@@ -1,15 +1,15 @@
-import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import Image from 'next/image';
+import React from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import Image from "next/image";
 
 function generateHeadingId(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
     .trim();
 }
 
@@ -20,15 +20,52 @@ export default function Markdown({ content }: { content: string }) {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
         components={{
-          img: ({ src, alt }) => {
-            if (typeof src === 'string') {
+          img: ({ src, alt, width, height }) => {
+            if (typeof src === "string") {
+              // Handle both local and remote images with proper fallback
+              const imageSrc = src.startsWith("/") ? src : src;
+
+              // Validate image source
+              if (!imageSrc) {
+                return (
+                  <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48 my-4" />
+                );
+              }
+
+              // If width and height are provided, use them, otherwise use aspect-video
+              if (width && height) {
+                return (
+                  <div
+                    className="relative my-4"
+                    style={{ width: `${width}px`, height: `${height}px` }}
+                  >
+                    <Image
+                      src={imageSrc}
+                      alt={alt || ""}
+                      fill
+                      className="rounded-lg shadow-md object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/img/placeholder.jpg"; // Fallback placeholder
+                      }}
+                    />
+                  </div>
+                );
+              }
+
+              // Default to aspect-video for responsive images with error handling
               return (
-                <div className="relative w-full h-48 my-4">
+                <div className="relative w-full aspect-video my-4">
                   <Image
-                    src={src}
-                    alt={alt || ''}
+                    src={imageSrc}
+                    alt={alt || ""}
                     fill
                     className="rounded-lg shadow-md object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/img/placeholder.jpg"; // Fallback placeholder
+                    }}
                   />
                 </div>
               );
@@ -36,61 +73,87 @@ export default function Markdown({ content }: { content: string }) {
             return null;
           },
           h1: ({ children, ...props }) => {
-            const text = typeof children === 'string' ? children : '';
+            const text = typeof children === "string" ? children : "";
             const id = generateHeadingId(text);
             return (
-              <h1 id={id} className="text-3xl font-bold mt-8 mb-4 scroll-mt-20" {...props}>
+              <h1
+                id={id}
+                className="text-3xl font-bold mt-8 mb-4 scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h1>
             );
           },
           h2: ({ children, ...props }) => {
-            const text = typeof children === 'string' ? children : '';
+            const text = typeof children === "string" ? children : "";
             const id = generateHeadingId(text);
             return (
-              <h2 id={id} className="text-2xl font-bold mt-6 mb-3 scroll-mt-20" {...props}>
+              <h2
+                id={id}
+                className="text-2xl font-bold mt-6 mb-3 scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h2>
             );
           },
           h3: ({ children, ...props }) => {
-            const text = typeof children === 'string' ? children : '';
+            const text = typeof children === "string" ? children : "";
             const id = generateHeadingId(text);
             return (
-              <h3 id={id} className="text-xl font-semibold mt-5 mb-2 scroll-mt-20" {...props}>
+              <h3
+                id={id}
+                className="text-xl font-semibold mt-5 mb-2 scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h3>
             );
           },
           h4: ({ children, ...props }) => {
-            const text = typeof children === 'string' ? children : '';
+            const text = typeof children === "string" ? children : "";
             const id = generateHeadingId(text);
             return (
-              <h4 id={id} className="text-lg font-semibold mt-4 mb-2 scroll-mt-20" {...props}>
+              <h4
+                id={id}
+                className="text-lg font-semibold mt-4 mb-2 scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h4>
             );
           },
           h5: ({ children, ...props }) => {
-            const text = typeof children === 'string' ? children : '';
+            const text = typeof children === "string" ? children : "";
             const id = generateHeadingId(text);
             return (
-              <h5 id={id} className="text-base font-medium mt-3 mb-2 scroll-mt-20" {...props}>
+              <h5
+                id={id}
+                className="text-base font-medium mt-3 mb-2 scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h5>
             );
           },
           h6: ({ children, ...props }) => {
-            const text = typeof children === 'string' ? children : '';
+            const text = typeof children === "string" ? children : "";
             const id = generateHeadingId(text);
             return (
-              <h6 id={id} className="text-sm font-medium mt-3 mb-2 scroll-mt-20" {...props}>
+              <h6
+                id={id}
+                className="text-sm font-medium mt-3 mb-2 scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h6>
             );
           },
           a: ({ href, children, ...props }) => {
-            const isExternal = href && (href.startsWith('http://') || href.startsWith('https://'));
+            const isExternal =
+              href &&
+              (href.startsWith("http://") || href.startsWith("https://"));
             if (isExternal) {
               return (
                 <a

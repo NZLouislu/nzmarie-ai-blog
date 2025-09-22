@@ -1,47 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateCredentials } from "../../../../lib/auth/validate";
-import { createSession } from "../../../../lib/auth/session";
+import { validateCredentials } from "@/lib/auth/validate";
+import { serialize } from "cookie";
 
 export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json();
 
-    if (!username || !password) {
-      return NextResponse.json(
-        { error: "Username and password are required" },
-        { status: 400 }
-      );
-    }
+    // Validate credentials
+    const isValid = await validateCredentials(username, password);
 
-    const user = validateCredentials(username, password);
-    if (!user) {
+    if (!isValid) {
       return NextResponse.json(
-        { error: "Invalid username or password" },
+        { error: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    const session = createSession(user);
-    
-    const response = NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        name: user.name,
-        role: user.role,
-        languagePreferences: user.languagePreferences
-      },
-      session
+    // Set cookie with secure flag set to false for development environment
+    const cookie = serialize("admin-auth", "true", {
+      httpOnly: true,
+      secure: false, // Set to false in development environment
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: "/",
+      sameSite: "strict",
     });
 
-    response.headers.set("X-Content-Type-Options", "nosniff");
-    response.headers.set("X-Frame-Options", "DENY");
-    response.headers.set("X-XSS-Protection", "1; mode=block");
+    const response = NextResponse.json({ success: true });
+    response.headers.set("Set-Cookie", cookie);
 
     return response;
   } catch (error) {
-    console.error("Login API error:", error);
+    console.error("Login error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

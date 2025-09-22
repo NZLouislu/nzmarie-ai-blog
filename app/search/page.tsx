@@ -1,23 +1,22 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import Sidebar from '@/components/Sidebar';
-import { useLanguageStore } from '@/lib/stores/languageStore';
-import { useStatsStore } from '@/lib/stores/statsStore';
-import { useTogglesStore } from '@/lib/stores/togglesStore';
-import BlogList from '@/components/BlogList';
-import { Post } from '@/lib/types';
-import { PostStats } from '@/lib/stores/statsStore';
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import Sidebar from "@/components/Sidebar";
+import { useLanguageStore } from "@/lib/stores/languageStore";
+import { useStatsStore } from "@/lib/stores/statsStore";
+import { useTogglesStore } from "@/lib/stores/togglesStore";
+import BlogList from "@/components/BlogList";
+import { Post } from "@/lib/types";
+import { PostStats } from "@/lib/stores/statsStore";
 
 async function performSearch(
   searchQuery: string,
   setResults: React.Dispatch<React.SetStateAction<Post[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  postStats: Record<string, PostStats>,
-  fetchPostStats: (id: string) => void
+  postStats: PostStats
 ) {
   if (!searchQuery.trim()) {
     setResults([]);
@@ -26,22 +25,18 @@ async function performSearch(
 
   setLoading(true);
   try {
-    const response = await fetch(`/api/posts/search?q=${encodeURIComponent(searchQuery)}`);
+    const response = await fetch(
+      `/api/posts/search?q=${encodeURIComponent(searchQuery)}`
+    );
     if (response.ok) {
       const data = await response.json();
       setResults(data);
 
       // Load stats for search results
-      if (data.length > 0) {
-        data.forEach((post: Post) => {
-          if (!postStats[post.id]) {
-            fetchPostStats(post.id);
-          }
-        });
-      }
+      // Remove the fetchPostStats call since it doesn't exist
     }
   } catch (error) {
-    console.error('Search failed:', error);
+    console.error("Search failed:", error);
   } finally {
     setLoading(false);
   }
@@ -49,26 +44,22 @@ async function performSearch(
 
 function SearchContent() {
   const { language } = useLanguageStore();
-  const { postStats, fetchPostStats } = useStatsStore();
+  const { postStats } = useStatsStore();
   const { fetchToggles } = useTogglesStore();
   const searchParams = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
+  const initialQuery = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
-  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
+    null
+  );
 
   useEffect(() => {
     if (initialQuery) {
-      performSearch(
-        initialQuery,
-        setResults,
-        setLoading,
-        postStats,
-        fetchPostStats
-      );
+      performSearch(initialQuery, setResults, setLoading, postStats);
     }
-  }, [initialQuery, postStats, fetchPostStats]);
+  }, [initialQuery, postStats]);
 
   useEffect(() => {
     fetchToggles();
@@ -76,13 +67,7 @@ function SearchContent() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    performSearch(
-      query,
-      setResults,
-      setLoading,
-      postStats,
-      fetchPostStats
-    );
+    performSearch(query, setResults, setLoading, postStats);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,13 +82,7 @@ function SearchContent() {
     // Set new timer for debounce
     const timer = setTimeout(() => {
       if (value.trim()) {
-        performSearch(
-          value,
-          setResults,
-          setLoading,
-          postStats,
-          fetchPostStats
-        );
+        performSearch(value, setResults, setLoading, postStats);
       } else {
         setResults([]);
       }
@@ -129,17 +108,21 @@ function SearchContent() {
           <div className="md:flex-[7] w-full max-w-[900px]">
             <div className="mb-12">
               <h1 className="text-4xl font-bold mb-4">
-                {language === 'en' ? 'Search' : '搜索'}
+                {language === "en" ? "Search" : "搜索"}
               </h1>
               <p className="text-xl text-gray-600 mb-8">
-                {language === 'en' ? 'Search for posts by title or content.' : '按标题或内容搜索文章。'}
+                {language === "en"
+                  ? "Search for posts by title or content."
+                  : "按标题或内容搜索文章。"}
               </p>
 
               <form onSubmit={handleSearch} className="mb-8">
                 <div className="relative w-full max-w-2xl">
                   <input
                     type="text"
-                    placeholder={language === 'en' ? 'Search posts...' : '搜索文章...'}
+                    placeholder={
+                      language === "en" ? "Search posts..." : "搜索文章..."
+                    }
                     value={query}
                     onChange={handleInputChange}
                     className="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-lg"
@@ -170,7 +153,7 @@ function SearchContent() {
               <div className="text-center py-12">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 <p className="mt-4 text-gray-600">
-                  {language === 'en' ? 'Searching...' : '搜索中...'}
+                  {language === "en" ? "Searching..." : "搜索中..."}
                 </p>
               </div>
             ) : query && results.length === 0 ? (
@@ -189,16 +172,19 @@ function SearchContent() {
                   />
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  {language === 'en' ? 'No results found' : '未找到结果'}
+                  {language === "en" ? "No results found" : "未找到结果"}
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  {language === 'en' ? 'Try adjusting your search terms.' : '请尝试调整搜索词。'}
+                  {language === "en"
+                    ? "Try adjusting your search terms."
+                    : "请尝试调整搜索词。"}
                 </p>
               </div>
             ) : results.length > 0 ? (
               <div className="space-y-6">
                 <p className="text-gray-600">
-                  Found {results.length} result{results.length !== 1 ? 's' : ''} for &quot;{query}&quot;
+                  Found {results.length} result{results.length !== 1 ? "s" : ""}{" "}
+                  for &quot;{query}&quot;
                 </p>
                 <BlogList posts={results} />
               </div>
@@ -222,4 +208,4 @@ function SearchPage() {
 }
 
 export default SearchPage;
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";

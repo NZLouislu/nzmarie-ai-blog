@@ -6,10 +6,6 @@ export function validateCredentials(username: string, password: string): User | 
       user: process.env.ADMIN_USERNAME, 
       pass: process.env.ADMIN_PASSWORD 
     },
-    nzlouis: { 
-      user: process.env.NZLOUIS_USERNAME, 
-      pass: process.env.NZLOUIS_PASSWORD 
-    },
     nzmarie: { 
       user: process.env.NZMARIE_USERNAME, 
       pass: process.env.NZMARIE_PASSWORD 

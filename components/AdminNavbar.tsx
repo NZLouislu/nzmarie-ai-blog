@@ -16,11 +16,13 @@ export default function AdminNavbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, selectedUserId, selectUser, logout, isAdmin } = useAuthStore();
-  const [users, setUsers] = useState<Array<{ id: string; name: string; username: string }>>([]);
+  const [users, setUsers] = useState<
+    Array<{ id: string; name: string; username: string }>
+  >([]);
 
   useEffect(() => {
     if (isAdmin()) {
-      setUsers(getAllUsers().filter(u => u.role === 'user'));
+      setUsers(getAllUsers().filter((u) => u.role === "user"));
     }
   }, [user, isAdmin]);
 
@@ -50,6 +52,11 @@ export default function AdminNavbar() {
       href: "/admin/manage/toggles",
       current: pathname === "/admin/manage/toggles",
     },
+    {
+      name: "Drafts",
+      href: "/admin/manage/drafts",
+      current: pathname === "/admin/manage/drafts",
+    },
   ];
 
   const handleNavigation = (href: string) => {
@@ -75,12 +82,11 @@ export default function AdminNavbar() {
 
   const handleLogout = () => {
     logout();
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.removeItem("adminAuthenticated");
     }
     router.push("/admin");
   };
-
 
   return (
     <nav className="bg-white shadow-sm border-b">
@@ -88,7 +94,7 @@ export default function AdminNavbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <h1 className="text-xl font-semibold text-gray-900">
-              NZLouis Blog Admin
+              NZMarie Blog Admin
             </h1>
           </div>
           <div className="flex items-center space-x-4">
@@ -111,7 +117,7 @@ export default function AdminNavbar() {
               {isAdmin() && users.length > 0 && (
                 <div className="relative">
                   <select
-                    value={selectedUserId || users[0]?.id || ''}
+                    value={selectedUserId || users[0]?.id || ""}
                     onChange={(e) => handleUserSwitch(e.target.value)}
                     className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >

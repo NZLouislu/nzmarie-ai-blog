@@ -8,7 +8,7 @@ interface Comment {
   content: string;
   is_anonymous: boolean;
   createdAt: string;
-  language?: string;
+  avatar?: string;
 }
 
 interface CommentCount {
@@ -30,7 +30,7 @@ interface CachedComments {
 }
 
 interface CommentsState {
-  comments: Comment[];
+  comments: Record<string, Comment[]>;
   commentCounts: CommentCount[];
   cachedComments: CachedComments;
   selectedPost: string | null;
@@ -40,7 +40,7 @@ interface CommentsState {
   currentLanguage: string;
   lastFetchTime: number;
 
-  setComments: (comments: Comment[]) => void;
+  setCommentsForPost: (postId: string, comments: Comment[]) => void;
   setCommentCounts: (commentCounts: CommentCount[]) => void;
   setCurrentLanguage: (language: string) => void;
   setSelectedPost: (postId: string | null) => void;
@@ -56,11 +56,11 @@ interface CommentsState {
     forceRefresh?: boolean
   ) => Promise<void>;
   deleteComment: (id: string) => Promise<void>;
+  addComment: (postId: string, comment: Comment) => void;
   selectPost: (postId: string) => void;
 }
 
 const CACHE_DURATION = 5 * 60 * 1000;
-const COMMENT_COUNTS_CACHE_DURATION = 2 * 60 * 1000;
 
 const mockCommentCounts: CommentCount[] = [
   {
@@ -101,7 +101,7 @@ const mockComments: Comment[] = [
 ];
 
 export const useCommentsStore = create<CommentsState>((set, get) => ({
-  comments: [],
+  comments: {},
   commentCounts: [],
   cachedComments: {},
   selectedPost: null,
@@ -111,7 +111,7 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
   currentLanguage: "en",
   lastFetchTime: 0,
 
-  setComments: (comments) => set({ comments }),
+  setCommentsForPost: (postId, comments) => set((state) => ({ comments: { ...state.comments, [postId]: comments } })),
   setCommentCounts: (commentCounts) => set({ commentCounts }),
   setCurrentLanguage: (language) => {
     const { selectedPost, commentCounts } = get();
@@ -131,6 +131,8 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
   setLoading: (loading) => set({ isLoading: loading }),
   setLoadingComments: (loading) => set({ isLoadingComments: loading }),
   setError: (error) => set({ error }),
+
+  addComment: (postId, comment) => set((state) => ({ comments: { ...state.comments, [postId]: [...(state.comments[postId] || []), comment] } })),
 
   clearCache: () => set({ cachedComments: {}, lastFetchTime: 0 }),
   invalidateCache: (postId) => {
@@ -152,30 +154,43 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
     const { setLoading, setError, setCommentCounts, lastFetchTime } = get();
     const now = Date.now();
 
-    if (now - lastFetchTime < COMMENT_COUNTS_CACHE_DURATION) {
-      console.log("Using cached comment counts");
+    // Increase cache duration to prevent frequent requests
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+    if (now - lastFetchTime < CACHE_DURATION) {
+      console.log(
+        "Using cached comment counts - last fetch was",
+        Math.floor((now - lastFetchTime) / 1000),
+        "seconds ago"
+      );
       return;
     }
 
     setLoading(true);
     setError(null);
     try {
-      await fetch("/api/admin/init-posts", { method: "POST" });
+      // Only call init-posts if needed (less frequent)
+      const shouldInit = now - lastFetchTime > 30 * 60 * 1000; // 30 minutes
+      if (shouldInit) {
+        await fetch("/api/admin/init-posts", { method: "POST" });
+      }
 
       const response = await fetch("/api/admin/comments/count");
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched comment counts:", data);
+        console.log("Fetched comment counts:", data.length, "posts");
         setCommentCounts(data);
         set({ lastFetchTime: now });
       } else {
         console.log("Using mock comment counts");
         setCommentCounts(mockCommentCounts);
+        set({ lastFetchTime: now }); // Still update timestamp even when using mock data
       }
     } catch (err) {
       console.error("Failed to load comment counts:", err);
       setError("Failed to load comment counts");
       setCommentCounts(mockCommentCounts);
+      set({ lastFetchTime: now }); // Still update timestamp even when using mock data
     } finally {
       setLoading(false);
     }
@@ -185,7 +200,7 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
     const {
       setLoadingComments,
       setError,
-      setComments,
+      setCommentsForPost,
       currentLanguage,
       cachedComments,
     } = get();
@@ -196,7 +211,7 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
       const cached = cachedComments[cacheKey];
       if (now - cached.timestamp < CACHE_DURATION) {
         console.log("Using cached comments for:", postId, currentLanguage);
-        setComments(cached.data);
+        setCommentsForPost(postId, cached.data);
         return;
       }
     }
@@ -219,7 +234,7 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
       if (response.ok) {
         const data = await response.json();
         console.log("Comments API response data:", data);
-        setComments(data);
+        setCommentsForPost(postId, data);
 
         set({
           cachedComments: {
@@ -238,13 +253,13 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
         const fallbackComments = mockComments.filter(
           (c) => c.postId === postId
         );
-        setComments(fallbackComments);
+        setCommentsForPost(postId, fallbackComments);
       }
     } catch (err) {
       console.error("Failed to load comments:", err);
       setError("Failed to load comments");
       const fallbackComments = mockComments.filter((c) => c.postId === postId);
-      setComments(fallbackComments);
+      setCommentsForPost(postId, fallbackComments);
     } finally {
       setLoadingComments(false);
     }

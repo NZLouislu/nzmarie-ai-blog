@@ -11,13 +11,13 @@ export default function Sidebar() {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await fetch('/api/tags');
+        const response = await fetch("/api/tags");
         if (response.ok) {
           const data = await response.json();
           setAllTags(data);
         }
       } catch (error) {
-        console.error('Failed to fetch tags:', error);
+        console.error("Failed to fetch tags:", error);
       }
     };
 
@@ -32,7 +32,7 @@ export default function Sidebar() {
 
       {allTags.length > 0 && (
         <div className="bg-white rounded-2xl shadow-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">{t('featuredTags')}</h3>
+          <h3 className="text-lg font-semibold mb-4">{t("featuredTags")}</h3>
           <div className="flex flex-wrap gap-2">
             {allTags.slice(0, 20).map((tag, index) => (
               <span
@@ -47,18 +47,22 @@ export default function Sidebar() {
       )}
 
       <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">{t('friends')}</h3>
+        <h3 className="text-lg font-semibold mb-4">{t("friends")}</h3>
         <div className="space-y-3">
           <a
-            href="https://nzmarie.com/blog"
+            href="https://blog.nzlouis.com"
             target="_blank"
             rel="noopener noreferrer"
             className="block p-3 bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg hover:from-pink-100 hover:to-rose-100 transition-all duration-200 border border-pink-200"
           >
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-medium text-gray-900">{language === 'zh' ? 'NZMarie 个人博客' : 'NZMarie\'s Blog'}</h4>
-                <p className="text-sm text-gray-600">{t('friendsDescription')}</p>
+                <h4 className="font-medium text-gray-900">
+                  {language === "zh" ? "NZLouis 个人博客" : "NZLouis' Blog"}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {t("friendsDescription")}
+                </p>
               </div>
               <svg
                 className="w-5 h-5 text-pink-500"

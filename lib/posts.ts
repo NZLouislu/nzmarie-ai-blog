@@ -3,18 +3,18 @@ import matter from "gray-matter";
 import fs from "fs";
 import path from "path";
 
-function getPostsDirectory(language: 'en' | 'zh' = 'en') {
+function getPostsDirectory(language: "en" | "zh" = "en") {
   return path.join(process.cwd(), "lib/post", language);
 }
 
-function getPostSlugs(language: 'en' | 'zh' = 'en') {
+function getPostSlugs(language: "en" | "zh" = "en") {
   try {
     const postsDirectory = getPostsDirectory(language);
-    console.log('Posts directory for', language, ':', postsDirectory);
+    console.log("Posts directory for", language, ":", postsDirectory);
     const files = fs.readdirSync(postsDirectory);
-    console.log('Files in directory:', files);
+    console.log("Files in directory:", files);
     const slugs = files.filter((file: string) => file.endsWith(".md"));
-    console.log('Filtered slugs:', slugs);
+    console.log("Filtered slugs:", slugs);
     return slugs;
   } catch (error) {
     console.error("Error reading posts directory:", error);
@@ -22,13 +22,16 @@ function getPostSlugs(language: 'en' | 'zh' = 'en') {
   }
 }
 
-export function getPostBySlug(slug: string, language: 'en' | 'zh' = 'en'): Post | null {
+export function getPostBySlug(
+  slug: string,
+  language: "en" | "zh" = "en"
+): Post | null {
   try {
     const realSlug = slug.replace(/\.md$/, "");
     const postsDirectory = getPostsDirectory(language);
     const fullPath = path.join(postsDirectory, `${realSlug}.md`);
-    console.log('Looking for post:', fullPath);
-    console.log('Path exists:', fs.existsSync(fullPath));
+    console.log("Looking for post:", fullPath);
+    console.log("Path exists:", fs.existsSync(fullPath));
 
     if (!fs.existsSync(fullPath)) {
       return null;
@@ -60,6 +63,7 @@ export function getPostBySlug(slug: string, language: 'en' | 'zh' = 'en'): Post 
       content: content,
       image: data.image,
       author: data.author,
+      language: language, // Add language property
     };
 
     return post;
@@ -69,7 +73,10 @@ export function getPostBySlug(slug: string, language: 'en' | 'zh' = 'en'): Post 
   }
 }
 
-export function getAllPosts(language: 'en' | 'zh' = 'en', authorId?: string): Post[] {
+export function getAllPosts(
+  language: "en" | "zh" = "en",
+  authorId?: string
+): Post[] {
   const slugs = getPostSlugs(language);
   let posts = slugs
     .map((slug: string) => getPostBySlug(slug.replace(/\.md$/, ""), language))
@@ -81,29 +88,37 @@ export function getAllPosts(language: 'en' | 'zh' = 'en', authorId?: string): Po
 
   // Filter by author if specified
   if (authorId) {
-    posts = posts.filter(post => post.author === authorId || post.id.includes(authorId));
+    posts = posts.filter(
+      (post) => post.author === authorId || post.id.includes(authorId)
+    );
   }
 
   return posts;
 }
 
-export function listPublished(language: 'en' | 'zh' = 'en'): Post[] {
+export function listPublished(language: "en" | "zh" = "en"): Post[] {
   return getAllPosts(language).filter((p) => p.status === "published");
 }
 
-export function getPostsByCategory(category: string, language: 'en' | 'zh' = 'en'): Post[] {
+export function getPostsByCategory(
+  category: string,
+  language: "en" | "zh" = "en"
+): Post[] {
   return listPublished(language).filter((p) =>
     p.categories.some((cat) => cat.toLowerCase() === category.toLowerCase())
   );
 }
 
-export function getPostsByTag(tag: string, language: 'en' | 'zh' = 'en'): Post[] {
+export function getPostsByTag(
+  tag: string,
+  language: "en" | "zh" = "en"
+): Post[] {
   return listPublished(language).filter((p) =>
     p.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
   );
 }
 
-export function getAllCategories(language: 'en' | 'zh' = 'en'): string[] {
+export function getAllCategories(language: "en" | "zh" = "en"): string[] {
   const categories = new Set<string>();
   listPublished(language).forEach((post) => {
     post.categories.forEach((category) => categories.add(category));
@@ -111,7 +126,7 @@ export function getAllCategories(language: 'en' | 'zh' = 'en'): string[] {
   return Array.from(categories).sort();
 }
 
-export function getAllTags(language: 'en' | 'zh' = 'en'): string[] {
+export function getAllTags(language: "en" | "zh" = "en"): string[] {
   const tags = new Set<string>();
   listPublished(language).forEach((post) => {
     post.tags.forEach((tag) => tags.add(tag));
@@ -119,7 +134,10 @@ export function getAllTags(language: 'en' | 'zh' = 'en'): string[] {
   return Array.from(tags).sort();
 }
 
-export function getBySlug(slug: string, language: 'en' | 'zh' = 'en'): Post | null {
+export function getBySlug(
+  slug: string,
+  language: "en" | "zh" = "en"
+): Post | null {
   const post = getPostBySlug(slug, language);
   return post && post.status === "published" ? post : null;
 }
