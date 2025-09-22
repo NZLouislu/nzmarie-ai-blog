@@ -1,32 +1,50 @@
-# 数据库SQL脚本
+# Database Scripts
 
-这个目录包含了两个核心的SQL脚本，用于管理NZMarie博客的数据库：
+This directory contains two essential SQL scripts for managing the NZMarie blog database:
 
 ## 1. reset_and_update_all_nzmarie_posts.sql
 
-**用途**: 重置并更新所有NZMarie的文章数据
-- 删除所有现有的NZMarie文章
-- 重新插入最小元数据
-- 更新文章统计信息（包含comments字段）
+**Purpose**: Completely reset and reinitialize all NZMarie blog posts with minimal metadata.
+**When to use**: When you need to clear all existing NZMarie content and start fresh.
 
-**使用场景**: 
-- 当需要完全重新初始化NZMarie的文章数据时
-- 当文章内容需要从Markdown文件重新加载时
+**Key features**:
+
+- Deletes all existing NZMarie posts and related data
+- Re-inserts posts with placeholder content
+- Updates post statistics
+- Fixes database constraints to ensure consistency
 
 ## 2. init_nzmarie_final.sql
 
-**用途**: 初始化NZMarie博客的完整数据库结构
-- 清理现有数据
-- 插入用户信息
-- 插入文章数据
-- 插入文章统计信息（包含comments字段）
-- 插入示例评论
-- 插入每日统计数据（包含comments字段）
+**Purpose**: Initialize or update NZMarie blog data without removing existing content.
+**When to use**: For initial setup or when adding new posts while preserving existing data.
 
-**使用场景**:
-- 首次设置NZMarie博客数据库
-- 完整重新初始化所有博客数据
+**Key features**:
 
-## 重要提醒
+- Safely adds new posts without affecting existing ones
+- Updates post statistics with proper conflict handling
+- Adds sample comments for both languages
+- Sets up daily statistics
+- Fixes database constraints to ensure consistency
+- Includes verification queries at the end
 
-这两个SQL脚本是维护NZMarie博客数据库的唯二核心文件。在进行任何数据库操作时，请优先使用这两个文件，以确保数据结构的一致性和完整性。
+## Database Constraint Fix
+
+Both scripts now include commands to fix database constraints:
+
+- Remove old constraint: `post_stats_post_id_key`
+- Ensure new constraint exists: `post_stats_post_id_language_key` (UNIQUE constraint on post_id and language)
+
+This fix resolves issues with comment submission on multilingual posts and ensures proper data consistency.
+
+## Usage Instructions
+
+1. Execute these scripts in the Supabase SQL editor
+2. The init_nzmarie_final.sql script is safe to run multiple times
+3. The reset_and_update_all_nzmarie_posts.sql script will delete all existing NZMarie data
+
+## Recent Updates
+
+- Added database constraint fix to ensure proper handling of multilingual posts
+- Improved conflict handling in all INSERT statements
+- Added comments field to post_stats table initialization

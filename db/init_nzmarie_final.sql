@@ -446,4 +446,152 @@ SELECT
         WHEN 'maximizing-property-investment-returns-new-zealand' THEN 8
         WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 7
         WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 5
-        WHEN '
+        WHEN 'new-zealand-property-market-trends-2024' THEN 12
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 6
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 14
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 7
+        ELSE 5
+    END,
+    CASE p.slug
+        WHEN 'buying-property-new-zealand-complete-guide' THEN 10
+        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 8
+        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 6
+        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 5
+        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 4
+        WHEN 'new-zealand-property-market-trends-2024' THEN 9
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 4
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 11
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 5
+        ELSE 5
+    END,
+    CASE p.slug
+        WHEN 'buying-property-new-zealand-complete-guide' THEN 2
+        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 1
+        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
+        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 0
+        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 0
+        WHEN 'new-zealand-property-market-trends-2024' THEN 1
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 0
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 2
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 1
+        ELSE 0
+    END
+FROM posts p 
+WHERE p."authorId" = 'nzmarie' AND p."language" = 'en'
+ON CONFLICT DO NOTHING;
+
+-- Insert daily stats for Chinese posts
+INSERT INTO daily_stats (id, "post_id", date, "pageViews", likes, "ai_questions", "ai_summaries", "language", "uniqueVisitors", reads, comments)
+SELECT 
+    gen_random_uuid(),
+    p.id,  -- This is the post_id field needed in Supabase
+    CURRENT_DATE,
+    CASE p.slug
+        WHEN 'buying-property-new-zealand-complete-guide' THEN 18
+        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 12
+        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 10
+        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 9
+        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 6
+        WHEN 'new-zealand-property-market-trends-2024' THEN 14
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 7
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 16
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 8
+        ELSE 5
+    END,
+    CASE p.slug
+        WHEN 'buying-property-new-zealand-complete-guide' THEN 3
+        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 2
+        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
+        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 1
+        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 1
+        WHEN 'new-zealand-property-market-trends-2024' THEN 2
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 1
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 2
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 1
+        ELSE 1
+    END,
+    CASE p.slug
+        WHEN 'buying-property-new-zealand-complete-guide' THEN 2
+        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 1
+        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
+        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 0
+        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 0
+        WHEN 'new-zealand-property-market-trends-2024' THEN 1
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 0
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 1
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 0
+        ELSE 0
+    END,
+    CASE p.slug
+        WHEN 'buying-property-new-zealand-complete-guide' THEN 3
+        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 1
+        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
+        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 1
+        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 1
+        WHEN 'new-zealand-property-market-trends-2024' THEN 2
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 1
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 2
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 1
+        ELSE 1
+    END,
+    'zh',
+    CASE p.slug
+        WHEN 'buying-property-new-zealand-complete-guide' THEN 15
+        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 10
+        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 8
+        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 7
+        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 5
+        WHEN 'new-zealand-property-market-trends-2024' THEN 12
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 6
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 14
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 7
+        ELSE 5
+    END,
+    CASE p.slug
+        WHEN 'buying-property-new-zealand-complete-guide' THEN 10
+        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 8
+        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 6
+        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 5
+        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 4
+        WHEN 'new-zealand-property-market-trends-2024' THEN 9
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 4
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 11
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 5
+        ELSE 5
+    END,
+    CASE p.slug
+        WHEN 'buying-property-new-zealand-complete-guide' THEN 2
+        WHEN 'first-home-buyer-financing-guide-new-zealand' THEN 1
+        WHEN 'maximizing-property-investment-returns-new-zealand' THEN 1
+        WHEN 'navigating-legal-aspects-property-purchase-new-zealand' THEN 0
+        WHEN 'new-zealand-property-investment-guide-australian-expats' THEN 0
+        WHEN 'new-zealand-property-market-trends-2024' THEN 1
+        WHEN 'retirement-planning-new-zealand-property-owners' THEN 0
+        WHEN 'selling-your-home-new-zealand-step-by-step' THEN 2
+        WHEN 'understanding-body-corporate-apartment-owners-new-zealand' THEN 1
+        ELSE 0
+    END
+FROM posts p 
+WHERE p."authorId" = 'nzmarie' AND p."language" = 'zh'
+ON CONFLICT DO NOTHING;
+
+-- 8. Verify the updates
+SELECT 
+  "language",
+  COUNT(*) as post_count,
+  SUM(views) as total_views,
+  SUM(likes) as total_likes,
+  SUM("ai_questions") as total_ai_questions,
+  SUM("ai_summaries") as total_ai_summaries
+FROM post_stats 
+GROUP BY "language" 
+ORDER BY "language";
+
+SELECT 
+  "language",
+  COUNT(*) as comment_count
+FROM comments 
+GROUP BY "language" 
+ORDER BY "language";
+
+SELECT id, "authorId", title, "language" FROM posts WHERE "authorId" = 'nzmarie' ORDER BY "language", "createdAt" DESC;
