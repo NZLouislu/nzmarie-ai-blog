@@ -105,7 +105,10 @@ export function getPostsByCategory(
   language: "en" | "zh" = "en"
 ): Post[] {
   return listPublished(language).filter((p) =>
-    p.categories.some((cat) => cat.toLowerCase() === category.toLowerCase())
+    p.categories.some(
+      (cat) =>
+        typeof cat === "string" && cat.toLowerCase() === category.toLowerCase()
+    )
   );
 }
 
@@ -114,7 +117,9 @@ export function getPostsByTag(
   language: "en" | "zh" = "en"
 ): Post[] {
   return listPublished(language).filter((p) =>
-    p.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
+    p.tags.some(
+      (t) => typeof t === "string" && t.toLowerCase() === tag.toLowerCase()
+    )
   );
 }
 
