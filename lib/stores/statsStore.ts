@@ -100,11 +100,7 @@ export const useStatsStore = create<StatsState>()(
       incrementAIStats: (postId, type) =>
         set((state) => {
           const statKey = type === "questions" ? "aiQuestions" : "aiSummaries";
-          const newState: {
-            postStats: PostStats;
-            aiQuestions?: number;
-            aiSummaries?: number;
-          } = {
+          return {
             postStats: {
               ...state.postStats,
               [postId]: {
@@ -112,13 +108,11 @@ export const useStatsStore = create<StatsState>()(
                 [statKey]: (state.postStats[postId]?.[statKey] || 0) + 1,
               },
             },
+            [statKey === "aiQuestions" ? "aiQuestions" : "aiSummaries"]:
+              statKey === "aiQuestions"
+                ? state.aiQuestions + 1
+                : state.aiSummaries + 1,
           };
-          if (type === "questions") {
-            newState.aiQuestions = state.aiQuestions + 1;
-          } else {
-            newState.aiSummaries = state.aiSummaries + 1;
-          }
-          return newState;
         }),
 
       setTotalStats: (stats) =>

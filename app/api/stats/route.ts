@@ -147,22 +147,7 @@ export async function POST(request: NextRequest) {
         error.message.includes("post_stats_post_id_key")
       ) {
         // Conflict due to old constraint, try to update existing record directly
-        const { data: existingStats, error: fetchError } = await supabase
-          .from("post_stats")
-          .select("*")
-          .eq("post_id", dbPostId)
-          .eq("language", language)
-          .single();
-
-        if (fetchError) {
-          console.error("Error fetching existing stats:", fetchError);
-          return NextResponse.json(
-            { error: "Failed to update stats" },
-            { status: 500 }
-          );
-        }
-
-        // Update the existing record
+        // If upsert fails due to conflict, try to update existing record
         const { data: updatedStats, error: updateError } = await supabase
           .from("post_stats")
           .update({
@@ -311,22 +296,7 @@ export async function PUT(request: NextRequest) {
         error.message.includes("post_stats_post_id_key")
       ) {
         // Conflict due to old constraint, try to update existing record directly
-        const { data: existingStats, error: fetchError } = await supabase
-          .from("post_stats")
-          .select("*")
-          .eq("post_id", dbPostId)
-          .eq("language", language)
-          .single();
-
-        if (fetchError) {
-          console.error("Error fetching existing stats:", fetchError);
-          return NextResponse.json(
-            { error: "Failed to update likes" },
-            { status: 500 }
-          );
-        }
-
-        // Update the existing record
+        // If upsert fails due to conflict, try to update existing record
         const { data: updatedStats, error: updateError } = await supabase
           .from("post_stats")
           .update({

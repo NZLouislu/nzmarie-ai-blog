@@ -127,7 +127,6 @@ function CommentsSection({ postId }: { postId: string }) {
         });
       } else {
         // Revert optimistic update on failure
-        incrementComments(postId); // We don't have a way to decrement, so we'll just log the error
         setComments((prev) =>
           prev.filter((comment) => comment.id !== optimisticComment.id)
         );
@@ -140,7 +139,6 @@ function CommentsSection({ postId }: { postId: string }) {
       }
     } catch (error) {
       // Revert optimistic update on failure
-      incrementComments(postId); // We don't have a way to decrement, so we'll just log the error
       setComments((prev) =>
         prev.filter((comment) => comment.id !== optimisticComment.id)
       );
@@ -249,7 +247,7 @@ function CommentsSection({ postId }: { postId: string }) {
         ) : (
           comments.map((comment, index) => (
             <div
-              key={index}
+              key={`${comment.id}-${index}`} // 使用唯一的key
               className="p-4 bg-white rounded-lg border border-gray-200"
             >
               <div className="flex items-center gap-3 mb-2">
@@ -350,7 +348,6 @@ function AIChatbot({
           { role: "assistant", content: t("sorryError") },
         ]);
         // Revert optimistic update on failure
-        incrementAiQuestions(postId, "questions");
       }
     } catch (error) {
       console.error("AI assistant error:", error);
@@ -359,7 +356,6 @@ function AIChatbot({
         { role: "assistant", content: t("sorryError") },
       ]);
       // Revert optimistic update on failure
-      incrementAiQuestions(postId, "questions");
     } finally {
       setIsLoading(false);
     }
@@ -378,7 +374,7 @@ function AIChatbot({
             <div className="space-y-4">
               {messages.map((message, index) => (
                 <div
-                  key={index}
+                  key={`${message.role}-${index}`} // 使用唯一的key
                   className={`flex ${
                     message.role === "user" ? "justify-end" : "justify-start"
                   }`}
@@ -466,7 +462,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
       try {
         const response = await fetch("/api/admin/toggles");
         if (response.ok && isMounted) {
-          const data = await response.json();
+          await response.json();
           fetchToggles(); // Use the fetchToggles function from the store instead of setToggles
         }
       } catch (error) {
@@ -522,7 +518,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
     return () => {
       isMounted = false;
     };
-  }, [fetchPostStats, incrementPostViews, language, post.id, postStats]);
+  }, [fetchPostStats, incrementPostViews, language, post.id]); // 移除了postStats依赖
 
   const handleLike = async () => {
     const newIsLiked = !isLiked;
@@ -590,14 +586,12 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         setSummary(originalSummary);
         setError(t("generationFailed"));
         // Revert optimistic update on failure
-        incrementAiSummaries(post.id, "summaries");
       }
     } catch (error) {
       console.error("Error generating AI summary:", error);
       setSummary(originalSummary);
       setError(t("generationFailed"));
       // Revert optimistic update on failure
-      incrementAiSummaries(post.id, "summaries");
     } finally {
       setIsLoading(false);
     }
@@ -772,7 +766,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
                 <div className="flex flex-wrap gap-2 mb-4 lg:mb-6">
                   {post.tags.map((tag, index) => (
                     <span
-                      key={index}
+                      key={`${tag}-${index}`} // 使用唯一的key
                       className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
                     >
                       {tag}
