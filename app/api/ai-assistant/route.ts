@@ -1,5 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Function to delay execution
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Function to call Gemini API with retry logic
+async function callGeminiAPI(
+  apiUrl: string,
+  apiKey: string,
+  prompt: string,
+  retries = 3
+) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const response = await fetch(`${apiUrl}?key=${apiKey}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: prompt,
+                },
+              ],
+            },
+          ],
+        }),
+      });
+
+      if (response.ok) {
+        return response;
+      }
+
+      // If we get a 429 error, wait before retrying
+      if (response.status === 429 && i < retries) {
+        // Exponential backoff: wait 1s, 2s, 4s, etc.
+        const waitTime = Math.pow(2, i) * 1000;
+        console.log(
+          `Received 429 error, waiting ${waitTime}ms before retry ${
+            i + 1
+          }/${retries}`
+        );
+        await delay(waitTime);
+        continue;
+      }
+
+      // For other errors, throw immediately
+      throw new Error(`Gemini API error: ${response.status}`);
+    } catch (error) {
+      if (i === retries) {
+        throw error;
+      }
+      // Wait before retrying
+      const waitTime = Math.pow(2, i) * 1000;
+      console.log(
+        `API call failed, waiting ${waitTime}ms before retry ${
+          i + 1
+        }/${retries}`
+      );
+      await delay(waitTime);
+    }
+  }
+  throw new Error("Max retries exceeded");
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { question, context, postId } = await request.json();
@@ -30,23 +98,7 @@ User Question: ${question}
 
 Please provide a clear, accurate answer based on the article content.`;
 
-    const response = await fetch(`${apiUrl}?key=${apiKey}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt,
-              },
-            ],
-          },
-        ],
-      }),
-    });
+    const response = await callGeminiAPI(apiUrl, apiKey, prompt);
 
     if (!response.ok) {
       throw new Error(`Gemini API error: ${response.status}`);
