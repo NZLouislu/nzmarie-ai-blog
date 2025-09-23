@@ -6,7 +6,7 @@ interface LanguageState {
 }
 
 export const useLanguageStore = create<LanguageState>((set) => ({
-  language: "en", // 默认值
+  language: "en",
   setLanguage: (language) => {
     set({ language });
     if (typeof window !== "undefined") {

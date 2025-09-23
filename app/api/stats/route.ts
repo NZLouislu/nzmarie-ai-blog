@@ -85,110 +85,68 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert postId to match database format without language suffix
-    // The postId from frontend may include language suffix, but database stores without it
-    const dbPostId = postId.endsWith(`-${language}`)
-      ? postId.slice(0, -(language.length + 1))
-      : postId;
+    // Convert postId to match database format with language suffix for Chinese
+    // For Chinese posts, the postId in database includes -zh suffix
+    const dbPostId = language === "zh" ? `${postId}-zh` : postId;
 
     // For now, we'll assume all users are non-admins to avoid the authentication issue
     // In a real application, you would check the user's role from the session/cookie
     const isAdmin = false;
 
-    // Get or create post stats in Supabase
-    const updateData: { [key: string]: { increment: number } } = {};
-    switch (action) {
-      case "view":
-        updateData.views = { increment: 1 };
-        break;
-      case "like":
-        updateData.likes = { increment: 1 };
-        break;
-      case "ai_question":
-        updateData.ai_questions = { increment: 1 };
-        break;
-      case "ai_summary":
-        updateData.ai_summaries = { increment: 1 };
-        break;
-      case "comment":
-        updateData.comments = { increment: 1 };
-        break;
-      default:
-        updateData.views = { increment: 1 };
-    }
-
-    // Try upsert with the correct conflict resolution first
-    const upsertData = {
-      post_id: dbPostId,
-      title: `Post ${dbPostId}`,
-      language: language,
-      views: action === "view" ? 1 : 0,
-      likes: action === "like" ? 1 : 0,
-      ai_questions: action === "ai_question" ? 1 : 0,
-      ai_summaries: action === "ai_summary" ? 1 : 0,
-      comments: action === "comment" ? 1 : 0,
-    };
-
-    // Upsert stats in Supabase
-    const { data: updatedStats, error } = await supabase
+    // First, try to get existing record
+    const { data: existingStats, error: selectError } = await supabase
       .from("post_stats")
-      .upsert(upsertData, {
-        onConflict: "post_id,language", // This should match the unique constraint
-      })
-      .select()
+      .select("*")
+      .eq("post_id", dbPostId)
+      .eq("language", language)
+      .limit(1)
       .single();
 
-    if (error) {
-      console.error("Supabase error when updating stats:", error);
+    // Handle select error (other than "no rows found")
+    if (selectError && selectError.code !== "PGRST116") {
+      console.error("Supabase error when fetching stats:", selectError);
+    }
 
-      // If the error is due to the old constraint, try to handle it
-      if (
-        error.code === "23505" &&
-        error.message.includes("post_stats_post_id_key")
-      ) {
-        // Conflict due to old constraint, try to update existing record directly
-        // If upsert fails due to conflict, try to update existing record
-        const { data: updatedStats, error: updateError } = await supabase
-          .from("post_stats")
-          .update({
-            views: action === "view" ? { increment: 1 } : undefined,
-            likes: action === "like" ? { increment: 1 } : undefined,
-            ai_questions:
-              action === "ai_question" ? { increment: 1 } : undefined,
-            ai_summaries:
-              action === "ai_summary" ? { increment: 1 } : undefined,
-            comments: action === "comment" ? { increment: 1 } : undefined,
-          })
-          .eq("post_id", dbPostId)
-          .eq("language", language)
-          .select()
-          .single();
+    // Prepare upsert data
+    const upsertData = {
+      post_id: dbPostId,
+      title: `Post ${postId}`, // Use original postId for title
+      language: language,
+      views: existingStats?.views || 0,
+      likes: existingStats?.likes || 0,
+      ai_questions: existingStats?.ai_questions || 0,
+      ai_summaries: existingStats?.ai_summaries || 0,
+      comments: existingStats?.comments || 0,
+    };
 
-        if (updateError) {
-          console.error("Supabase error when updating stats:", updateError);
-          return NextResponse.json(
-            { error: "Failed to update stats" },
-            { status: 500 }
-          );
-        }
+    // Apply increment based on action
+    switch (action) {
+      case "view":
+        upsertData.views += 1;
+        break;
+      case "like":
+        upsertData.likes += 1;
+        break;
+      case "ai_question":
+        upsertData.ai_questions += 1;
+        break;
+      case "ai_summary":
+        upsertData.ai_summaries += 1;
+        break;
+      case "comment":
+        upsertData.comments += 1;
+        break;
+      default:
+        upsertData.views += 1;
+    }
 
-        // Continue with daily stats update
-        await updateDailyStats(dbPostId, language, action, isAdmin);
-        return NextResponse.json(updatedStats);
-      }
-
-      // If upsert fails due to conflict, try to update existing record
+    // Use insert for new records, or update for existing records to avoid constraint issues
+    if (existingStats) {
+      // Update existing record
       const { data: updatedStats, error: updateError } = await supabase
         .from("post_stats")
-        .update({
-          views: action === "view" ? { increment: 1 } : undefined,
-          likes: action === "like" ? { increment: 1 } : undefined,
-          ai_questions: action === "ai_question" ? { increment: 1 } : undefined,
-          ai_summaries: action === "ai_summary" ? { increment: 1 } : undefined,
-          comments: action === "comment" ? { increment: 1 } : undefined,
-        })
-        .eq("post_id", dbPostId)
-        .eq("language", language)
+        .update(upsertData)
+        .eq("id", existingStats.id)
         .select()
         .single();
 
@@ -200,14 +158,29 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Continue with daily stats update
+      // Also update daily stats
       await updateDailyStats(dbPostId, language, action, isAdmin);
       return NextResponse.json(updatedStats);
-    }
+    } else {
+      // Insert new record
+      const { data: insertedStats, error: insertError } = await supabase
+        .from("post_stats")
+        .insert(upsertData)
+        .select()
+        .single();
 
-    // Also update daily stats
-    await updateDailyStats(dbPostId, language, action, isAdmin);
-    return NextResponse.json(updatedStats);
+      if (insertError) {
+        console.error("Supabase error when inserting stats:", insertError);
+        return NextResponse.json(
+          { error: "Failed to insert stats" },
+          { status: 500 }
+        );
+      }
+
+      // Also update daily stats
+      await updateDailyStats(dbPostId, language, action, isAdmin);
+      return NextResponse.json(insertedStats);
+    }
   } catch (error) {
     console.error("Error in POST /api/stats:", error);
     return NextResponse.json(
@@ -227,29 +200,84 @@ async function updateDailyStats(
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0); // Set to start of day in UTC
 
-  // Upsert daily stats - include post_id as it's required
-  const { error: dailyError } = await supabase.from("daily_stats").upsert(
-    {
-      post_id: dbPostId,
-      userId: "nzmarie",
-      date: today,
-      language: language,
-      views: action === "view" ? 1 : 0,
-      likes: action === "like" ? 1 : 0,
-      ai_questions: action === "ai_question" ? 1 : 0,
-      ai_summaries: action === "ai_summary" ? 1 : 0,
-      pageViews: action === "view" ? 1 : 0,
-      uniqueVisitors: isAdmin ? 0 : 1,
-      reads: 0,
-      comments: action === "comment" ? 1 : 0,
-    },
-    {
-      onConflict: "userId,date,language",
-    }
-  );
+  // Format date as YYYY-MM-DD to match database format
+  const formattedDate = today.toISOString().split("T")[0];
 
-  if (dailyError) {
-    console.error("Supabase error when updating daily stats:", dailyError);
+  // First try to get existing record
+  const { data: existingRecord, error: selectError } = await supabase
+    .from("daily_stats")
+    .select("*")
+    .eq("userId", "nzmarie")
+    .eq("date", formattedDate)
+    .eq("language", language)
+    .limit(1)
+    .single();
+
+  // If there's an error other than "no rows found", log it
+  if (selectError && selectError.code !== "PGRST116") {
+    console.error("Error selecting daily stats:", selectError);
+  }
+
+  // Prepare base update data
+  const updateData = {
+    userId: "nzmarie",
+    date: formattedDate,
+    language: language,
+    views: existingRecord?.views || 0,
+    likes: existingRecord?.likes || 0,
+    ai_questions: existingRecord?.ai_questions || 0,
+    ai_summaries: existingRecord?.ai_summaries || 0,
+    pageViews: existingRecord?.pageViews || 0,
+    uniqueVisitors: existingRecord?.uniqueVisitors || 0,
+    reads: existingRecord?.reads || 0,
+    comments: existingRecord?.comments || 0,
+  };
+
+  // Apply increment based on action
+  switch (action) {
+    case "view":
+      updateData.views += 1;
+      updateData.pageViews += 1;
+      updateData.uniqueVisitors = isAdmin
+        ? updateData.uniqueVisitors
+        : updateData.uniqueVisitors + 1;
+      break;
+    case "like":
+      updateData.likes += 1;
+      break;
+    case "ai_question":
+      updateData.ai_questions += 1;
+      break;
+    case "ai_summary":
+      updateData.ai_summaries += 1;
+      break;
+    case "comment":
+      updateData.comments += 1;
+      break;
+  }
+
+  // Use insert for new records, or update for existing records
+  if (existingRecord) {
+    // Update existing record
+    const { error: updateError } = await supabase
+      .from("daily_stats")
+      .update(updateData)
+      .eq("id", existingRecord.id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error("Supabase error when updating daily stats:", updateError);
+    }
+  } else {
+    // Insert new record
+    const { error: insertError } = await supabase
+      .from("daily_stats")
+      .insert(updateData);
+
+    if (insertError) {
+      console.error("Supabase error when inserting daily stats:", insertError);
+    }
   }
 }
 
@@ -265,67 +293,43 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Convert postId to match database format without language suffix
-    // The postId from frontend may include language suffix, but database stores without it
-    const dbPostId = postId.endsWith(`-${language}`)
-      ? postId.slice(0, -(language.length + 1))
-      : postId;
+    // Convert postId to match database format with language suffix for Chinese
+    // For Chinese posts, the postId in database includes -zh suffix
+    const dbPostId = language === "zh" ? `${postId}-zh` : postId;
 
-    // Try upsert with the correct conflict resolution first
-    const upsertData = {
-      post_id: dbPostId,
-      language: language,
-      likes: 1,
-    };
-
-    // Increment likes in Supabase
-    const { data: updatedStats, error } = await supabase
+    // First, try to get existing record
+    const { data: existingStats, error: selectError } = await supabase
       .from("post_stats")
-      .upsert(upsertData, {
-        onConflict: "post_id,language",
-      })
-      .select()
+      .select("*")
+      .eq("post_id", dbPostId)
+      .eq("language", language)
+      .limit(1)
       .single();
 
-    if (error) {
-      console.error("Supabase error when updating likes:", error);
+    // Handle select error (other than "no rows found")
+    if (selectError && selectError.code !== "PGRST116") {
+      console.error("Supabase error when fetching stats:", selectError);
+    }
 
-      // If the error is due to the old constraint, try to handle it
-      if (
-        error.code === "23505" &&
-        error.message.includes("post_stats_post_id_key")
-      ) {
-        // Conflict due to old constraint, try to update existing record directly
-        // If upsert fails due to conflict, try to update existing record
-        const { data: updatedStats, error: updateError } = await supabase
-          .from("post_stats")
-          .update({
-            likes: { increment: 1 },
-          })
-          .eq("post_id", dbPostId)
-          .eq("language", language)
-          .select()
-          .single();
+    // Prepare upsert data
+    const upsertData = {
+      post_id: dbPostId,
+      title: `Post ${postId}`, // Use original postId for title
+      language: language,
+      views: existingStats?.views || 0,
+      likes: (existingStats?.likes || 0) + 1, // Increment likes
+      ai_questions: existingStats?.ai_questions || 0,
+      ai_summaries: existingStats?.ai_summaries || 0,
+      comments: existingStats?.comments || 0,
+    };
 
-        if (updateError) {
-          console.error("Supabase error when updating likes:", updateError);
-          return NextResponse.json(
-            { error: "Failed to update likes" },
-            { status: 500 }
-          );
-        }
-
-        return NextResponse.json(updatedStats);
-      }
-
-      // If upsert fails due to conflict, try to update existing record
+    // Use insert for new records, or update for existing records to avoid constraint issues
+    if (existingStats) {
+      // Update existing record
       const { data: updatedStats, error: updateError } = await supabase
         .from("post_stats")
-        .update({
-          likes: { increment: 1 },
-        })
-        .eq("post_id", dbPostId)
-        .eq("language", language)
+        .update(upsertData)
+        .eq("id", existingStats.id)
         .select()
         .single();
 
@@ -338,9 +342,24 @@ export async function PUT(request: NextRequest) {
       }
 
       return NextResponse.json(updatedStats);
-    }
+    } else {
+      // Insert new record
+      const { data: insertedStats, error: insertError } = await supabase
+        .from("post_stats")
+        .insert(upsertData)
+        .select()
+        .single();
 
-    return NextResponse.json(updatedStats);
+      if (insertError) {
+        console.error("Supabase error when inserting likes:", insertError);
+        return NextResponse.json(
+          { error: "Failed to insert likes" },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json(insertedStats);
+    }
   } catch (error) {
     console.error("Error in PUT /api/stats/like:", error);
     return NextResponse.json(

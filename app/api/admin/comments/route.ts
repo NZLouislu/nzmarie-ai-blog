@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
       .order("createdAt", { ascending: false });
 
     if (postId) {
-      // Use the actual post id without language suffix
-      const dbPostId = postId;
+      // For comments, we always use the base postId (without language suffix)
+      const dbPostId = postId.replace(/-zh$/, ""); // Remove -zh suffix if present
       query = query.eq("postId", dbPostId);
     }
 

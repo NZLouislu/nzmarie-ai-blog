@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// GET /api/comments?postId={postId}
+// GET /api/comments?postId={postId}&language={language}
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -21,14 +21,28 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // For comments, we always use the base postId (without language suffix)
+    // but filter by language field
+    const dbPostId = postId.replace(/-zh$/, ""); // Remove -zh suffix if present
+
     // Get comments from Supabase
-    const { data: comments, error } = await supabase
+    let query = supabase
       .from("comments")
       .select("*")
-      .eq("postId", postId)
+      .eq("postId", dbPostId)
       .eq("language", language)
-      .eq("status", "approved")
       .order("createdAt", { ascending: false });
+
+    // In development, show all comments regardless of status
+    // In production, only show approved comments
+    if (process.env.NODE_ENV === "development") {
+      console.log("Development mode: showing all comments");
+      // Don't add status filter in development
+    } else {
+      query = query.eq("status", "approved");
+    }
+
+    const { data: comments, error } = await query;
 
     if (error) {
       console.error("Supabase error when fetching comments:", error);
@@ -68,11 +82,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert postId to match database format without language suffix
-    // The postId from frontend includes language suffix, but database stores without it
-    const dbPostId = postId.endsWith(`-${language}`)
-      ? postId.slice(0, -(language.length + 1))
-      : postId;
+    // For comments, we always use the base postId (without language suffix)
+    // Comments table stores postId without language suffix, but we filter by language field
+    const dbPostId = postId.replace(/-zh$/, ""); // Remove -zh suffix if present
 
     // Create comment in Supabase
     const { data: comment, error } = await supabase
@@ -83,7 +95,7 @@ export async function POST(request: NextRequest) {
         authorEmail: isAnonymous ? "anonymous@example.com" : authorEmail,
         content: content,
         is_anonymous: isAnonymous || false,
-        status: "pending",
+        status: process.env.NODE_ENV === "development" ? "approved" : "pending", // Auto-approve in development
         language: language,
         createdAt: new Date().toISOString(),
       })
@@ -95,6 +107,69 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Failed to create comment" },
         { status: 500 }
+      );
+    }
+
+    // After successfully creating a comment, increment the comment count in post_stats
+    try {
+      // For stats, we need to use the correct postId with language suffix for Chinese
+      const statsPostId = language === "zh" ? `${dbPostId}-zh` : dbPostId;
+
+      // First, try to get existing record
+      const { data: existingStats, error: selectError } = await supabase
+        .from("post_stats")
+        .select("*")
+        .eq("post_id", statsPostId)
+        .eq("language", language)
+        .limit(1)
+        .single();
+
+      // Handle select error (other than "no rows found")
+      if (selectError && selectError.code !== "PGRST116") {
+        console.error("Supabase error when fetching stats:", selectError);
+      }
+
+      // Prepare upsert data
+      const upsertData = {
+        post_id: statsPostId,
+        title: `Post ${postId}`,
+        language: language,
+        views: existingStats?.views || 0,
+        likes: existingStats?.likes || 0,
+        ai_questions: existingStats?.ai_questions || 0,
+        ai_summaries: existingStats?.ai_summaries || 0,
+        comments: (existingStats?.comments || 0) + 1, // Increment comments
+      };
+
+      // Use insert for new records, or update for existing records to avoid constraint issues
+      if (existingStats) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from("post_stats")
+          .update(upsertData)
+          .eq("id", existingStats.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error("Supabase error when updating stats:", updateError);
+        }
+      } else {
+        // Insert new record
+        const { error: insertError } = await supabase
+          .from("post_stats")
+          .insert(upsertData)
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error("Supabase error when inserting stats:", insertError);
+        }
+      }
+    } catch (statsUpdateError) {
+      console.error(
+        "Error updating post stats after comment creation:",
+        statsUpdateError
       );
     }
 
