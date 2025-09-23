@@ -5,7 +5,7 @@ subtitle: "A Comprehensive Guide to Owners' Rights and Responsibilities"
 description: "Everything apartment owners need to know about body corporate, including rights, responsibilities, and how to navigate body corporate meetings and decisions."
 date: 2024-02-17
 author: "Marie Hong"
-image: "/img/body-corporate-guide.jpg"
+image: "/img/body-corporate-guide.gif"
 published: true
 tags:
   - Body Corporate

@@ -5,7 +5,7 @@ subtitle: "业主权利和责任的全面指南"
 description: "公寓业主需要了解的关于业主立案法团的所有信息，包括权利、责任以及如何参与业主立案法团会议和决策。"
 date: 2024-02-17
 author: "Marie Hong"
-image: "/img/body-corporate-guide.jpg"
+image: "/img/body-corporate-guide.gif"
 published: true
 tags:
   - 业主立案法团
