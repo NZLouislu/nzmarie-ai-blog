@@ -100,6 +100,10 @@ export function listPublished(language: "en" | "zh" = "en"): Post[] {
   return getAllPosts(language).filter((p) => p.status === "published");
 }
 
+export function listDrafts(language: "en" | "zh" = "en"): Post[] {
+  return getAllPosts(language).filter((p) => p.status === "draft");
+}
+
 export function getPostsByCategory(
   category: string,
   language: "en" | "zh" = "en"

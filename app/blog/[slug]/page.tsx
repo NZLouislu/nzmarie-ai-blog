@@ -45,9 +45,9 @@ export default async function BlogPost({ params }: PageProps) {
     }
 
     // If user is not admin and post is not published, return 404
-    if (post.status !== "published" && !isAdmin) {
-      notFound();
-    }
+    // if (post.status !== "published" && !isAdmin) {
+    //   notFound();
+    // }
 
     console.log("Rendering post:", post.title);
     // Map the post data to include the date field required by BlogPostClient
