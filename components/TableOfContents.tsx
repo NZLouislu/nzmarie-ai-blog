@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTocStore } from "@/lib/stores/tocStore";
+import { useLanguageStore } from "@/lib/stores/languageStore";
 import { extractHeadings } from "@/lib/toc";
 
 interface TableOfContentsProps {
@@ -10,15 +11,16 @@ interface TableOfContentsProps {
 
 export function TableOfContents({ content }: TableOfContentsProps) {
   const { headings, setHeadings } = useTocStore();
+  const { language } = useLanguageStore();
   const [visible, setVisible] = useState(false);
 
-  // Extract headings from content when content changes
+  // Extract headings from content when content or language changes
   useEffect(() => {
     if (content) {
       const extractedHeadings = extractHeadings(content);
       setHeadings(extractedHeadings);
     }
-  }, [content, setHeadings]);
+  }, [content, language, setHeadings]); // Add language as dependency
 
   // Toggle visibility on mobile
   const toggleVisibility = () => {
@@ -62,7 +64,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
           className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-full"
         >
           <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
-            Table of Contents
+            {language === "en" ? "Table of Contents" : "目录"}
           </h3>
           <ul className="space-y-1 max-h-[calc(100vh-200px)] overflow-y-auto">
             {headings.map((heading) => (
@@ -89,7 +91,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
       <button
         className="fixed right-4 bottom-4 lg:hidden bg-blue-500 text-white p-3 rounded-full shadow-lg z-20"
         onClick={toggleVisibility}
-        aria-label="Toggle table of contents"
+        aria-label={language === "en" ? "Toggle table of contents" : "切换目录"}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -111,12 +113,14 @@ export function TableOfContents({ content }: TableOfContentsProps) {
           <div className="fixed right-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-800 shadow-lg p-4 overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-                Table of Contents
+                {language === "en" ? "Table of Contents" : "目录"}
               </h3>
               <button
                 onClick={toggleVisibility}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                aria-label="Close table of contents"
+                aria-label={
+                  language === "en" ? "Close table of contents" : "关闭目录"
+                }
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

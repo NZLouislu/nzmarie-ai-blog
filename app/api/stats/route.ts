@@ -223,20 +223,18 @@ async function updateDailyStats(
     userId: "nzmarie",
     date: formattedDate,
     language: language,
-    views: existingRecord?.views || 0,
-    likes: existingRecord?.likes || 0,
-    ai_questions: existingRecord?.ai_questions || 0,
-    ai_summaries: existingRecord?.ai_summaries || 0,
     pageViews: existingRecord?.pageViews || 0,
     uniqueVisitors: existingRecord?.uniqueVisitors || 0,
     reads: existingRecord?.reads || 0,
+    likes: existingRecord?.likes || 0,
     comments: existingRecord?.comments || 0,
+    ai_questions: existingRecord?.ai_questions || 0,
+    ai_summaries: existingRecord?.ai_summaries || 0,
   };
 
   // Apply increment based on action
   switch (action) {
     case "view":
-      updateData.views += 1;
       updateData.pageViews += 1;
       updateData.uniqueVisitors = isAdmin
         ? updateData.uniqueVisitors
@@ -273,7 +271,9 @@ async function updateDailyStats(
     // Insert new record
     const { error: insertError } = await supabase
       .from("daily_stats")
-      .insert(updateData);
+      .insert(updateData)
+      .select()
+      .single();
 
     if (insertError) {
       console.error("Supabase error when inserting daily stats:", insertError);

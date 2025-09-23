@@ -1,43 +1,56 @@
-const { PrismaClient } = require('@prisma/client');
+const { createClient } = require('@supabase/supabase-js');
 
-const prisma = new PrismaClient();
+// Create Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
-async function main() {
+async function checkTableStructure() {
   try {
-    // 检查 daily_stats 表结构
-    const dailyStatsSchema = await prisma.$queryRaw`
-      SELECT sql FROM sqlite_master 
-      WHERE type='table' AND name='daily_stats'
-    `;
+    // Check daily_stats table structure
+    console.log('Checking daily_stats table structure...');
     
-    console.log('Daily Stats Table Schema:');
-    console.log(dailyStatsSchema[0].sql);
-    console.log('');
-    
-    // 检查 post_stats 表结构
-    const postStatsSchema = await prisma.$queryRaw`
-      SELECT sql FROM sqlite_master 
-      WHERE type='table' AND name='post_stats'
-    `;
-    
-    console.log('Post Stats Table Schema:');
-    console.log(postStatsSchema[0].sql);
-    console.log('');
-    
-    // 检查 comments 表结构
-    const commentsSchema = await prisma.$queryRaw`
-      SELECT sql FROM sqlite_master 
-      WHERE type='table' AND name='comments'
-    `;
-    
-    console.log('Comments Table Schema:');
-    console.log(commentsSchema[0].sql);
-    
+    // Try to get table info
+    const { data, error } = await supabase
+      .from('daily_stats')
+      .select('*')
+      .limit(1);
+
+    if (error) {
+      console.log('Error querying daily_stats:', error);
+    } else {
+      console.log('Sample daily_stats record:', data[0]);
+      console.log('Fields in daily_stats:', Object.keys(data[0] || {}));
+    }
+
+    // Check if post_id column exists
+    const { data: postData, error: postError } = await supabase
+      .from('daily_stats')
+      .select('post_id')
+      .limit(1);
+
+    if (postError) {
+      console.log('post_id column does not exist or is not accessible');
+    } else {
+      console.log('post_id column exists');
+    }
+
+    // Check if userId column exists
+    const { data: userData, error: userError } = await supabase
+      .from('daily_stats')
+      .select('userId')
+      .limit(1);
+
+    if (userError) {
+      console.log('userId column does not exist or is not accessible');
+    } else {
+      console.log('userId column exists');
+    }
+
   } catch (error) {
-    console.error('Error:', error.message);
-  } finally {
-    await prisma.$disconnect();
+    console.error('Error checking table structure:', error);
   }
 }
 
-main();
+checkTableStructure();
