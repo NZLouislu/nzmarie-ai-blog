@@ -29,6 +29,17 @@ export async function POST(request: NextRequest) {
     const results = [];
 
     for (const post of enPosts) {
+      // Ensure post.id is valid
+      if (!post.id) {
+        console.error(`Skipping English post with invalid ID:`, post);
+        results.push({
+          post_id: "unknown",
+          status: "error",
+          error: "Invalid post ID",
+        });
+        continue;
+      }
+
       const { data: existingStats } = await supabase
         .from("post_stats")
         .select("id")
@@ -52,26 +63,47 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (statsError) {
-          console.error(`Failed to create stats for ${post.id}:`, statsError);
-          results.push({
-            post_id: post.id,
-            status: "error",
-            error: statsError.message,
-          });
+          // Check if it's a duplicate key error, if so, it's not a real error
+          if (statsError.code === "23505") {
+            console.log(
+              `English post ${post.id} already exists, marking as exists...`
+            );
+            results.push({ post_id: post.id, status: "exists" });
+          } else {
+            console.error(`Failed to create stats for ${post.id}:`, statsError);
+            results.push({
+              post_id: post.id,
+              status: "error",
+              error: statsError.message,
+            });
+          }
         } else {
           results.push({ post_id: post.id, status: "created", data: newStats });
         }
 
-        const today = new Date().toISOString().split("T")[0];
-        await supabase.from("daily_stats").insert({
-          post_id: post.id,
-          date: today,
-          views: Math.floor(Math.random() * 20) + 5,
-          likes: Math.floor(Math.random() * 5) + 1,
-          ai_questions: Math.floor(Math.random() * 3),
-          ai_summaries: Math.floor(Math.random() * 4) + 1,
-          language: "en",
-        });
+        // Only insert daily stats if post stats were successfully created or if we're updating
+        if (!statsError || statsError.code === "23505") {
+          const today = new Date().toISOString().split("T")[0];
+          const { error: dailyStatsError } = await supabase
+            .from("daily_stats")
+            .insert({
+              post_id: post.id,
+              date: today,
+              views: Math.floor(Math.random() * 20) + 5,
+              likes: Math.floor(Math.random() * 5) + 1,
+              ai_questions: Math.floor(Math.random() * 3),
+              ai_summaries: Math.floor(Math.random() * 4) + 1,
+              language: "en",
+            });
+
+          // We don't need to handle duplicate errors for daily_stats as they might be expected
+          if (dailyStatsError && dailyStatsError.code !== "23505") {
+            console.error(
+              `Failed to create daily stats for ${post.id}:`,
+              dailyStatsError
+            );
+          }
+        }
       } else {
         results.push({ post_id: post.id, status: "exists" });
       }

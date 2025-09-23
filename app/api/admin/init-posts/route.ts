@@ -23,6 +23,12 @@ export async function POST() {
 
     // Initialize English posts
     for (const post of enPosts) {
+      // Ensure post.id is valid
+      if (!post.id) {
+        console.error(`Skipping English post with invalid ID:`, post);
+        continue;
+      }
+
       const { data: existing } = await supabase
         .from("post_stats")
         .select("id")
@@ -31,21 +37,55 @@ export async function POST() {
         .single();
 
       if (!existing) {
-        const { error } = await supabase.from("post_stats").insert({
-          post_id: post.id,
-          title: post.title,
-          views: 0,
-          likes: 0,
-          ai_questions: 0,
-          ai_summaries: 0,
-          language: "en",
-        });
+        const { error } = await supabase
+          .from("post_stats")
+          .insert({
+            post_id: post.id,
+            title: post.title,
+            views: 0,
+            likes: 0,
+            ai_questions: 0,
+            ai_summaries: 0,
+            language: "en",
+          })
+          .select(); // Add select() to avoid void return
 
         if (error) {
-          console.error(`Failed to initialize English post ${post.id}:`, error);
+          // Check if it's a duplicate key error, if so, it's not a real error
+          if (error.code === "23505") {
+            console.log(`English post ${post.id} already exists, skipping...`);
+            initialized++;
+          } else {
+            console.error(
+              `Failed to initialize English post ${post.id}:`,
+              error
+            );
+          }
         } else {
           initialized++;
           console.log(`Initialized English post: ${post.title}`);
+
+          // Insert initial daily stats
+          const today = new Date().toISOString().split("T")[0];
+          const { error: dailyStatsError } = await supabase
+            .from("daily_stats")
+            .insert({
+              post_id: post.id,
+              date: today,
+              views: 0,
+              likes: 0,
+              ai_questions: 0,
+              ai_summaries: 0,
+              language: "en",
+            });
+
+          // We don't need to handle duplicate errors for daily_stats as they might be expected
+          if (dailyStatsError && dailyStatsError.code !== "23505") {
+            console.error(
+              `Failed to create daily stats for ${post.id}:`,
+              dailyStatsError
+            );
+          }
         }
       } else {
         // Update title if needed
@@ -63,6 +103,12 @@ export async function POST() {
 
     // Initialize Chinese posts
     for (const post of zhPosts) {
+      // Ensure post.id is valid
+      if (!post.id) {
+        console.error(`Skipping Chinese post with invalid ID:`, post);
+        continue;
+      }
+
       const { data: existing } = await supabase
         .from("post_stats")
         .select("id")
@@ -71,21 +117,55 @@ export async function POST() {
         .single();
 
       if (!existing) {
-        const { error } = await supabase.from("post_stats").insert({
-          post_id: post.id,
-          title: post.title,
-          views: 0,
-          likes: 0,
-          ai_questions: 0,
-          ai_summaries: 0,
-          language: "zh",
-        });
+        const { error } = await supabase
+          .from("post_stats")
+          .insert({
+            post_id: post.id,
+            title: post.title,
+            views: 0,
+            likes: 0,
+            ai_questions: 0,
+            ai_summaries: 0,
+            language: "zh",
+          })
+          .select(); // Add select() to avoid void return
 
         if (error) {
-          console.error(`Failed to initialize Chinese post ${post.id}:`, error);
+          // Check if it's a duplicate key error, if so, it's not a real error
+          if (error.code === "23505") {
+            console.log(`Chinese post ${post.id} already exists, skipping...`);
+            initialized++;
+          } else {
+            console.error(
+              `Failed to initialize Chinese post ${post.id}:`,
+              error
+            );
+          }
         } else {
           initialized++;
           console.log(`Initialized Chinese post: ${post.title}`);
+
+          // Insert initial daily stats
+          const today = new Date().toISOString().split("T")[0];
+          const { error: dailyStatsError } = await supabase
+            .from("daily_stats")
+            .insert({
+              post_id: post.id,
+              date: today,
+              views: 0,
+              likes: 0,
+              ai_questions: 0,
+              ai_summaries: 0,
+              language: "zh",
+            });
+
+          // We don't need to handle duplicate errors for daily_stats as they might be expected
+          if (dailyStatsError && dailyStatsError.code !== "23505") {
+            console.error(
+              `Failed to create daily stats for ${post.id}:`,
+              dailyStatsError
+            );
+          }
         }
       } else {
         // Update title if needed
