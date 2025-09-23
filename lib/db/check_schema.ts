@@ -1,33 +1,33 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
   // 获取 daily_stats 表的结构信息
-  const dailyStatsFields = await prisma.$queryRaw`
+  const dailyStatsFields = await prisma.$queryRaw<{ sql: string }[]>`
     SELECT sql FROM sqlite_master 
     WHERE type='table' AND name='daily_stats'
   `;
-  
-  console.log('Daily Stats Table Schema:');
+
+  console.log("Daily Stats Table Schema:");
   console.log(dailyStatsFields[0].sql);
-  
+
   // 获取 comments 表的结构信息
-  const commentsFields = await prisma.$queryRaw`
+  const commentsFields = await prisma.$queryRaw<{ sql: string }[]>`
     SELECT sql FROM sqlite_master 
     WHERE type='table' AND name='comments'
   `;
-  
-  console.log('\nComments Table Schema:');
+
+  console.log("\nComments Table Schema:");
   console.log(commentsFields[0].sql);
-  
+
   // 获取 post_stats 表的结构信息
-  const postStatsFields = await prisma.$queryRaw`
+  const postStatsFields = await prisma.$queryRaw<{ sql: string }[]>`
     SELECT sql FROM sqlite_master 
     WHERE type='table' AND name='post_stats'
   `;
-  
-  console.log('\nPost Stats Table Schema:');
+
+  console.log("\nPost Stats Table Schema:");
   console.log(postStatsFields[0].sql);
 }
 

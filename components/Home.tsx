@@ -14,11 +14,12 @@ export default function HomePage() {
     useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
   const { language } = useLanguageStore();
-  const { t } = useTranslation();
+  // const { t } = useTranslation(); // Removed unused translation hook
 
   useEffect(() => {
     fetchToggles();
   }, [fetchToggles]);
+
   return (
     <Box className="w-full px-6 py-12">
       <div className="flex flex-col items-center mb-20">
@@ -38,9 +39,10 @@ export default function HomePage() {
         </Text>
 
         {/* Statistics Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 w-full max-w-6xl mb-12">
-          {toggles.homeStatistics && (
-            <>
+        {toggles.homeStatistics && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 w-full max-w-6xl mb-12">
+            {/* Total Views */}
+            {toggles.totalViews && (
               <div className="bg-white rounded-lg shadow-md p-6 text-center border border-gray-200">
                 <div className="flex items-center justify-center mb-2">
                   <svg
@@ -68,7 +70,10 @@ export default function HomePage() {
                 </div>
                 <p className="text-gray-600">Total Views</p>
               </div>
+            )}
 
+            {/* Total Likes */}
+            {toggles.totalLikes && (
               <div className="bg-white rounded-lg shadow-md p-6 text-center border border-gray-200">
                 <div className="flex items-center justify-center mb-2">
                   <svg
@@ -90,7 +95,10 @@ export default function HomePage() {
                 </div>
                 <p className="text-gray-600">Total Likes</p>
               </div>
+            )}
 
+            {/* Total Comments */}
+            {toggles.totalComments && (
               <div className="bg-white rounded-lg shadow-md p-6 text-center border border-gray-200">
                 <div className="flex items-center justify-center mb-2">
                   <svg
@@ -112,7 +120,10 @@ export default function HomePage() {
                 </div>
                 <p className="text-gray-600">Total Comments</p>
               </div>
+            )}
 
+            {/* AI Summaries */}
+            {toggles.aiSummaries && (
               <div className="bg-white rounded-lg shadow-md p-6 text-center border border-gray-200">
                 <div className="flex items-center justify-center mb-2">
                   <svg
@@ -134,7 +145,10 @@ export default function HomePage() {
                 </div>
                 <p className="text-gray-600">AI Summaries</p>
               </div>
+            )}
 
+            {/* AI Questions */}
+            {toggles.aiQuestions && (
               <div className="bg-white rounded-lg shadow-md p-6 text-center border border-gray-200">
                 <div className="flex items-center justify-center mb-2">
                   <svg
@@ -156,9 +170,9 @@ export default function HomePage() {
                 </div>
                 <p className="text-gray-600">AI Questions</p>
               </div>
-            </>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
       <Flex className="flex flex-col md:flex-row gap-12 md:justify-center mt-12">

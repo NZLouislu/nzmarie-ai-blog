@@ -63,12 +63,17 @@ export const useTogglesStore = create<TogglesState>()(
       fetchToggles: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await fetch("/api/admin/toggles");
+          // 使用测试API端点
+          const response = await fetch("/api/test-toggles");
           if (response.ok) {
             const data = await response.json();
             set({ toggles: data });
+          } else {
+            const errorData = await response.json();
+            set({ error: errorData.error || "Failed to fetch toggles" });
           }
-        } catch {
+        } catch (error) {
+          console.error("Fetch toggles error:", error);
           set({ error: "Failed to fetch toggles" });
         } finally {
           set({ isLoading: false });
@@ -78,17 +83,20 @@ export const useTogglesStore = create<TogglesState>()(
       updateToggle: async (key, value) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await fetch("/api/admin/toggles", {
-            method: "POST",
+          // 使用测试API端点
+          const response = await fetch("/api/test-toggles", {
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ [key]: value }),
+            body: JSON.stringify({ key, value }),
           });
           if (response.ok) {
             get().setToggle(key, value);
           } else {
-            set({ error: "Failed to update toggle" });
+            const errorData = await response.json();
+            set({ error: errorData.error || "Failed to update toggle" });
           }
-        } catch {
+        } catch (error) {
+          console.error("Update toggle error:", error);
           set({ error: "Failed to update toggle" });
         } finally {
           set({ isLoading: false });

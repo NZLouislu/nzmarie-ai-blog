@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { listPublished } from "@/lib/posts";
 
 export async function GET(request: Request) {

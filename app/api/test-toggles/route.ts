@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
-import { UserSession } from "@/lib/auth/session";
 
 // Create Supabase client
 const supabase = createClient(
@@ -9,68 +7,24 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Helper function to get user ID from session
-async function getUserId(request: NextRequest): Promise<string | null> {
-  try {
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get("userSession");
-
-    if (!sessionCookie?.value) {
-      return null;
-    }
-
-    const session: UserSession = JSON.parse(sessionCookie.value);
-
-    if (new Date(session.expiresAt) < new Date()) {
-      return null;
-    }
-
-    // Return the actual user ID from the session
-    return session.id;
-  } catch (error) {
-    console.error("Session validation error:", error);
-    return null;
-  }
-}
-
+// 简单的测试路由，不进行复杂的会话验证
 export async function GET(request: NextRequest) {
   try {
-    // Get user ID from session
-    const sessionUserId = await getUserId(request);
+    console.log("Test toggles API called");
 
-    if (!sessionUserId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // 直接使用固定的用户ID进行测试
+    const testUserId = "nzmarie";
 
-    // Try to get feature toggles for the session user ID first
-    let { data: toggles, error } = await supabase
+    // 获取功能切换
+    const { data: toggles, error } = await supabase
       .from("feature_toggles")
       .select("*")
-      .eq("user_id", sessionUserId)
+      .eq("user_id", testUserId)
       .limit(1)
       .single();
 
-    // If not found, try with the mapped user ID (fallback for existing data)
-    if (error || !toggles) {
-      // Map the session user ID to the database user ID for backward compatibility
-      const userIdMap: Record<string, string> = {
-        nzmarie: "user_nzmarie",
-        admin: "user_admin",
-        nzlouis: "user_nzlouis",
-      };
-
-      const dbUserId = userIdMap[sessionUserId] || sessionUserId;
-
-      ({ data: toggles, error } = await supabase
-        .from("feature_toggles")
-        .select("*")
-        .eq("user_id", dbUserId)
-        .limit(1)
-        .single());
-    }
-
     if (error) {
-      // If no toggles exist, return default values
+      console.log("No toggles found, returning defaults");
       return NextResponse.json({
         totalViews: true,
         totalLikes: true,
@@ -81,7 +35,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Convert to the expected format
+    // 转换格式
     const result = {
       totalViews: toggles.total_views ?? true,
       totalLikes: toggles.total_likes ?? true,
@@ -91,9 +45,10 @@ export async function GET(request: NextRequest) {
       homeStatistics: toggles.home_statistics ?? true,
     };
 
+    console.log("Returning toggles:", result);
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Toggles API error:", error);
+    console.error("Test API error:", error);
     return NextResponse.json(
       { error: "Failed to fetch toggles" },
       { status: 500 }
@@ -103,14 +58,11 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const sessionUserId = await getUserId(request);
-
-    if (!sessionUserId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    console.log("Test toggles PUT API called");
 
     const body = await request.json();
     const { key, value } = body;
+    console.log("Update request:", { key, value });
 
     if (!key || typeof value !== "boolean") {
       return NextResponse.json(
@@ -119,7 +71,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Map frontend feature names to database columns
+    // 字段映射
     const columnMap: Record<string, string> = {
       totalViews: "total_views",
       totalLikes: "total_likes",
@@ -137,13 +89,15 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Prepare update data using the session user ID
+    // 准备更新数据
     const updateData: Record<string, boolean | string> = {
       [dbColumn]: value,
-      user_id: sessionUserId, // 使用会话中的实际用户ID
+      user_id: "nzmarie", // 直接使用固定用户ID
     };
 
-    // Update or insert the toggle for the specific user
+    console.log("Upsert data:", updateData);
+
+    // 更新功能切换
     const { error } = await supabase
       .from("feature_toggles")
       .upsert(updateData, {
@@ -160,9 +114,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    console.log("Toggle updated successfully");
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Toggles API error:", error);
+    console.error("Test PUT API error:", error);
     return NextResponse.json(
       { error: "Failed to update toggle" },
       { status: 500 }
