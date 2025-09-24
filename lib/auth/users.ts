@@ -17,7 +17,7 @@ export const USERS: Record<string, User> = {
   nzmarie: {
     id: "nzmarie",
     username: "nzmarie",
-    name: "Marie Hong",
+    name: "Marie Nian",
     role: "user",
     languagePreferences: "both",
   },

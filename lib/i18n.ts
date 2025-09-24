@@ -11,8 +11,8 @@ interface Translations {
 
 const translations: Translations = {
   aboutMeTitle: {
-    en: "Marie Hong",
-    zh: "Marie Hong",
+    en: "Marie Nian",
+    zh: "Marie Nian",
   },
   aboutMeDescription: {
     en: "Real Estate Agent, Property Expert, and Lifetime Learner.",

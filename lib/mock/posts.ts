@@ -22,7 +22,7 @@ export const mockPosts: Post[] = [
       "Everything you need to know about buying property in New Zealand as a first-time buyer or investor.",
     content: `# Your Complete Guide to Buying Property in New Zealand
 
-Welcome! I'm Marie Hong, a licensed real estate agent with over 8 years of experience helping clients navigate New Zealand's property market. Whether you're a first-time buyer or looking to invest, this comprehensive guide will walk you through every step of the property buying process.
+Welcome! I'm Marie Nian, a licensed real estate agent with over 8 years of experience helping clients navigate New Zealand's property market. Whether you're a first-time buyer or looking to invest, this comprehensive guide will walk you through every step of the property buying process.
 
 ## Understanding the New Zealand Property Market
 
@@ -129,7 +129,7 @@ As of 2024, key trends include:
 - **Government Policies**: Stay updated on housing-related policy changes
 - **Regional Growth**: Smaller centers showing strong growth potential
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 With my Real Estate Institute of New Zealand (REINZ) license and local expertise, I provide:
 
@@ -149,7 +149,7 @@ Ready to start your property journey? Contact me for a no-obligation consultatio
 
 Remember, buying property is one of life's biggest investments. Having the right guidance makes all the difference in achieving your property goals.
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 marie@nzrealestate.co.nz  
 📱 021 555 0123  
@@ -158,7 +158,7 @@ Licensed Real Estate Agent (REAA 2008)
 _Disclaimer: This information is general in nature and should not replace professional financial or legal advice._`,
     image: "/images/posts/buying-property.jpg",
     author: {
-      name: "Marie Hong",
+      name: "Marie Nian",
       avatar: "/images/authors/marie.jpg",
     },
     date: "2025-08-10",
@@ -388,7 +388,7 @@ Buyers typically have 10-15 working days for:
 4. **Emotional Decisions**: Not accepting reasonable offers
 5. **Inadequate Documentation**: Missing important certificates or consents
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 As your licensed real estate agent, I provide:
 
@@ -416,7 +416,7 @@ If you're considering selling your home, I'd love to help you achieve the best p
 - Expected timeframe and costs
 - Next steps in the process
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 marie@nzrealestate.co.nz  
 📱 021 555 0123  
@@ -431,7 +431,7 @@ Licensed Real Estate Agent (REAA 2008)
 _Disclaimer: This information is general in nature. Property values and market conditions vary by location and time. Always seek professional advice for your specific situation._`,
     image: "/images/posts/selling-property.jpg",
     author: {
-      name: "Marie Hong",
+      name: "Marie Nian",
       avatar: "/images/authors/marie.jpg",
     },
     date: "2025-08-12",

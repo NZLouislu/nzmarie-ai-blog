@@ -129,7 +129,7 @@ If comments don't show up:
 The NZMarie user is configured with:
 
 - **ID**: `nzmarie`
-- **Name**: `Marie Hong`
+- **Name**: `Marie Nian`
 - **Email**: `marie@nzrealestate.co.nz`
 - **Role**: `user`
 - **Language Preferences**: `both` (English and Chinese)

@@ -4,7 +4,7 @@ title: "了解在新西兰购买房产的法律方面"
 subtitle: "理解合同、尽职调查和您的法律权利"
 description: "关于在新西兰购买房产法律流程的全面指南，涵盖合同、尽职调查和买方的法律保护。"
 date: 2024-02-24
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/property-legal-guide.png"
 published: true
 tags:
@@ -353,7 +353,7 @@ categories: [买房]
 - **免于负担**：房产免于大多数限制
 - **法律补救**：出现产权问题时的选项
 
-## 与 Marie Hong 房地产合作
+## 与 Marie Nian 房地产合作
 
 我的法律知识帮助客户处理复杂的房产交易：
 
@@ -384,7 +384,7 @@ categories: [买房]
 3. **完成尽职调查**：对房产的彻底调查
 4. **联系我**：让我们讨论您的房产购买需求
 
-**联系 Marie Hong**  
+**联系 Marie Nian**  
 持牌房地产经纪人 (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

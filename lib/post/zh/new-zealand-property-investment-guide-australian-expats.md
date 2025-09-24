@@ -4,7 +4,7 @@ title: "在新西兰投资房产：澳洲移民指南"
 subtitle: "了解规则并最大化您的投资潜力"
 description: "为希望在新西兰投资房产的澳洲移民提供的全面指南，涵盖法规、税务影响和投资策略。"
 date: 2024-02-11
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/aussie-expat-investment.jpg"
 published: true
 tags:
@@ -301,7 +301,7 @@ categories: [买房]
 - 市场状况评估
 - 必要时的策略调整
 
-## 与 Marie Hong 房地产合作
+## 与 Marie Nian 房地产合作
 
 作为澳洲移民本人，我了解您面临的独特挑战和机遇：
 
@@ -332,7 +332,7 @@ categories: [买房]
 3. **选择您的结构**：决定最适合您需求的所有权结构
 4. **联系我**：让我们讨论您的投资策略并找到合适的房产
 
-**联系 Marie Hong**  
+**联系 Marie Nian**  
 持牌房地产经纪人 (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

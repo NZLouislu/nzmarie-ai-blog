@@ -5,7 +5,7 @@ subtitle: "This article should not be published"
 description: "A test article to verify draft functionality"
 excerpt: "Test draft article"
 date: 2024-01-15
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/test-draft.jpg"
 published: false
 tags:

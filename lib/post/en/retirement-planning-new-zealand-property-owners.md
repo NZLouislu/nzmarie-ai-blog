@@ -4,7 +4,7 @@ title: "Retirement Planning for New Zealand Property Owners"
 subtitle: "Using Real Estate to Secure Your Financial Future"
 description: "A comprehensive guide to using property ownership as a retirement planning strategy in New Zealand, covering superannuation, equity release, and aged care considerations."
 date: 2024-03-10
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/retirement-planning-real-estate.png"
 published: true
 tags:
@@ -352,7 +352,7 @@ Optimizing tax outcomes for beneficiaries:
 - Maximizing exemptions
 - Professional guidance
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 My retirement planning expertise helps clients maximize property wealth:
 
@@ -383,7 +383,7 @@ Planning for retirement using property wealth requires careful consideration:
 3. **Plan for the Future**: Consider aged care and estate planning
 4. **Contact Me**: Let's discuss your retirement property strategy
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

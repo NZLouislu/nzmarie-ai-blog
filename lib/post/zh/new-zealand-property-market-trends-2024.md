@@ -4,7 +4,7 @@ title: "了解新西兰2024年房地产市场趋势"
 subtitle: "买家和投资者的关键洞察"
 description: "分析新西兰当前的房地产市场趋势以及它们对2024年买家和投资者的意义。"
 date: 2024-01-28
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/property-market-trends.jpg"
 published: true
 tags:
@@ -177,7 +177,7 @@ categories: [买房]
 - **规划法规**：分区和发展规则的变化
 - **海外投资**：外国买家限制的可能修改
 
-## 与 Marie Hong 房地产合作
+## 与 Marie Nian 房地产合作
 
 凭借我在新西兰房地产市场的丰富经验，我提供：
 
@@ -199,7 +199,7 @@ categories: [买房]
 
 **准备好探索 2024 年房地产市场了吗？** 联系我进行免费咨询，我们可以讨论您的具体需求，并制定适合当今市场的量身定制策略。
 
-**联系 Marie Hong**  
+**联系 Marie Nian**  
 持牌房地产经纪人 (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

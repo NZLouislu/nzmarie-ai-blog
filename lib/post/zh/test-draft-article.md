@@ -5,7 +5,7 @@ subtitle: "这篇文章不应该被发布"
 description: "测试文章以验证草稿功能"
 excerpt: "测试草稿文章"
 date: 2024-01-15
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/test-draft.jpg"
 published: false
 tags:

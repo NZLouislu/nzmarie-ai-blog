@@ -88,7 +88,7 @@ export default function BlogList({ posts: initialPosts }: BlogListProps) {
                     radius="full"
                     className="w-5 h-5 shrink-0"
                   />
-                  <span className="text-sm">{post.author || "Marie Hong"}</span>
+                  <span className="text-sm">{post.author || "Marie Nian"}</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-500">
                   {postStats[post.id] ? (

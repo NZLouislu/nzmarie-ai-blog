@@ -2,10 +2,10 @@
 layout: post
 title: "Your Complete Guide to Buying Property in New Zealand"
 subtitle: "A Step-by-Step Guide for First-Time Buyers and Investors"
-description: "Marie Hong's comprehensive guide to buying property in New Zealand. Whether you're a first-time buyer or looking to invest, this guide walks you through every step of the property buying process."
+description: "Marie Nian's comprehensive guide to buying property in New Zealand. Whether you're a first-time buyer or looking to invest, this guide walks you through every step of the property buying process."
 excerpt: "Everything about buying property in New Zealand"
 date: 2024-01-10
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/property-buying-guide.jpg"
 published: true
 tags:
@@ -24,7 +24,7 @@ categories: [Buying]
 
 # Your Complete Guide to Buying Property in New Zealand
 
-Welcome! I'm Marie Hong, a licensed real estate agent with over 8 years of experience helping clients navigate New Zealand's property market. Whether you're a first-time buyer or looking to invest, this comprehensive guide will walk you through every step of the property buying process.
+Welcome! I'm Marie Nian, a licensed real estate agent with over 8 years of experience helping clients navigate New Zealand's property market. Whether you're a first-time buyer or looking to invest, this comprehensive guide will walk you through every step of the property buying process.
 
 ## Understanding the New Zealand Property Market
 
@@ -131,7 +131,7 @@ As of 2024, key trends include:
 - **Government Policies**: Stay updated on housing-related policy changes
 - **Regional Growth**: Smaller centers showing strong growth potential
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 With my Real Estate Institute of New Zealand (REINZ) license and local expertise, I provide:
 
@@ -151,7 +151,7 @@ Ready to start your property journey? Contact me for a no-obligation consultatio
 
 Remember, buying property is one of life's biggest investments. Having the right guidance makes all the difference in achieving your property goals.
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

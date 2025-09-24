@@ -50,7 +50,7 @@ export default function Footer() {
       </div>
 
       <div className="text-sm text-gray-500">
-        © {new Date().getFullYear()} NZMarie | Marie Hong. All rights reserved.
+        © {new Date().getFullYear()} NZMarie | Marie Nian. All rights reserved.
       </div>
     </footer>
   );

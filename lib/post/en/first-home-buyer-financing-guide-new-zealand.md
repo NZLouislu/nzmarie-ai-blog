@@ -4,7 +4,7 @@ title: "First Home Buyer's Guide to Financing Your Property Purchase in New Zeal
 subtitle: "Understanding Your Options and Maximizing Your Approval Chances"
 description: "A comprehensive guide for first home buyers on navigating the mortgage and financing landscape in New Zealand."
 date: 2024-02-04
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/first-home-financing.jpg"
 published: true
 tags:
@@ -334,7 +334,7 @@ Timing your purchase incorrectly can impact your finances:
 - Allow time for credit file improvements if needed
 - Consider seasonal market factors
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 As your real estate agent, I work closely with trusted mortgage professionals to ensure a seamless buying experience:
 
@@ -364,7 +364,7 @@ Ready to start your first home buying journey? Here's what to do next:
 3. **Speak to a Lender**: Get pre-approval to understand your options
 4. **Contact Me**: Let's discuss your property goals and create a plan
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

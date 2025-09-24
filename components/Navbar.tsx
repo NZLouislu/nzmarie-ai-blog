@@ -34,7 +34,7 @@ export default function Navbar() {
             <div className="flex items-center w-[100px] h-[30px]">
               <Image
                 src="/images/nzmarie-logo.png"
-                alt="NZMarie logo — Marie Hong"
+                alt="NZMarie logo — Marie Nian"
                 width={100}
                 height={30}
                 priority

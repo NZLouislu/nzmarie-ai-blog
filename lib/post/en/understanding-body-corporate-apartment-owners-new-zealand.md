@@ -4,7 +4,7 @@ title: "Understanding Body Corporate for Apartment Owners in New Zealand"
 subtitle: "A Comprehensive Guide to Owners' Rights and Responsibilities"
 description: "Everything apartment owners need to know about body corporate, including rights, responsibilities, and how to navigate body corporate meetings and decisions."
 date: 2024-02-17
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/body-corporate-guide.gif"
 published: true
 tags:
@@ -318,7 +318,7 @@ When internal resolution isn't sufficient:
 - More costly and time-consuming
 - Last resort option
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 My experience with body corporate properties helps clients make informed decisions:
 
@@ -349,7 +349,7 @@ Whether you're buying your first apartment or managing an investment portfolio, 
 3. **Attend Meetings**: Participate actively in body corporate governance
 4. **Contact Me**: Let's discuss your apartment buying or selling needs
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

@@ -4,7 +4,7 @@ title: "了解新西兰公寓业主的业主立案法团"
 subtitle: "业主权利和责任的全面指南"
 description: "公寓业主需要了解的关于业主立案法团的所有信息，包括权利、责任以及如何参与业主立案法团会议和决策。"
 date: 2024-02-17
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/body-corporate-guide.gif"
 published: true
 tags:
@@ -318,7 +318,7 @@ categories: [买房]
 - 更昂贵和耗时
 - 最后的选择
 
-## 与 Marie Hong 房地产合作
+## 与 Marie Nian 房地产合作
 
 我在业主立案法团房产方面的经验帮助客户做出明智的决策：
 
@@ -349,7 +349,7 @@ categories: [买房]
 3. **参加会议**：积极参与业主立案法团治理
 4. **联系我**：让我们讨论您的公寓买卖需求
 
-**联系 Marie Hong**  
+**联系 Marie Nian**
 持牌房地产经纪人 (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

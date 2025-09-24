@@ -4,7 +4,7 @@ title: "Understanding New Zealand's Property Market Trends in 2024"
 subtitle: "Key Insights for Buyers and Investors"
 description: "An analysis of current property market trends in New Zealand and what they mean for buyers and investors in 2024."
 date: 2024-01-28
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/property-market-trends.jpg"
 published: true
 tags:
@@ -177,7 +177,7 @@ Keep an eye on potential policy changes:
 - **Planning Regulations**: Changes to zoning and development rules
 - **Overseas Investment**: Potential modifications to foreign buyer restrictions
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 With my extensive experience in New Zealand's property market, I provide:
 
@@ -199,7 +199,7 @@ New Zealand's property market in 2024 presents both challenges and opportunities
 
 **Ready to explore the 2024 property market?** Contact me for a no-obligation consultation where we can discuss your specific needs and develop a tailored strategy for success in today's market.
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

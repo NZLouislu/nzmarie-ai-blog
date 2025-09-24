@@ -101,7 +101,7 @@ export default function TagContent({ tag, posts, language }: TagContentProps) {
                             className="w-5 h-5 shrink-0"
                           />
                           <span className="text-sm">
-                            {post.author || "Marie Hong"}
+                            {post.author || "Marie Nian"}
                           </span>
                         </div>
                         {postStats[post.id] && (

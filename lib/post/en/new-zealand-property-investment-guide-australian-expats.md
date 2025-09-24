@@ -4,7 +4,7 @@ title: "Investing in New Zealand Property: A Guide for Australian Expats"
 subtitle: "Understanding the Rules and Maximizing Your Investment Potential"
 description: "A comprehensive guide for Australian expats looking to invest in New Zealand property, covering regulations, tax implications, and investment strategies."
 date: 2024-02-11
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/aussie-expat-investment.jpg"
 published: true
 tags:
@@ -301,7 +301,7 @@ Regular portfolio review is essential:
 - Market condition assessments
 - Strategy adjustments as needed
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 As an Australian expat myself, I understand the unique challenges and opportunities you face:
 
@@ -332,7 +332,7 @@ Ready to start your New Zealand property investment journey? Here's what to do n
 3. **Choose Your Structure**: Decide on the best ownership structure for your needs
 4. **Contact Me**: Let's discuss your investment strategy and find suitable properties
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

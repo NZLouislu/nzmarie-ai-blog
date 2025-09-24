@@ -25,7 +25,7 @@ DELETE FROM comments WHERE "postId" IN (
 
 -- 3. Insert or update NZMarie user
 INSERT INTO users (id, email, name, role, "avatarUrl", "languagePreferences", "createdAt", "updatedAt") VALUES
-('nzmarie', 'marie@nzrealestate.co.nz', 'Marie Hong', 'user', '/images/authors/marie.jpg', 'both', NOW(), NOW())
+('nzmarie', 'marie@nzrealestate.co.nz', 'Marie Nian', 'user', '/images/authors/marie.jpg', 'both', NOW(), NOW())
 ON CONFLICT (id) DO UPDATE SET
   email = EXCLUDED.email,
   name = EXCLUDED.name,

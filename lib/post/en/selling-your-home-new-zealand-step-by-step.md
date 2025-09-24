@@ -2,9 +2,9 @@
 layout: post
 title: "Selling Your Home in New Zealand: A Step-by-Step Guide for Homeowners"
 subtitle: "Maximize Your Sale Price with Professional Real Estate Advice"
-description: "Marie Hong's comprehensive guide to selling your home in New Zealand. Learn how to prepare your property, choose the right selling method, and achieve the best possible outcome."
+description: "Marie Nian's comprehensive guide to selling your home in New Zealand. Learn how to prepare your property, choose the right selling method, and achieve the best possible outcome."
 date: 2024-01-20
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/selling-home-guide.png"
 published: true
 tags:
@@ -238,7 +238,7 @@ Buyers typically have 10-15 working days for:
 4. **Emotional Decisions**: Not accepting reasonable offers
 5. **Inadequate Documentation**: Missing important certificates or consents
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 As your licensed real estate agent, I provide:
 
@@ -266,7 +266,7 @@ If you're considering selling your home, I'd love to help you achieve the best p
 - Expected timeframe and costs
 - Next steps in the process
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

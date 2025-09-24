@@ -4,7 +4,7 @@ title: "Maximizing Your Property Investment Returns in New Zealand"
 subtitle: "Strategies for Building Wealth Through Smart Real Estate Investments"
 description: "A comprehensive guide to maximizing returns on property investments in New Zealand, covering strategies for capital growth, rental yield, and portfolio optimization."
 date: 2024-03-02
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/property-investment-returns.png"
 published: true
 tags:
@@ -372,7 +372,7 @@ Growing your investment portfolio effectively:
 - Performance monitoring tools
 - Decision-making frameworks
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 My investment property expertise helps clients maximize returns:
 
@@ -403,7 +403,7 @@ Maximizing property investment returns requires strategic action:
 3. **Research Markets**: Identify high-potential investment areas
 4. **Contact Me**: Let's discuss your investment strategy and property needs
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

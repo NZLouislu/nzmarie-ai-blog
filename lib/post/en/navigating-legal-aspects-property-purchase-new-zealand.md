@@ -4,7 +4,7 @@ title: "Navigating the Legal Aspects of Property Purchase in New Zealand"
 subtitle: "Understanding Contracts, Due Diligence, and Your Legal Rights"
 description: "A comprehensive guide to the legal process of buying property in New Zealand, covering contracts, due diligence, and legal protections for buyers."
 date: 2024-02-24
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/property-legal-guide.png"
 published: true
 tags:
@@ -353,7 +353,7 @@ Specific real estate legal protections:
 - **Free from Encumbrances**: Property clear of most restrictions
 - **Legal Remedies**: Options if title issues arise
 
-## Working with Marie Hong Real Estate
+## Working with Marie Nian Real Estate
 
 My legal knowledge helps clients navigate complex property transactions:
 
@@ -384,7 +384,7 @@ Protecting your interests through proper legal processes is essential:
 3. **Complete Due Diligence**: Thorough investigation of the property
 4. **Contact Me**: Let's discuss your property purchase needs
 
-**Contact Marie Hong**  
+**Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089

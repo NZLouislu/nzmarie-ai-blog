@@ -4,7 +4,7 @@ title: "首次购房者新西兰房产融资指南"
 subtitle: "了解您的选择并最大化获批机会"
 description: "为首次购房者提供的在新西兰进行抵押贷款和融资的全面指南。"
 date: 2024-02-04
-author: "Marie Hong"
+author: "Marie Nian"
 image: "/img/first-home-financing.jpg"
 published: true
 tags:
@@ -334,7 +334,7 @@ categories: [买房]
 - 如需要，留出时间改善信用档案
 - 考虑季节性市场因素
 
-## 与 Marie Hong 房地产合作
+## 与 Marie Nian 房地产合作
 
 作为您的房地产经纪人，我与值得信赖的抵押贷款专业人士密切合作，确保无缝的购房体验：
 
@@ -364,7 +364,7 @@ categories: [买房]
 3. **与贷款机构交谈**：获得预批以了解您的选择
 4. **联系我**：让我们讨论您的房产目标并制定计划
 
-**联系 Marie Hong**  
+**联系 Marie Nian**  
 持牌房地产经纪人 (REAA 2008)  
 📧 nzmarie.com@gmail.com
 📱 021 0693 089
