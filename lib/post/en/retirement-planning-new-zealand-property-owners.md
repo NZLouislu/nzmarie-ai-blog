@@ -385,7 +385,7 @@ Planning for retirement using property wealth requires careful consideration:
 
 **Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 nzmarie.com@gmail.com
+📧 marie@ssrealty.co.nz
 📱 021 0693 089
 
 _Disclaimer: This information is general in nature and should not replace professional financial, legal, or tax advice. Retirement planning is complex and individual circumstances vary significantly. Property values, tax laws, and government benefits are subject to change. Always consult with qualified professionals before making decisions affecting your retirement._

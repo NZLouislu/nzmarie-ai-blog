@@ -366,7 +366,7 @@ Ready to start your first home buying journey? Here's what to do next:
 
 **Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 nzmarie.com@gmail.com
+📧 marie@ssrealty.co.nz
 📱 021 0693 089
 
 _Disclaimer: This information is general in nature and should not replace professional financial advice. Lending criteria, rates, and terms are subject to change. Always consult with qualified professionals before making financial decisions._

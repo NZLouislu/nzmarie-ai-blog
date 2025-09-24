@@ -268,7 +268,7 @@ If you're considering selling your home, I'd love to help you achieve the best p
 
 **Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 nzmarie.com@gmail.com
+📧 marie@ssrealty.co.nz
 📱 021 0693 089
 
 **Recent Success Stories:**

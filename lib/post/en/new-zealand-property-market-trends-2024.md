@@ -201,7 +201,7 @@ New Zealand's property market in 2024 presents both challenges and opportunities
 
 **Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 nzmarie.com@gmail.com
+📧 marie@ssrealty.co.nz
 📱 021 0693 089
 
 _Disclaimer: This information is general in nature and should not replace professional financial or legal advice. Property markets are dynamic and conditions can change rapidly._

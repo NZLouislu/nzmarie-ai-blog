@@ -351,7 +351,7 @@ Whether you're buying your first apartment or managing an investment portfolio, 
 
 **Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 nzmarie.com@gmail.com
+📧 marie@ssrealty.co.nz
 📱 021 0693 089
 
 _Disclaimer: This information is general in nature and should not replace professional legal or financial advice. Body corporate laws and regulations are complex and subject to change. Always consult with qualified professionals before making decisions affecting your property._

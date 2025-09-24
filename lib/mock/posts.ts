@@ -151,7 +151,7 @@ Remember, buying property is one of life's biggest investments. Having the right
 
 **Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 marie@nzrealestate.co.nz  
+📧 marie@ssrealty.co.nz  
 📱 021 555 0123  
 🏢 Harcourts Auckland Central
 
@@ -418,7 +418,7 @@ If you're considering selling your home, I'd love to help you achieve the best p
 
 **Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 marie@nzrealestate.co.nz  
+📧 marie@ssrealty.co.nz  
 📱 021 555 0123  
 🏢 Harcourts Auckland Central
 

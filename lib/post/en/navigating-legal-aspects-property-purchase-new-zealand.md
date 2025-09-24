@@ -386,7 +386,7 @@ Protecting your interests through proper legal processes is essential:
 
 **Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 nzmarie.com@gmail.com
+📧 marie@ssrealty.co.nz
 📱 021 0693 089
 
 _Disclaimer: This information is general in nature and should not replace professional legal advice. Property law is complex and varies by situation. Always consult with qualified legal professionals before making decisions affecting your property purchase._

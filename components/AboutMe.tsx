@@ -34,7 +34,7 @@ export default function AboutMe() {
         </a>
 
         <a
-          href="mailto:nzmarie.com@gmail.com"
+          href="mailto:marie@ssrealty.co.nz"
           className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r from-red-500 to-pink-600 rounded-full hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
           title="Send email"
         >

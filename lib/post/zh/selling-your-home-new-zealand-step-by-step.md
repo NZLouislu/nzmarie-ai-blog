@@ -230,7 +230,7 @@ categories: [卖房]
 
 **联系 Marie Nian**  
 持牌房地产经纪人 (REAA 2008)  
-📧 nzmarie.com@gmail.com
+📧 marie@ssrealty.co.nz
 📱 021 0693 089
 
 _免责声明：此信息为一般性质。房产价值和市场条件因地点和时间而异。请始终为您的具体情况寻求专业建议。_

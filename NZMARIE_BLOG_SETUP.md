@@ -130,7 +130,7 @@ The NZMarie user is configured with:
 
 - **ID**: `nzmarie`
 - **Name**: `Marie Nian`
-- **Email**: `marie@nzrealestate.co.nz`
+- **Email**: `marie@ssrealty.co.nz`
 - **Role**: `user`
 - **Language Preferences**: `both` (English and Chinese)
 

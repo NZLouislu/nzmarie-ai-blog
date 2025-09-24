@@ -13,7 +13,7 @@ export default function Footer() {
         </a>
 
         <a
-          href="mailto:nzmarie.com@gmail.com"
+          href="mailto:marie@ssrealty.co.nz"
           className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-red-500 to-pink-600 rounded-full hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
           title="Send email"
         >

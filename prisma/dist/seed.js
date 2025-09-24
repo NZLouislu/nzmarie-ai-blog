@@ -48,10 +48,10 @@ function main() {
                     // Create a sample user for posts
                     console.log('Creating user...');
                     return [4 /*yield*/, prisma.user.upsert({
-                            where: { email: 'nzmarie@example.com' },
+                            where: { email: 'marie@ssrealty.co.nz' },
                             update: {},
                             create: {
-                                email: 'nzmarie@example.com',
+                                email: 'marie@ssrealty.co.nz',
                                 name: 'NZMarie',
                                 role: 'admin',
                                 languagePreferences: 'both'
