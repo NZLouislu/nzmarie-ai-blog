@@ -13,6 +13,7 @@ interface BlogCardProps {
   title: string;
   date: string;
   summary: string;
+  subtitle?: string;
   slug: string;
   image: string;
   author: {
@@ -26,6 +27,7 @@ export default function BlogCard({
   title,
   date,
   summary,
+  subtitle,
   slug,
   image,
   author,
@@ -61,7 +63,7 @@ export default function BlogCard({
               <h3 className="text-xl font-bold hover:underline">{title}</h3>
             </a>
           </Link>
-          <p className="mt-1 text-sm text-gray-600">{summary}</p>
+          <p className="mt-1 text-sm text-gray-600">{subtitle ?? summary}</p>
         </div>
 
         <div className="mt-3 flex items-center justify-between">

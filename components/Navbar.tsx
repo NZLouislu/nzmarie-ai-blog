@@ -56,7 +56,7 @@ export default function Navbar() {
                     {language === "en" ? "All Posts" : "所有文章"}
                   </Link>
                 </NavigationMenu.Item>
-                <NavigationMenu.Item>
+                {/* <NavigationMenu.Item>
                   <Link
                     href={getLocalizedPath("/blog/category/buying", language)}
                     className={linkCls(
@@ -65,7 +65,7 @@ export default function Navbar() {
                   >
                     {language === "en" ? "Buying" : "买房"}
                   </Link>
-                </NavigationMenu.Item>
+                </NavigationMenu.Item> */}
                 <NavigationMenu.Item>
                   <Link
                     href={getLocalizedPath("/blog/category/selling", language)}

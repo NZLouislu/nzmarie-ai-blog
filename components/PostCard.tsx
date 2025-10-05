@@ -17,7 +17,7 @@ export default function PostCard({ post }: { post: PostMeta }) {
         <Text size="2" color="gray">
           {format(new Date(post.publishedAt ?? post.updatedAt), "yyyy-MM-dd")}
         </Text>
-        <Text size="3">{post.excerpt}</Text>
+        <Text size="3">{post.subtitle ?? post.excerpt ?? post.description}</Text>
         <Flex gap="2" wrap="wrap">
           {post.tags?.map((t) => (
             <Tag key={t} name={t} />

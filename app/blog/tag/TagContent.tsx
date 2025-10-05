@@ -89,7 +89,7 @@ export default function TagContent({ tag, posts, language }: TagContentProps) {
                         color="gray"
                         className="line-clamp-3 flex-1"
                       >
-                        {post.excerpt}
+                        {post.subtitle ?? post.excerpt ?? post.description}
                       </Text>
 
                       <div className="pt-4 flex items-center justify-between">

@@ -177,7 +177,7 @@ export default function DraftsManagement() {
                               {draft.title}
                             </div>
                             <div className="truncate text-gray-500 text-xs mt-1">
-                              {draft.excerpt}
+                              {draft.subtitle ?? draft.excerpt ?? draft.description}
                             </div>
                             <div className="sm:hidden mt-2 flex items-center space-x-2">
                               <span
@@ -294,9 +294,9 @@ export default function DraftsManagement() {
                       {selectedDraft.language === "zh" ? "Chinese" : "English"}
                     </span>
                   </div>
-                  {selectedDraft.excerpt && (
+                  {(selectedDraft.subtitle || selectedDraft.excerpt || selectedDraft.description) && (
                     <p className="text-lg text-gray-700 mb-6 italic">
-                      {selectedDraft.excerpt}
+                      {selectedDraft.subtitle ?? selectedDraft.excerpt ?? selectedDraft.description}
                     </p>
                   )}
                   <div

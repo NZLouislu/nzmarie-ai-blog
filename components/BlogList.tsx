@@ -77,7 +77,7 @@ export default function BlogList({ posts: initialPosts }: BlogListProps) {
                 <span className="text-gray-500"> • 5 min read</span>
               </Text>
               <Text size="3" color="gray" className="line-clamp-3 flex-1">
-                {post.excerpt}
+                {post.subtitle ?? post.excerpt ?? post.description}
               </Text>
 
               <div className="pt-4 flex items-center justify-between">
