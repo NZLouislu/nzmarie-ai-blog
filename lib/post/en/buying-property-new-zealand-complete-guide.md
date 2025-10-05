@@ -7,7 +7,7 @@ excerpt: "Everything about buying property in New Zealand"
 date: 2024-01-10
 author: "Marie Nian"
 image: "/img/property-buying-guide.jpg"
-published: true
+published: false
 tags:
   - Real Estate
   - Property Buying

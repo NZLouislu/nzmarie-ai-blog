@@ -1,4 +1,3 @@
-import { listDrafts } from "@/lib/posts";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { UserSession } from "../../../../lib/auth/session";
@@ -7,12 +6,23 @@ const AUTHORIZED_USERS = ["nzmarie", "admin"];
 
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const slug = searchParams.get("slug");
+    const language = searchParams.get("language") || "en";
+
+    if (!slug) {
+      return NextResponse.json({ 
+        error: "Missing slug parameter" 
+      }, { status: 400 });
+    }
+
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get("userSession");
 
     if (!sessionCookie?.value) {
       return NextResponse.json({ 
-        error: "Unauthorized access to drafts" 
+        authorized: false, 
+        error: "No session found" 
       }, { status: 401 });
     }
 
@@ -20,6 +30,7 @@ export async function GET(request: NextRequest) {
     
     if (new Date(session.expiresAt) < new Date()) {
       return NextResponse.json({ 
+        authorized: false, 
         error: "Session expired" 
       }, { status: 401 });
     }
@@ -27,35 +38,21 @@ export async function GET(request: NextRequest) {
     const isAuthorized = AUTHORIZED_USERS.includes(session.username) || 
                         session.role === "admin";
 
-    console.log("Draft access check:", {
-      sessionUsername: session.username,
-      sessionRole: session.role,
-      authorizedUsers: AUTHORIZED_USERS,
-      isAuthorized: isAuthorized
+    return NextResponse.json({ 
+      authorized: isAuthorized,
+      slug: slug,
+      language: language,
+      user: {
+        username: session.username,
+        role: session.role
+      }
     });
 
-    if (!isAuthorized) {
-      return NextResponse.json({ 
-        error: "Access denied. Draft access restricted to authorized users only.",
-        debug: {
-          sessionUsername: session.username,
-          authorizedUsers: AUTHORIZED_USERS,
-          sessionRole: session.role
-        }
-      }, { status: 403 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const lang = searchParams.get("lang") || "en";
-
-    const drafts = listDrafts(lang as "en" | "zh");
-
-    return NextResponse.json(drafts);
-
   } catch (error) {
-    console.error("Draft API error:", error);
+    console.error("Draft review auth check error:", error);
     return NextResponse.json({ 
-      error: "Failed to fetch drafts" 
+      authorized: false, 
+      error: "Authentication check failed" 
     }, { status: 500 });
   }
 }

@@ -6,7 +6,7 @@ description: "公寓业主需要了解的关于业主立案法团的所有信息
 date: 2024-02-17
 author: "Marie Nian"
 image: "/img/body-corporate-guide.gif"
-published: true
+published: false
 tags:
   - 业主立案法团
   - 公寓生活

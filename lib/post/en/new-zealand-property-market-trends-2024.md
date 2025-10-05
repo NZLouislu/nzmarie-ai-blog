@@ -6,7 +6,7 @@ description: "An analysis of current property market trends in New Zealand and w
 date: 2024-01-28
 author: "Marie Nian"
 image: "/img/property-market-trends.jpg"
-published: true
+published: false
 tags:
   - Real Estate
   - Property Market

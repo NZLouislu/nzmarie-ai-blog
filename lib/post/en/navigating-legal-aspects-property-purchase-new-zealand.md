@@ -6,7 +6,7 @@ description: "A comprehensive guide to the legal process of buying property in N
 date: 2024-02-24
 author: "Marie Nian"
 image: "/img/property-legal-guide.png"
-published: true
+published: false
 tags:
   - Property Law
   - Legal Process

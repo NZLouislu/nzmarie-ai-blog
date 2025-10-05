@@ -104,6 +104,14 @@ export function listDrafts(language: "en" | "zh" = "en"): Post[] {
   return getAllPosts(language).filter((p) => p.status === "draft");
 }
 
+export function getDraftBySlug(
+  slug: string,
+  language: "en" | "zh" = "en"
+): Post | null {
+  const post = getPostBySlug(slug, language);
+  return post && post.status === "draft" ? post : null;
+}
+
 export function getPostsByCategory(
   category: string,
   language: "en" | "zh" = "en"

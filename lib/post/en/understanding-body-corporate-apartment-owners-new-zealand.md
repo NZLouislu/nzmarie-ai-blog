@@ -6,7 +6,7 @@ description: "Everything apartment owners need to know about body corporate, inc
 date: 2024-02-17
 author: "Marie Nian"
 image: "/img/body-corporate-guide.gif"
-published: true
+published: false
 tags:
   - Body Corporate
   - Apartment Living

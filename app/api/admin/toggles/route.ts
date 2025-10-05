@@ -10,7 +10,7 @@ const supabase = createClient(
 );
 
 // Helper function to get user ID from session
-async function getUserId(request: NextRequest): Promise<string | null> {
+async function getUserId(): Promise<string | null> {
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get("userSession");
@@ -33,10 +33,10 @@ async function getUserId(request: NextRequest): Promise<string | null> {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get user ID from session
-    const sessionUserId = await getUserId(request);
+    const sessionUserId = await getUserId();
 
     if (!sessionUserId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const sessionUserId = await getUserId(request);
+    const sessionUserId = await getUserId();
 
     if (!sessionUserId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -427,9 +427,10 @@ function AIChatbot({
 
 interface BlogPostClientProps {
   post: Post;
+  isDraft?: boolean;
 }
 
-export default function BlogPostClient({ post }: BlogPostClientProps) {
+export default function BlogPostClient({ post, isDraft = false }: BlogPostClientProps) {
   const { language } = useLanguageStore();
   const { t } = useTranslation();
   const [summary, setSummary] = useState(post?.description || "");
@@ -629,6 +630,20 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
                   {post.subtitle}
                 </h2>
               )}
+              
+              {/* Status Badge */}
+              <div className="mb-4">
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    post.status === "draft" || isDraft
+                      ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                      : "bg-green-100 text-green-800 border border-green-200"
+                  }`}
+                >
+                  {post.status === "draft" || isDraft ? "📄 Draft" : "✅ Published"}
+                </span>
+              </div>
+
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-gray-600 mb-4 lg:mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                   <div className="flex items-center gap-2">

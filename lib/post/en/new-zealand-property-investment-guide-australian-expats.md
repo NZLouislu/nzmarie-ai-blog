@@ -6,7 +6,7 @@ description: "A comprehensive guide for Australian expats looking to invest in N
 date: 2024-02-11
 author: "Marie Nian"
 image: "/img/aussie-expat-investment.jpg"
-published: true
+published: false
 tags:
   - Property Investment
   - Australian Expats

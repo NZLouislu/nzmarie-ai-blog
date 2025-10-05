@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import AuthCheck from "../auth-check";
+import SimpleDraftAuthCheck from "./SimpleDraftAuthCheck";
 import AdminNavbar from "../../../../components/AdminNavbar";
 import { Post } from "@/lib/types";
 
@@ -16,16 +16,25 @@ export default function DraftsManagement() {
       try {
         setLoading(true);
 
-        // Fetch drafts from API for both languages
         const [englishResponse, chineseResponse] = await Promise.all([
-          fetch("/api/posts/drafts?lang=en"),
-          fetch("/api/posts/drafts?lang=zh"),
+          fetch("/api/posts/drafts?lang=en", {
+            credentials: "include",
+          }),
+          fetch("/api/posts/drafts?lang=zh", {
+            credentials: "include",
+          }),
         ]);
+
+        if (!englishResponse.ok || !chineseResponse.ok) {
+          const errorMsg = englishResponse.status === 403 || chineseResponse.status === 403
+            ? "Access denied to drafts"
+            : "Failed to load drafts";
+          throw new Error(errorMsg);
+        }
 
         const englishDrafts = await englishResponse.json();
         const chineseDrafts = await chineseResponse.json();
 
-        // Combine and sort drafts
         const allDrafts = [...englishDrafts, ...chineseDrafts].sort(
           (a: Post, b: Post) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -34,6 +43,7 @@ export default function DraftsManagement() {
         setDrafts(allDrafts);
       } catch (error) {
         console.error("Failed to load drafts:", error);
+        setDrafts([]);
       } finally {
         setLoading(false);
       }
@@ -42,8 +52,10 @@ export default function DraftsManagement() {
     loadDrafts();
   }, []);
 
-  const handleViewPost = (slug: string, language: string) => {
-    const path = language === "zh" ? `/cn/blog/${slug}` : `/blog/${slug}`;
+
+
+  const handleReviewDraft = (slug: string, language: string) => {
+    const path = language === "zh" ? `/cn/blog/${slug}?draft=true` : `/blog/${slug}?draft=true`;
     window.open(path, "_blank");
   };
 
@@ -59,7 +71,7 @@ export default function DraftsManagement() {
 
   if (loading) {
     return (
-      <AuthCheck>
+      <SimpleDraftAuthCheck>
         <div className="min-h-screen bg-gray-50">
           <AdminNavbar />
           <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -74,12 +86,12 @@ export default function DraftsManagement() {
             </div>
           </div>
         </div>
-      </AuthCheck>
+      </SimpleDraftAuthCheck>
     );
   }
 
   return (
-    <AuthCheck>
+    <SimpleDraftAuthCheck>
       <div className="min-h-screen bg-gray-50">
         <AdminNavbar />
         <div className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
@@ -127,46 +139,62 @@ export default function DraftsManagement() {
                   </p>
                 </div>
               ) : (
-                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
                   <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                       <tr>
                         <th
                           scope="col"
-                          className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                          className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 w-2/5 min-w-0"
                         >
                           Title
                         </th>
                         <th
                           scope="col"
-                          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-24 hidden sm:table-cell"
                         >
                           Language
                         </th>
                         <th
                           scope="col"
-                          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-28 hidden md:table-cell"
                         >
                           Created
                         </th>
                         <th
                           scope="col"
-                          className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                          className="py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-semibold text-gray-900 w-48"
                         >
-                          <span className="sr-only">Actions</span>
+                          Actions
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
                       {drafts.map((draft) => (
                         <tr key={`${draft.id}-${draft.language}`}>
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                            {draft.title}
-                            <div className="text-gray-500 text-xs mt-1">
+                          <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 max-w-0 w-2/5">
+                            <div className="truncate font-medium text-gray-900">
+                              {draft.title}
+                            </div>
+                            <div className="truncate text-gray-500 text-xs mt-1">
                               {draft.excerpt}
                             </div>
+                            <div className="sm:hidden mt-2 flex items-center space-x-2">
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                  draft.language === "zh"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-blue-100 text-blue-800"
+                                }`}
+                              >
+                                {draft.language === "zh" ? "中文" : "EN"}
+                              </span>
+                              <span className="text-xs text-gray-500 md:hidden">
+                                {new Date(draft.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
                           </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden sm:table-cell">
                             <span
                               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                 draft.language === "zh"
@@ -177,27 +205,31 @@ export default function DraftsManagement() {
                               {draft.language === "zh" ? "Chinese" : "English"}
                             </span>
                           </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden md:table-cell">
                             {new Date(draft.createdAt).toLocaleDateString()}
                           </td>
-                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                            <button
-                              onClick={() => handlePreview(draft)}
-                              className="text-indigo-600 hover:text-indigo-900 mr-4"
-                            >
-                              Preview
-                            </button>
-                            <button
-                              onClick={() =>
-                                handleViewPost(
-                                  draft.slug,
-                                  draft.language || "en"
-                                )
-                              }
-                              className="text-green-600 hover:text-green-900"
-                            >
-                              View
-                            </button>
+                          <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                            <div className="flex justify-end space-x-2 lg:space-x-3">
+                              <button
+                                onClick={() => handlePreview(draft)}
+                                className="text-indigo-600 hover:text-indigo-900 px-2 lg:px-3 py-1 rounded hover:bg-indigo-50 text-sm"
+                                title="Preview draft content"
+                              >
+                                Preview
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleReviewDraft(
+                                    draft.slug,
+                                    draft.language || "en"
+                                  )
+                                }
+                                className="text-purple-600 hover:text-purple-900 px-2 lg:px-3 py-1 rounded hover:bg-purple-50 text-sm"
+                                title="Review draft in blog format"
+                              >
+                                Review
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -305,6 +337,6 @@ export default function DraftsManagement() {
           </div>
         )}
       </div>
-    </AuthCheck>
+    </SimpleDraftAuthCheck>
   );
 }

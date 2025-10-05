@@ -21,7 +21,7 @@ export function withAuth(handler: (req: AuthenticatedRequest) => Promise<NextRes
       const token = authHeader.substring(7);
       const [username, password] = Buffer.from(token, 'base64').toString().split(':');
       
-      const user = validateCredentials(username, password);
+      const user = await validateCredentials(username, password);
       if (!user) {
         return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
       }

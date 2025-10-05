@@ -1,6 +1,6 @@
 import { User, USERS } from './users';
 
-export function validateCredentials(username: string, password: string): User | null {
+export async function validateCredentials(username: string, password: string): Promise<User | null> {
   const envMap = {
     admin: { 
       user: process.env.ADMIN_USERNAME, 

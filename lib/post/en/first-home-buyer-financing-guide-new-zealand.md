@@ -6,7 +6,7 @@ description: "A comprehensive guide for first home buyers on navigating the mort
 date: 2024-02-04
 author: "Marie Nian"
 image: "/img/first-home-financing.jpg"
-published: true
+published: false
 tags:
   - First Home Buyer
   - Mortgage

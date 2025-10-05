@@ -6,7 +6,7 @@ description: "为首次购房者提供的在新西兰进行抵押贷款和融资
 date: 2024-02-04
 author: "Marie Nian"
 image: "/img/first-home-financing.jpg"
-published: true
+published: false
 tags:
   - 首次购房
   - 抵押贷款

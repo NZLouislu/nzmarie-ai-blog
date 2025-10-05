@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
 import { useLanguageStore } from "@/lib/stores/languageStore";
-import { useTranslation } from "@/lib/i18n";
+
 
 export default function HomePage() {
   const { totalViews, totalLikes, totalComments, aiSummaries, aiQuestions } =

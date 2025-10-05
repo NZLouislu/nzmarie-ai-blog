@@ -8,7 +8,7 @@ const supabase = createClient(
 );
 
 // 简单的测试路由，不进行复杂的会话验证
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     console.log("Test toggles API called");
 

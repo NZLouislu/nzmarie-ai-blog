@@ -2,15 +2,21 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname, search } = request.nextUrl
+  const response = NextResponse.next()
+  
   if (pathname.startsWith('/cn/') || pathname === '/cn') {
     const url = request.nextUrl.clone()
     url.pathname = pathname.replace('/cn', '')
-    const response = NextResponse.rewrite(url)
-    response.headers.set('x-locale', 'zh')
-    return response
+    const rewriteResponse = NextResponse.rewrite(url)
+    rewriteResponse.headers.set('x-locale', 'zh')
+    rewriteResponse.headers.set('x-search-params', search)
+    return rewriteResponse
   }
-  return NextResponse.next()
+  
+  response.headers.set('x-locale', 'en')
+  response.headers.set('x-search-params', search)
+  return response
 }
 
 export const config = {
