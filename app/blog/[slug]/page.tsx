@@ -75,7 +75,6 @@ export default async function BlogPost({ params }: PageProps) {
 export async function generateStaticParams() {
   try {
     const { listPublished } = await import("@/lib/posts");
-    // 为所有语言生成静态路径
     const enPosts = listPublished("en");
     const zhPosts = listPublished("zh");
     const posts = [...enPosts, ...zhPosts];
