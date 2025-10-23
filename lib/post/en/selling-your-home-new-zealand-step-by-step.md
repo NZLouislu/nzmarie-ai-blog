@@ -38,7 +38,7 @@ Before going to market, understanding the true market value is critical:
 - **Professional Valuation**: If your property is unique and lacks comparable sales, consider a formal valuation from a registered valuer
 - **Market Trends**: Understand pricing trends of current listings in your area
 
-🏡 **Free Market Appraisal**  
+#### 🏡 Free Market Appraisal
 
 We provide a free market appraisal including CMA, trend analysis, and can liaise with registered valuers to help you fully understand your property value.
 
@@ -65,7 +65,7 @@ First impressions matter. Targeted improvements can significantly lift the sale 
 - **Lighting**: Ensure bright, well-lit spaces
 - **Comfort**: Keep a comfortable indoor temperature during viewings
 
-🛋️ **Staging and Preparation**  
+#### 🛋️ Staging and Preparation
 
 We can connect you with trusted cleaning companies, staging experts, and moving services to ensure your home presents at its best to buyers.
 
@@ -85,7 +85,7 @@ Common sales methods in New Zealand:
 - Properties difficult to price accurately
 - Sellers seeking a quick sale
 
-🔨 **Auction Support**  
+#### 🔨 Auction Support
 
 We can arrange a reputable auctioneer and help you prepare for the auction process to ensure a smooth, efficient transaction.
 
@@ -101,7 +101,7 @@ We can arrange a reputable auctioneer and help you prepare for the auction proce
 - Sellers who prefer not to run a public bidding process
 - Unique or hard-to-price properties
 
-📩 **Tender Process Guidance**  
+#### 📩 Tender Process Guidance  
 
 We design the tender process, prepare documents and conditions, and help you choose the best offer among multiple bids.
 
@@ -117,7 +117,7 @@ We design the tender process, prepare documents and conditions, and help you cho
 - Sellers wanting to remain flexible
 - Competitive properties that are not “headline” hot listings
 
-⏰ **Deadline Sale Support**  
+#### ⏰ Deadline Sale Support
 
 We set a realistic sales timeframe and execute a promotion strategy to increase buyer urgency and conversion efficiency.
 
@@ -130,7 +130,7 @@ We set a realistic sales timeframe and execute a promotion strategy to increase 
 - **Title Certificate**: Proof of ownership
 - **Tenancy Agreement**: If tenanted, clarify lease end dates
 
-📑 **Document Preparation Assistance**  
+#### 📑 Document Preparation Assistance  
 
 We assist in preparing and organizing required legal documents and can recommend trusted law firms.
 
@@ -143,7 +143,7 @@ As a seller, you must disclose:
 - Neighbour disputes
 - Planning or zoning changes
 
-⚖️ **Compliance and Disclosure Guidance**  
+#### ⚖️ Compliance and Disclosure Guidance  
 
 We provide professional advice on your disclosure obligations to meet legal requirements and reduce risk.
 
@@ -155,7 +155,7 @@ We provide professional advice on your disclosure obligations to meet legal requ
 - **Virtual Tours**: Consider 360-degree virtual tours
 - **Drone Aerials**: Showcase the property and surroundings
 
-📸 **Photography Arrangement**  
+#### 📸 Photography Arrangement  
 
 We can arrange professional photography, virtual tours, and aerials to maximize your property’s appeal.
 
@@ -165,7 +165,7 @@ We can arrange professional photography, virtual tours, and aerials to maximize 
 - **realestate.co.nz**: Leading real estate portal
 - **Social Media**: Promotion via Facebook and Instagram
 
-🌐 **Omnichannel Promotion**  
+#### 🌐 *Omnichannel Promotion*
 
 We develop a tailored online plan covering major property platforms and social media to expand buyer reach.
 
@@ -175,7 +175,7 @@ We develop a tailored online plan covering major property platforms and social m
 - **Signage**: For-sale signage to capture neighbourhood attention
 - **Print Ads**: Local newspapers and property magazines
 
-📰 **Traditional Marketing Support**  
+#### 📰 Traditional Marketing Support 
 
 We arrange open homes, print advertising, and signage to maximize local market exposure.
 
@@ -184,7 +184,7 @@ We arrange open homes, print advertising, and signage to maximize local market e
 - **Buyer Database**: Reach registered active buyers to increase viewing and offer efficiency
 - **Prospect Network**: Maintain long-term relationships with local investors, owner-occupiers, and developers
 
-🔑 **Direct Access to Buyers**  
+#### 🔑 Direct Access to Buyers
 
 Beyond public advertising, we directly tap into ready buyer resources—strengthening our unique advantage and improving conversion and sale price.
 
@@ -199,7 +199,7 @@ Consider the following when receiving offers:
 - **Conditions**: Assess any limiting clauses
 - **Settlement Date**: Ensure timing suits your plans
 
-🤝 **Offer Evaluation and Advice**  
+#### 🤝 Offer Evaluation and Advice  
 
 We assist in analysing offers, evaluating buyer conditions, and providing negotiation advice.
 
@@ -209,7 +209,7 @@ We assist in analysing offers, evaluating buyer conditions, and providing negoti
 - **Condition Changes**: Adjust unfavourable terms
 - **Timing Negotiation**: Modify settlement dates
 
-💬 **Negotiation and Counteroffer Support**  
+#### 💬 Negotiation and Counteroffer Support 
 
 We provide counteroffer strategies and negotiation tactics to help you secure the best terms.
 
@@ -223,7 +223,7 @@ Once an offer is accepted:
 - **Due Diligence Period**: Buyer inspections and confirming funds to the appropriate bank account
 - **Settlement Preparation**: Lawyers complete title transfer and handover arrangements
 
-📜 **Legal Process Coordination**  
+#### 📜 Legal Process Coordination  
 
 We liaise with your lawyer to ensure the agreement, due diligence, and settlement all run smoothly.
 
@@ -233,7 +233,7 @@ We liaise with your lawyer to ensure the agreement, due diligence, and settlemen
 - **Utilities Transfer**: Arrange electricity, gas, and water transitions
 - **Address Change**: Update banks, insurers, and other institutions
 
-🚚 **Move and Settlement Support**  
+#### 🚚 Move and Settlement Support
 
 We recommend reliable moving companies and assist with utilities and address changes for a hassle-free move.
 
@@ -296,7 +296,7 @@ Remember, successful sales rely on preparation, correct pricing, and effective m
 
 Book now and let us tailor a sales plan for you.
 
-**Contact Marie Nian**  
+#### Contact Marie Nian
 
 Licensed Real Estate Agent (REAA 2008)  
 📧 marie@ssrealty.co.nz  
