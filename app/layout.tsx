@@ -1,6 +1,7 @@
 import "./globals.css";
 import { ReactNode } from "react";
 import { headers } from 'next/headers';
+import LanguageHandler from "@/components/LanguageHandler";
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const h = await headers();
@@ -13,12 +14,15 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const currentPath = locale === 'zh' ? '/cn' : '';
 
   return (
-    <html lang={lang}>
+    <html lang={lang} className="scroll-smooth">
       <head>
         <link rel="alternate" hrefLang="en" href={`${baseUrl}${alternatePath}`} />
         <link rel="alternate" hrefLang="zh-CN" href={`${baseUrl}${currentPath}`} />
       </head>
-      <body className="antialiased bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900">{children}</body>
+      <body className="antialiased bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 min-h-screen">
+        <LanguageHandler initialLanguage={locale as "en" | "zh"} />
+        {children}
+      </body>
     </html>
   );
 }

@@ -7,20 +7,20 @@ export default function AboutMe() {
 
   return (
     <div className="flex flex-col items-center text-center">
-      <Avatar.Root className="inline-flex h-[280px] w-[200px] select-none items-center justify-center overflow-hidden rounded-2xl mb-6 bg-gray-200 relative">
+      <Avatar.Root className="inline-flex h-[280px] w-[200px] select-none items-center justify-center overflow-hidden rounded-2xl mb-6 bg-gray-200 dark:bg-slate-700 relative shadow-inner">
         <Image
           src="/images/authors/nzmarie.jpg"
           alt="NZMarie"
           fill
           className="object-cover"
         />
-        <Avatar.Fallback className="text-gray-600 flex items-center justify-center h-full w-full text-2xl">
+        <Avatar.Fallback className="text-gray-600 dark:text-gray-400 flex items-center justify-center h-full w-full text-2xl">
           NZMarie
         </Avatar.Fallback>
       </Avatar.Root>
 
-      <h2 className="text-2xl font-semibold">{t("aboutMeTitle")}</h2>
-      <p className="text-gray-600 text-lg mt-3">{t("aboutMeDescription")}</p>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("aboutMeTitle")}</h2>
+      <p className="text-gray-600 dark:text-gray-400 text-lg mt-3 leading-relaxed">{t("aboutMeDescription")}</p>
 
       <div className="flex items-center justify-center gap-3 sm:gap-4 mt-6 flex-wrap">
         <a

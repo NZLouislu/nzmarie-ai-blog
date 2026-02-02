@@ -4,19 +4,27 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --muted: #64748b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-muted: var(--muted);
   --font-sans: 'Inter', sans-serif;
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    --card-bg: #1e293b;
+    --card-border: #334155;
+    --muted: #94a3b8;
   }
 }
 
@@ -29,7 +37,27 @@ body {
 :root { --content-max: 880px; }
 html, body { margin:0; padding:0; }
 .container { max-width: var(--content-max); margin: 0 auto; padding: 24px; }
-.prose { line-height: 1.75; font-size: 16px; }
-.prose h1, .prose h2, .prose h3 { margin-top: 1.6em; margin-bottom: .6em; }
-.prose pre { overflow:auto; padding:16px; border-radius:12px; background:#f6f7f9; }
-.prose code { padding: 2px 6px; border-radius: 6px; background: #f1f3f5; }
+.prose { line-height: 1.75; font-size: 16px; color: var(--foreground); }
+.prose h1, .prose h2, .prose h3 { margin-top: 1.6em; margin-bottom: .6em; color: var(--foreground); }
+.prose pre { 
+  overflow:auto; 
+  padding:16px; 
+  border-radius:12px; 
+  background: #1e293b; 
+  color: #e2e8f0;
+  border: 1px solid var(--card-border);
+}
+@media (prefers-color-scheme: light) {
+  .prose pre {
+    background: #f8fafc;
+    color: #1e293b;
+  }
+}
+.prose code { 
+  padding: 2px 6px; 
+  border-radius: 6px; 
+  background: rgba(148, 163, 184, 0.1); 
+  font-family: monospace;
+}
+.prose a { color: #3b82f6; text-decoration: underline; }
+.prose a:hover { color: #2563eb; }

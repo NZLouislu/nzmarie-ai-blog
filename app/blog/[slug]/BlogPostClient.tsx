@@ -152,9 +152,9 @@ function CommentsSection({ postId }: { postId: string }) {
   };
 
   return (
-    <div className="mt-12 pt-8 border-t border-gray-200">
+    <div className="mt-12 pt-8 border-t border-gray-200 dark:border-slate-800">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-bold text-gray-900">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           {t("comments")} ({comments.length})
         </h3>
         <button
@@ -168,7 +168,7 @@ function CommentsSection({ postId }: { postId: string }) {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="mb-8 p-6 bg-gray-50 rounded-lg"
+          className="mb-8 p-6 bg-gray-50 dark:bg-slate-800 rounded-lg border dark:border-slate-700"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
@@ -248,7 +248,7 @@ function CommentsSection({ postId }: { postId: string }) {
           comments.map((comment, index) => (
             <div
               key={`${comment.id}-${index}`} // 使用唯一的key
-              className="p-4 bg-white rounded-lg border border-gray-200"
+              className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700"
             >
               <div className="flex items-center gap-3 mb-2">
                 <Avatar
@@ -260,17 +260,17 @@ function CommentsSection({ postId }: { postId: string }) {
                   className="w-8 h-8"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
                     {comment.is_anonymous ? t("anonymous") : comment.authorName}
                   </span>
-                  <span className="text-sm text-gray-500 ml-2">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
                     {new Date(comment.createdAt).toLocaleDateString(
                       language === "zh" ? "zh-CN" : "en-US"
                     )}
                   </span>
                 </div>
               </div>
-              <p className="text-gray-700">{comment.content}</p>
+              <p className="text-gray-700 dark:text-gray-300">{comment.content}</p>
             </div>
           ))
         )}
@@ -362,12 +362,12 @@ function AIChatbot({
   };
 
   return (
-    <div className="mt-8 pt-8 border-t border-gray-200">
-      <h3 className="text-2xl font-bold text-gray-900 mb-4">
+    <div className="mt-8 pt-8 border-t border-gray-200 dark:border-slate-800">
+      <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
         {t("askAiAboutArticle")}
       </h3>
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <div className="h-64 overflow-y-auto mb-4 p-2 border border-gray-100 rounded">
+      <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4">
+        <div className="h-64 overflow-y-auto mb-4 p-2 border border-gray-100 dark:border-slate-700 rounded">
           {messages.length === 0 ? (
             <p className="text-gray-500 text-center">{t("askMeAnything")}</p>
           ) : (
@@ -375,16 +375,14 @@ function AIChatbot({
               {messages.map((message, index) => (
                 <div
                   key={`${message.role}-${index}`} // 使用唯一的key
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"
+                    }`}
                 >
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      message.role === "user"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-100 text-gray-900"
-                    }`}
+                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${message.role === "user"
+                      ? "bg-blue-600 text-white shadow-md"
+                      : "bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-gray-100 border dark:border-slate-600"
+                      }`}
                   >
                     {message.content}
                   </div>
@@ -430,13 +428,49 @@ interface BlogPostClientProps {
   isDraft?: boolean;
 }
 
-export default function BlogPostClient({ post, isDraft = false }: BlogPostClientProps) {
+export default function BlogPostClient({ post: initialPost, isDraft = false }: BlogPostClientProps) {
   const { language } = useLanguageStore();
   const { t } = useTranslation();
+  const [post, setPost] = useState(initialPost);
   const [summary, setSummary] = useState(post?.description || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [isLiked, setIsLiked] = useState(false);
+
+  // Synchronize post state when initialPost changes
+  React.useEffect(() => {
+    setPost(initialPost);
+    setSummary(initialPost?.description || "");
+  }, [initialPost]);
+
+  // Refetch post content when language changes (if on the same slug)
+  React.useEffect(() => {
+    const refetchPost = async () => {
+      try {
+        const response = await fetch(`/api/posts/language?action=bySlug&slug=${post.slug}&language=${language}`);
+        if (response.ok) {
+          const updatedPost = await response.json();
+          if (updatedPost) {
+            setPost({
+              ...updatedPost,
+              date: updatedPost.publishedAt || updatedPost.createdAt,
+              author: updatedPost.author || "Louis Lu",
+              isDraft: isDraft,
+              status: isDraft ? "draft" : (updatedPost.status || "published")
+            });
+            setSummary(updatedPost.description || "");
+          }
+        }
+      } catch (err) {
+        console.error("Failed to refetch post for language switch:", err);
+      }
+    };
+
+    // Only refetch if the current post language doesn't match the store language
+    if (post.language !== language) {
+      refetchPost();
+    }
+  }, [language, post.slug, post.language, isDraft]);
 
   const {
     postStats,
@@ -622,38 +656,37 @@ export default function BlogPostClient({ post, isDraft = false }: BlogPostClient
           {/* Main Content */}
           <div className="flex-1 max-w-full lg:max-w-[900px]">
             <div className="mb-6 lg:mb-8">
-              <h1 className="text-4xl lg:text-5xl font-bold mb-3 lg:mb-4">
+              <h1 className="text-4xl lg:text-5xl font-bold mb-3 lg:mb-4 text-gray-900 dark:text-white">
                 {post.title}
               </h1>
               {post.subtitle && (
-                <h2 className="text-lg lg:text-xl text-gray-600 mb-4 italic">
+                <h2 className="text-lg lg:text-xl text-gray-600 dark:text-gray-400 mb-4 italic">
                   {post.subtitle}
                 </h2>
               )}
-              
+
               {/* Status Badge */}
               <div className="mb-4">
                 <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                    post.status === "draft" || isDraft
-                      ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                      : "bg-green-100 text-green-800 border border-green-200"
-                  }`}
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${post.status === "draft" || isDraft
+                    ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800"
+                    : "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border border-green-200 dark:border-green-800"
+                    }`}
                 >
                   {post.status === "draft" || isDraft ? "📄 Draft" : "✅ Published"}
                 </span>
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-gray-600 mb-4 lg:mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-gray-600 dark:text-gray-400 mb-4 lg:mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                   <div className="flex items-center gap-2">
                     <Avatar
-                      src="/images/authors/l.ico"
-                      fallback={(post.author || "L")[0]}
+                      src="/images/authors/m.png"
+                      fallback={(post.author || "M")[0]}
                       radius="full"
                       className="w-8 h-8"
                     />
-                    <span className="font-medium">
+                    <span className="font-medium text-gray-900 dark:text-gray-200">
                       {post.author || "Louis Lu"}
                     </span>
                   </div>
@@ -700,9 +733,8 @@ export default function BlogPostClient({ post, isDraft = false }: BlogPostClient
                   {toggles.totalLikes && (
                     <button
                       onClick={handleLike}
-                      className={`flex items-center gap-1 transition-colors ${
-                        isLiked ? "text-red-500" : "hover:text-red-500"
-                      }`}
+                      className={`flex items-center gap-1 transition-colors ${isLiked ? "text-red-500" : "hover:text-red-500"
+                        }`}
                     >
                       <svg
                         className="w-4 h-4"
@@ -723,18 +755,18 @@ export default function BlogPostClient({ post, isDraft = false }: BlogPostClient
                   {toggles.totalComments && (
                     <div className="flex items-center gap-1">
                       <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                            />
-                          </svg>
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                        />
+                      </svg>
                       <span>{useStatsStore.getState().totalComments || 0}</span>
                     </div>
                   )}
@@ -782,7 +814,7 @@ export default function BlogPostClient({ post, isDraft = false }: BlogPostClient
                   {post.tags.map((tag, index) => (
                     <span
                       key={`${tag}-${index}`} // 使用唯一的key
-                      className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                      className="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-sm rounded-full border border-blue-200 dark:border-blue-800"
                     >
                       {tag}
                     </span>
@@ -800,9 +832,8 @@ export default function BlogPostClient({ post, isDraft = false }: BlogPostClient
                     className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 rounded-lg border border-blue-700 shadow-lg text-sm font-semibold text-white hover:text-blue-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     <svg
-                      className={`w-5 h-5 ${
-                        isLoading ? "text-blue-200 animate-pulse" : "text-white"
-                      }`}
+                      className={`w-5 h-5 ${isLoading ? "text-blue-200 animate-pulse" : "text-white"
+                        }`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -839,17 +870,17 @@ export default function BlogPostClient({ post, isDraft = false }: BlogPostClient
                 )}
                 <div
                   id="summary-content"
-                  className="p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-blue-500 min-h-[80px] flex items-center shadow-sm"
+                  className="p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 rounded-lg border-l-4 border-blue-500 min-h-[80px] flex items-center shadow-sm"
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-3 w-full">
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
-                      <span className="text-blue-700 font-medium">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 dark:border-blue-400 border-t-transparent"></div>
+                      <span className="text-blue-700 dark:text-blue-300 font-medium">
                         {t("generatingSummary")}
                       </span>
                     </div>
                   ) : (
-                    <p className="text-base lg:text-lg text-gray-700 leading-relaxed w-full">
+                    <p className="text-base lg:text-lg text-gray-700 dark:text-gray-200 leading-relaxed w-full">
                       {summary}
                     </p>
                   )}
@@ -870,15 +901,14 @@ export default function BlogPostClient({ post, isDraft = false }: BlogPostClient
 
         {/* Like Section */}
         {toggles.totalLikes && (
-          <div className="mt-8 pt-8 border-t border-gray-200">
+          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-slate-800">
             <div className="flex items-center justify-center gap-4">
               <button
                 onClick={handleLike}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-200 ${
-                  isLiked
-                    ? "bg-red-100 text-red-600 hover:bg-red-200"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-200 shadow-sm ${isLiked
+                  ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50"
+                  : "bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700"
+                  }`}
               >
                 <svg
                   className="w-6 h-6"

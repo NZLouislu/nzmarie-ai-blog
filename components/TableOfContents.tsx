@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useTocStore } from "@/lib/stores/tocStore";
 import { useLanguageStore } from "@/lib/stores/languageStore";
 import { extractHeadings } from "@/lib/toc";
@@ -10,17 +10,17 @@ interface TableOfContentsProps {
 }
 
 export function TableOfContents({ content }: TableOfContentsProps) {
-  const { headings, setHeadings } = useTocStore();
+  const { setActiveHeading } = useTocStore();
   const { language } = useLanguageStore();
   const [visible, setVisible] = useState(false);
 
-  // Extract headings from content when content or language changes
-  useEffect(() => {
+  // Extract headings from content whenever content changes
+  const headings = useMemo(() => {
     if (content) {
-      const extractedHeadings = extractHeadings(content);
-      setHeadings(extractedHeadings);
+      return extractHeadings(content);
     }
-  }, [content, language, setHeadings]); // Add language as dependency
+    return [];
+  }, [content]);
 
   // Toggle visibility on mobile
   const toggleVisibility = () => {
@@ -61,9 +61,9 @@ export function TableOfContents({ content }: TableOfContentsProps) {
       <div className="hidden lg:block sticky top-8">
         <div
           id="table-of-contents"
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-full"
+          className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-4 w-full border border-gray-100 dark:border-slate-700"
         >
-          <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
+          <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-100">
             {language === "en" ? "Table of Contents" : "目录"}
           </h3>
           <ul className="space-y-1 max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -71,13 +71,12 @@ export function TableOfContents({ content }: TableOfContentsProps) {
               <li key={heading.id}>
                 <button
                   onClick={() => scrollToHeading(heading.id)}
-                  className={`text-left w-full px-2 py-1 rounded text-sm transition-colors ${
-                    heading.level === 1
-                      ? "font-semibold pl-2 text-gray-800 dark:text-gray-200"
-                      : heading.level === 2
-                      ? "pl-4 text-gray-600 dark:text-gray-400"
-                      : "pl-6 text-gray-500 dark:text-gray-500"
-                  } hover:bg-gray-100 dark:hover:bg-gray-700`}
+                  className={`text-left w-full px-2 py-1 rounded text-sm transition-colors ${heading.level === 1
+                    ? "font-semibold pl-2 text-gray-800 dark:text-gray-100"
+                    : heading.level === 2
+                      ? "pl-4 text-gray-600 dark:text-gray-300"
+                      : "pl-6 text-gray-500 dark:text-gray-400"
+                    } hover:bg-gray-100 dark:hover:bg-slate-700`}
                 >
                   {heading.text}
                 </button>
@@ -89,13 +88,13 @@ export function TableOfContents({ content }: TableOfContentsProps) {
 
       {/* Mobile TOC Toggle */}
       <button
-        className="fixed right-4 bottom-4 lg:hidden bg-blue-500 text-white p-3 rounded-full shadow-lg z-20"
+        className="fixed right-4 bottom-4 lg:hidden bg-blue-600 text-white p-3 rounded-full shadow-lg z-20 hover:bg-blue-700 transition-colors"
         onClick={toggleVisibility}
         aria-label={language === "en" ? "Toggle table of contents" : "切换目录"}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
+          className="h-6 w-6"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -109,15 +108,15 @@ export function TableOfContents({ content }: TableOfContentsProps) {
 
       {/* Mobile TOC Panel */}
       {visible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden">
-          <div className="fixed right-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-800 shadow-lg p-4 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden" onClick={() => setVisible(false)}>
+          <div className="fixed right-0 top-0 bottom-0 w-64 bg-white dark:bg-slate-800 shadow-xl p-4 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+              <h3 className="font-semibold text-gray-800 dark:text-gray-100">
                 {language === "en" ? "Table of Contents" : "目录"}
               </h3>
               <button
                 onClick={toggleVisibility}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 aria-label={
                   language === "en" ? "Close table of contents" : "关闭目录"
                 }
@@ -143,13 +142,12 @@ export function TableOfContents({ content }: TableOfContentsProps) {
                 <li key={heading.id}>
                   <button
                     onClick={() => scrollToHeading(heading.id)}
-                    className={`text-left w-full px-2 py-1 rounded text-sm transition-colors ${
-                      heading.level === 1
-                        ? "font-semibold pl-2 text-gray-800 dark:text-gray-200"
-                        : heading.level === 2
-                        ? "pl-4 text-gray-600 dark:text-gray-400"
-                        : "pl-6 text-gray-500 dark:text-gray-500"
-                    } hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`text-left w-full px-2 py-1 rounded text-sm transition-colors ${heading.level === 1
+                      ? "font-semibold pl-2 text-gray-800 dark:text-gray-100"
+                      : heading.level === 2
+                        ? "pl-4 text-gray-600 dark:text-gray-300"
+                        : "pl-6 text-gray-500 dark:text-gray-400"
+                      } hover:bg-gray-100 dark:hover:bg-slate-700`}
                   >
                     {heading.text}
                   </button>

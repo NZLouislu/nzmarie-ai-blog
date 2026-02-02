@@ -1,7 +1,10 @@
 export default function Footer() {
   return (
-    <footer className="mt-12 py-8 text-center">
-      <div className="flex items-center justify-center gap-4 sm:gap-6 mb-6 flex-wrap">
+    <footer className="mt-12 py-12 text-center border-t border-gray-100 dark:border-slate-800">
+      <div className="flex items-center justify-center gap-4 sm:gap-6 mb-8 flex-wrap">
+        {/* Social links are already gradient-based and look good on dark mode, 
+            but we can subtlely adjust the container if needed. */}
+        {/* ... existing social links ... */}
         <a
           href="https://nzmarie.com"
           target="_blank"
@@ -27,7 +30,7 @@ export default function Footer() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2V10a2 2 0 002 2z"
             />
           </svg>
         </a>
@@ -49,7 +52,7 @@ export default function Footer() {
         </a>
       </div>
 
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-gray-500 dark:text-gray-400">
         © {new Date().getFullYear()} NZMarie | Marie Nian. All rights reserved.
       </div>
     </footer>
