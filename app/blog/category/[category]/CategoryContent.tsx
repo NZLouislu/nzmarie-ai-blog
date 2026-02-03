@@ -38,7 +38,7 @@ export default function CategoryContent({
       <div className="w-full px-6 py-12 mx-auto max-w-[1200px] pt-20">
         <div className="mb-12">
           <h1 className="text-4xl font-bold mb-4 capitalize">{titleText}</h1>
-          <p className="text-xl text-gray-600">{descriptionText}</p>
+          <p className="text-xl text-gray-600 dark:text-gray-300">{descriptionText}</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-12 md:justify-center">

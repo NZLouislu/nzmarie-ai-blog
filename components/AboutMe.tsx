@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useTranslation } from "@/lib/i18n";
 
 export default function AboutMe() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   return (
     <div className="flex flex-col items-center text-center">
@@ -24,7 +24,7 @@ export default function AboutMe() {
 
       <div className="flex items-center justify-center gap-3 sm:gap-4 mt-6 flex-wrap">
         <a
-          href="https://nzmarie.com"
+          href={language === "zh" ? "https://www.nzmarie.com/cn" : "https://nzmarie.com"}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"

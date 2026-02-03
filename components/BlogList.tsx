@@ -91,7 +91,7 @@ export default function BlogList({ posts: initialPosts }: BlogListProps) {
                   <div className="pt-4 flex items-center justify-between border-t border-gray-100 dark:border-slate-700 mt-auto">
                     <div className="inline-flex items-center gap-2 whitespace-nowrap text-gray-700 dark:text-gray-300">
                       <Avatar
-                        src="/images/authors/m.ico"
+                        src="/images/authors/m.png"
                         fallback={(post.author || "M")[0]}
                         radius="full"
                         className="w-5 h-5 shrink-0"

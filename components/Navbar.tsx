@@ -1,26 +1,55 @@
 "use client";
 
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { useState } from "react";
 import { Menu, X, Search } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import { useLanguageStore } from "@/lib/stores/languageStore";
 import { getLocalizedPath } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const { language, setLanguage } = useLanguageStore();
-  const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const normalizedPath = pathname.replace(/^\/cn/, "");
+  const { language, setLanguage } = useLanguageStore();
+  const { t } = useTranslation();
+  const router = useRouter();
 
-  const linkCls = (isActive: boolean) =>
-    `relative pb-1 text-sm md:text-base font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 ${isActive
-      ? "text-indigo-600 dark:text-indigo-400 font-bold after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:bg-indigo-600 dark:after:bg-indigo-400 after:animate-underline"
-      : "text-gray-700 dark:text-gray-300"
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const normalizedPath = pathname.startsWith("/cn")
+    ? pathname.replace(/^\/cn/, "") || "/"
+    : pathname;
+
+  const linkCls = (active: boolean) =>
+    `text-sm md:text-base font-medium transition-colors ${active
+      ? "text-indigo-600 dark:text-indigo-400"
+      : "text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
     }`;
+
+  const toggleLanguage = (newLang: "en" | "zh") => {
+    const cleanPath = pathname.startsWith("/cn")
+      ? pathname.replace(/^\/cn/, "") || "/"
+      : pathname;
+
+    let newPath = cleanPath;
+    if (newLang === "zh") {
+      newPath = `/cn${cleanPath === "/" ? "" : cleanPath}`;
+    }
+
+    setLanguage(newLang);
+    router.push(newPath || "/");
+    setOpen(false);
+  };
 
   return (
     <>
@@ -73,7 +102,7 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <a
-                    href="https://nzmarie.com"
+                    href={language === "zh" ? "https://www.nzmarie.com/cn" : "https://nzmarie.com"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm md:text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
@@ -92,23 +121,7 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <button
-                    onClick={() => {
-                      const newLang = language === "en" ? "zh" : "en";
-                      let newPath = pathname;
-
-                      if (newLang === "zh") {
-                        if (!pathname.startsWith("/cn")) {
-                          newPath = `/cn${pathname === "/" ? "" : pathname}`;
-                        }
-                      } else {
-                        if (pathname.startsWith("/cn")) {
-                          newPath = pathname.replace(/^\/cn/, "") || "/";
-                        }
-                      }
-
-                      setLanguage(newLang);
-                      router.push(newPath);
-                    }}
+                    onClick={() => toggleLanguage(language === "en" ? "zh" : "en")}
                     className="px-3 py-1 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-full text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-600 transition-colors"
                   >
                     {language === "en" ? "中文" : "English"}
@@ -116,18 +129,18 @@ export default function Navbar() {
                 </NavigationMenu.Item>
               </NavigationMenu.List>
             </NavigationMenu.Root>
-          </div>
 
-          <button
-            onClick={() => setOpen(!open)}
-            className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 focus:outline-none"
-          >
-            {open ? <X size={24} /> : <Menu size={24} />}
-          </button>
+            <button
+              onClick={() => setOpen(!open)}
+              className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 focus:outline-none"
+            >
+              {open ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {open && (
-          <div className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95">
+          <div className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 overflow-y-auto max-h-[calc(100vh-64px)]">
             <NavigationMenu.Root>
               <NavigationMenu.List className="flex flex-col gap-4 p-4">
                 <NavigationMenu.Item>
@@ -172,7 +185,7 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <a
-                    href="https://nzmarie.com"
+                    href={language === "zh" ? "https://www.nzmarie.com/cn" : "https://nzmarie.com"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
@@ -192,24 +205,7 @@ export default function Navbar() {
                 </NavigationMenu.Item>
                 <NavigationMenu.Item>
                   <button
-                    onClick={() => {
-                      const newLang = language === "en" ? "zh" : "en";
-                      let newPath = pathname;
-
-                      if (newLang === "zh") {
-                        if (!pathname.startsWith("/cn")) {
-                          newPath = `/cn${pathname === "/" ? "" : pathname}`;
-                        }
-                      } else {
-                        if (pathname.startsWith("/cn")) {
-                          newPath = pathname.replace(/^\/cn/, "") || "/";
-                        }
-                      }
-
-                      setLanguage(newLang);
-                      router.push(newPath || "/");
-                      setOpen(false);
-                    }}
+                    onClick={() => toggleLanguage(language === "en" ? "zh" : "en")}
                     className="block w-full text-left px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   >
                     {language === "en" ? "中文" : "English"}

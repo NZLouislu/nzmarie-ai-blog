@@ -30,7 +30,7 @@ export default function ArchiveClient({ initialPosts }: ArchiveClientProps) {
               <h1 className="text-4xl font-bold mb-4">
                 {language === 'en' ? 'Archive' : '归档'}
               </h1>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600 dark:text-gray-300">
                 {language === 'en'
                   ? `All posts organized by year and date. (${Object.values(postsByYear).flat().length} posts)`
                   : `按年份和日期组织的所有文章。(${Object.values(postsByYear).flat().length}篇文章)`

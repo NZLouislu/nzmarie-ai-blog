@@ -11,6 +11,8 @@ interface CategoryPageProps {
   }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function CategoryPage({
   params,
   searchParams,
@@ -24,10 +26,11 @@ export default async function CategoryPage({
   const locale = h.get("x-locale") || "en";
   const language = (lang || locale || "en") as "en" | "zh";
 
-  // Map route parameters to actual category names
-  if (category === "buying") {
+  // Map route parameters to actual category names (case-insensitive)
+  const categoryLower = category.toLowerCase();
+  if (categoryLower === "buying") {
     category = language === "en" ? "Buying" : "买房";
-  } else if (category === "selling") {
+  } else if (categoryLower === "selling") {
     category = language === "en" ? "Selling" : "卖房";
   }
 
@@ -35,7 +38,7 @@ export default async function CategoryPage({
     const { getPostsByCategory } = await import("@/lib/posts");
     const posts = await getPostsByCategory(category, language);
 
-    if (posts.length === 0) {
+    if (!posts || posts.length === 0) {
       notFound();
     }
 
@@ -45,32 +48,5 @@ export default async function CategoryPage({
   } catch (error) {
     console.error("Failed to get posts:", error);
     notFound();
-  }
-}
-
-export async function generateStaticParams() {
-  try {
-    const allParams: { category: string; lang: string }[] = [];
-
-    // Add specific routes for buying and selling
-    // Use inline values instead of variables
-    for (const language of ["en", "zh"] as const) {
-      // Add buying route
-      allParams.push({
-        category: "buying",
-        lang: language,
-      });
-
-      // Add selling route
-      allParams.push({
-        category: "selling",
-        lang: language,
-      });
-    }
-
-    return allParams;
-  } catch (error) {
-    console.error("Failed to generate static params:", error);
-    return [];
   }
 }

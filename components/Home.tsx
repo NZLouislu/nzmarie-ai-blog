@@ -30,7 +30,7 @@ export default function HomePage() {
         </Heading>
         <Text
           size="3"
-          className="text-xl text-gray-600 dark:text-gray-400 text-center max-w-2xl mb-8"
+          className="text-xl text-gray-600 dark:text-gray-300 text-center max-w-2xl mb-8"
         >
           {language === "zh"
             ? "专业服务，诚信为本"

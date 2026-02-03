@@ -106,7 +106,7 @@ function SearchContent() {
               <h1 className="text-4xl font-bold mb-4">
                 {language === "en" ? "Search" : "搜索"}
               </h1>
-              <p className="text-xl text-gray-600 mb-8">
+              <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
                 {language === "en"
                   ? "Search for posts by title or content."
                   : "按标题或内容搜索文章。"}

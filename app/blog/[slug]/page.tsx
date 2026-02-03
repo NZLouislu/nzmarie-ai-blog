@@ -11,6 +11,8 @@ interface PageProps {
   }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function BlogPost({ params }: PageProps) {
   const { slug } = await params;
 
@@ -21,27 +23,27 @@ export default async function BlogPost({ params }: PageProps) {
 
   try {
     const { getPostBySlug, getDraftBySlug } = await import("@/lib/posts");
-    
+
     let post;
     let isDraft = false;
 
     if (isDraftMode) {
       post = getDraftBySlug ? getDraftBySlug(slug, lang as "en" | "zh") : null;
       isDraft = true;
-      
+
       if (post) {
         const cookieStore = await cookies();
         const sessionCookie = cookieStore.get("userSession");
-        
+
         if (!sessionCookie?.value) {
           notFound();
         }
 
         try {
           const session = JSON.parse(sessionCookie.value);
-          const isAuthorized = ["nzmarie", "admin"].includes(session.username) || 
-                              session.role === "admin";
-          
+          const isAuthorized = ["nzmarie", "admin"].includes(session.username) ||
+            session.role === "admin";
+
           if (!isAuthorized || new Date(session.expiresAt) < new Date()) {
             notFound();
           }
@@ -64,26 +66,10 @@ export default async function BlogPost({ params }: PageProps) {
       isDraft: isDraft,
       status: isDraft ? "draft" : (post.status || "published")
     };
-    
+
     return <BlogPostClient post={postWithDate} isDraft={isDraft} />;
   } catch (error) {
     console.error("Failed to get post:", error);
     notFound();
   }
-}
-
-export async function generateStaticParams() {
-  try {
-    const { listPublished } = await import("@/lib/posts");
-    const enPosts = listPublished("en");
-    const zhPosts = listPublished("zh");
-    const posts = [...enPosts, ...zhPosts];
-    return posts.map((post: Post) => ({
-      slug: post.slug,
-    }));
-  } catch (error) {
-    console.error("Failed to get posts:", error);
-  }
-
-  return [];
 }
