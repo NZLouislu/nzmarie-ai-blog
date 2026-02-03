@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function () { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function () { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -48,15 +48,15 @@ function main() {
                     // Create a sample user for posts
                     console.log('Creating user...');
                     return [4 /*yield*/, prisma.user.upsert({
-                            where: { email: 'marie@ssrealty.co.nz' },
-                            update: {},
-                            create: {
-                                email: 'marie@ssrealty.co.nz',
-                                name: 'NZMarie',
-                                role: 'admin',
-                                languagePreferences: 'both'
-                            }
-                        })];
+                        where: { email: 'nzmarie.com@gmail.com' },
+                        update: {},
+                        create: {
+                            email: 'nzmarie.com@gmail.com',
+                            name: 'NZMarie',
+                            role: 'admin',
+                            languagePreferences: 'both'
+                        }
+                    })];
                 case 1:
                     user = _c.sent();
                     console.log('Created/Found user:', user.email);
@@ -94,10 +94,10 @@ function main() {
                     _c.trys.push([3, 5, , 6]);
                     console.log('Creating post:', postData.title);
                     return [4 /*yield*/, prisma.post.upsert({
-                            where: { id: postData.id },
-                            update: {},
-                            create: postData
-                        })];
+                        where: { id: postData.id },
+                        update: {},
+                        create: postData
+                    })];
                 case 4:
                     post = _c.sent();
                     console.log('Created/Found Post:', post.title);
@@ -122,13 +122,13 @@ function main() {
                     // Get the actual post IDs
                     console.log('Fetching posts...');
                     return [4 /*yield*/, prisma.post.findUnique({
-                            where: { id: 'sample-post-1-en' }
-                        })];
+                        where: { id: 'sample-post-1-en' }
+                    })];
                 case 10:
                     post1 = _c.sent();
                     return [4 /*yield*/, prisma.post.findUnique({
-                            where: { id: 'sample-post-2-en' }
-                        })];
+                        where: { id: 'sample-post-2-en' }
+                    })];
                 case 11:
                     post2 = _c.sent();
                     console.log('Post1:', post1 ? 'Found' : 'Not found');
@@ -166,10 +166,10 @@ function main() {
                     _c.trys.push([13, 15, , 16]);
                     console.log('Creating post stat:', stat.title);
                     return [4 /*yield*/, prisma.postStat.upsert({
-                            where: { post_id: stat.post_id },
-                            update: {},
-                            create: stat
-                        })];
+                        where: { post_id: stat.post_id },
+                        update: {},
+                        create: stat
+                    })];
                 case 14:
                     created = _c.sent();
                     console.log('Created/Found PostStat:', created.title);
@@ -234,16 +234,18 @@ function main() {
 }
 main()
     .catch(function (e) {
-    console.error('Seed error:', e);
-    process.exit(1);
-})
-    .finally(function () { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, prisma.$disconnect()];
-            case 1:
-                _a.sent();
-                return [2 /*return*/];
-        }
+        console.error('Seed error:', e);
+        process.exit(1);
+    })
+    .finally(function () {
+        return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, prisma.$disconnect()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     });
-}); });

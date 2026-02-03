@@ -13,10 +13,10 @@ async function main() {
   // Create a sample user for posts
   console.log("Creating user...");
   const user = await prisma.user.upsert({
-    where: { email: "marie@ssrealty.co.nz" },
+    where: { email: "nzmarie.com@gmail.com" },
     update: {},
     create: {
-      email: "marie@ssrealty.co.nz",
+      email: "nzmarie.com@gmail.com",
       name: "NZMarie",
       role: "admin",
       languagePreferences: "both",

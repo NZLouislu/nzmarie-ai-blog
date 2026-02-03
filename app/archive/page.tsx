@@ -2,6 +2,8 @@ import React from 'react';
 import { headers } from 'next/headers';
 import ArchiveClient from './ArchiveClient';
 
+export const dynamic = "force-dynamic";
+
 export default async function ArchivePage() {
   const headersList = await headers();
   const language = headersList.get('x-locale') || 'en';

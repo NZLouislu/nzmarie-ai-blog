@@ -153,7 +153,7 @@ Remember, buying property is one of life's biggest investments. Having the right
 
 **Contact Marie Nian**  
 Licensed Real Estate Agent (REAA 2008)  
-📧 marie@ssrealty.co.nz
+📧 nzmarie.com@gmail.com
 📱 021 0693 089
 
 _Disclaimer: This information is general in nature and should not replace professional financial or legal advice._

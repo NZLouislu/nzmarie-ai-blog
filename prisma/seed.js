@@ -4,21 +4,21 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('Starting seed...');
-  
+
   // Create a sample user for posts
   console.log('Creating user...');
   const user = await prisma.user.upsert({
-    where: { email: 'marie@ssrealty.co.nz' },
+    where: { email: 'nzmarie.com@gmail.com' },
     update: {},
     create: {
-      email: 'marie@ssrealty.co.nz',
+      email: 'nzmarie.com@gmail.com',
       name: 'NZMarie',
       role: 'admin',
       languagePreferences: 'both'
     }
   });
   console.log('Created/Found user:', user.email);
-  
+
   // Create sample posts
   console.log('Creating posts...');
   const posts = [
@@ -43,7 +43,7 @@ async function main() {
       tags: 'New Zealand,Travel,Family'
     }
   ];
-  
+
   for (const postData of posts) {
     try {
       console.log('Creating post:', postData.title);
@@ -57,26 +57,26 @@ async function main() {
       console.error('Error creating post:', postData.title, error.message);
     }
   }
-  
+
   // Clear existing data
   console.log('Clearing existing data...');
   await prisma.postStat.deleteMany();
   await prisma.comment.deleteMany();
   console.log('Cleared existing data');
-  
+
   // Get the actual post IDs
   console.log('Fetching posts...');
   const post1 = await prisma.post.findUnique({
     where: { id: 'sample-post-1-en' }
   });
-  
+
   const post2 = await prisma.post.findUnique({
     where: { id: 'sample-post-2-en' }
   });
-  
+
   console.log('Post1:', post1 ? 'Found' : 'Not found');
   console.log('Post2:', post2 ? 'Found' : 'Not found');
-  
+
   if (post1 && post2) {
     // Create sample post stats
     console.log('Creating post stats...');
@@ -100,7 +100,7 @@ async function main() {
         ai_summaries: 4
       }
     ];
-    
+
     for (const stat of postStats) {
       try {
         console.log('Creating post stat:', stat.title);
@@ -114,7 +114,7 @@ async function main() {
         console.error('Error creating post stat:', stat.title, error.message);
       }
     }
-    
+
     // Create sample comments
     console.log('Creating comments...');
     const comments = [
@@ -133,7 +133,7 @@ async function main() {
         status: 'approved'
       }
     ];
-    
+
     for (const comment of comments) {
       try {
         console.log('Creating comment for post:', post1.title);
@@ -146,7 +146,7 @@ async function main() {
   } else {
     console.log('Could not find posts, skipping stats and comments');
   }
-  
+
   console.log('Database seeded successfully!');
 }
 

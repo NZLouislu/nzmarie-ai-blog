@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguageStore } from '@/lib/stores/languageStore';
 import { getLocalizedPath } from '@/lib/utils';
@@ -15,9 +15,45 @@ interface ArchiveClientProps {
 
 export default function ArchiveClient({ initialPosts }: ArchiveClientProps) {
   const { language } = useLanguageStore();
+  const [postsByYear, setPostsByYear] = useState(initialPosts);
+  const prevLanguageRef = useRef<string | null>(null);
 
-  // Use initial data for now - could be enhanced with client-side fetching later
-  const postsByYear = initialPosts;
+  useEffect(() => {
+    const languageChanged = prevLanguageRef.current !== null && prevLanguageRef.current !== language;
+
+    if (languageChanged) {
+      const fetchPosts = async () => {
+        try {
+          const res = await fetch(`/api/posts/published?language=${language}`);
+          if (res.ok) {
+            const allPosts: Post[] = await res.json();
+
+            // Group posts by year
+            const grouped = allPosts.reduce((acc, post) => {
+              const year = post.publishedAt
+                ? new Date(post.publishedAt).getFullYear().toString()
+                : new Date(post.createdAt).getFullYear().toString();
+
+              if (!acc[year]) {
+                acc[year] = [];
+              }
+              acc[year].push(post);
+              return acc;
+            }, {} as Record<string, Post[]>);
+
+            setPostsByYear(grouped);
+          }
+        } catch (error) {
+          console.error("Failed to fetch archive posts:", error);
+        }
+      };
+
+      fetchPosts();
+    }
+
+    prevLanguageRef.current = language;
+  }, [language]);
+
   const sortedYears = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a));
 
   return (
@@ -41,7 +77,7 @@ export default function ArchiveClient({ initialPosts }: ArchiveClientProps) {
             <div className="space-y-12">
               {sortedYears.map((year) => (
                 <div key={year} className="space-y-4">
-                  <h2 className="text-3xl font-bold text-gray-900 border-b border-gray-200 pb-2">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
                     {year}
                   </h2>
                   <div className="space-y-3">
@@ -55,12 +91,12 @@ export default function ArchiveClient({ initialPosts }: ArchiveClientProps) {
 
                         return (
                           <div key={post.id} className="flex items-start gap-4 py-2 hover:bg-gray-50 rounded-lg px-3 -mx-3 transition-colors">
-                            <span className="text-gray-500 font-mono text-sm min-w-[60px]">
+                            <span className="text-gray-500 dark:text-gray-400 font-mono text-sm min-w-[60px]">
                               {dateStr} —
                             </span>
                             <Link
                               href={getLocalizedPath(`/blog/${post.slug}`, language)}
-                              className="text-gray-900 hover:text-blue-600 transition-colors flex-1"
+                              className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex-1"
                             >
                               <span className="text-lg font-semibold">{post.title}</span>
                             </Link>

@@ -299,7 +299,7 @@ Book now and let us tailor a sales plan for you.
 #### Contact Marie Nian
 
 Licensed Real Estate Agent (REAA 2008)  
-📧 marie@ssrealty.co.nz  
+📧 nzmarie.com@gmail.com  
 📱 021 069 3089  
 🏢 Southern Star Realty 
 
