@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, Box, Text, Avatar } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Post } from "@/lib/types";
 import { useStatsStore } from "@/lib/stores/statsStore";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
@@ -16,12 +16,16 @@ interface BlogListProps {
 
 export default function BlogList({ posts: initialPosts }: BlogListProps) {
   const [posts, setPosts] = useState<Post[]>(initialPosts || []);
+  const prevLanguageRef = useRef<string | null>(null);
   const { postStats } = useStatsStore();
   const { toggles, fetchToggles } = useTogglesStore();
   const { language } = useLanguageStore();
 
   useEffect(() => {
-    if (!initialPosts) {
+    const languageChanged = prevLanguageRef.current !== null && prevLanguageRef.current !== language;
+    const shouldFetchPosts = !initialPosts || languageChanged;
+
+    if (shouldFetchPosts) {
       const loadPosts = async () => {
         try {
           const postsResponse = await fetch(
@@ -38,6 +42,8 @@ export default function BlogList({ posts: initialPosts }: BlogListProps) {
 
       loadPosts();
     }
+
+    prevLanguageRef.current = language;
     fetchToggles();
   }, [fetchToggles, initialPosts, language]);
 

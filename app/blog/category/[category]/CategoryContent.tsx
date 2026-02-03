@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import { Post } from "@/lib/types";
 import { useTogglesStore } from "@/lib/stores/togglesStore";
+import { useLanguageStore } from "@/lib/stores/languageStore";
 import BlogList from "@/components/BlogList";
 
 export interface CategoryContentProps {
@@ -17,20 +18,32 @@ export interface CategoryContentProps {
 export default function CategoryContent({
   category,
   posts,
-  language,
 }: CategoryContentProps) {
   const { fetchToggles } = useTogglesStore();
+  const { language } = useLanguageStore();
 
   useEffect(() => {
     fetchToggles();
   }, [fetchToggles]);
 
+  const getCategoryDisplayName = () => {
+    const categoryLower = category.toLowerCase();
+    if (categoryLower === "selling" || category === "卖房") {
+      return language === "zh" ? "卖房" : "Selling";
+    }
+    if (categoryLower === "buying" || category === "买房") {
+      return language === "zh" ? "买房" : "Buying";
+    }
+    return category;
+  };
+
+  const displayCategory = getCategoryDisplayName();
   const titleText =
-    language === "zh" ? `${category} 类别文章` : `${category} Category Posts`;
+    language === "zh" ? `${displayCategory} 类别文章` : `${displayCategory} Category Posts`;
   const descriptionText =
     language === "zh"
-      ? `发现 ${category} 类别的所有文章。`
-      : `Discover all articles in the ${category} category.`;
+      ? `发现 ${displayCategory} 类别的所有文章。`
+      : `Discover all articles in the ${displayCategory} category.`;
 
   return (
     <>

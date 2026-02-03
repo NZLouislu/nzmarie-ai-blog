@@ -37,17 +37,17 @@ export default function Navbar() {
     }`;
 
   const toggleLanguage = (newLang: "en" | "zh") => {
-    const cleanPath = pathname.startsWith("/cn")
-      ? pathname.replace(/^\/cn/, "") || "/"
-      : pathname;
-
-    let newPath = cleanPath;
-    if (newLang === "zh") {
-      newPath = `/cn${cleanPath === "/" ? "" : cleanPath}`;
+    // Remove language prefix if present
+    let cleanPath = pathname;
+    if (pathname.startsWith("/cn")) {
+      cleanPath = pathname.replace(/^\/cn/, "") || "/";
     }
 
+    // Generate new path with correct locale
+    const newPath = getLocalizedPath(cleanPath, newLang);
+
     setLanguage(newLang);
-    router.push(newPath || "/");
+    router.push(newPath);
     setOpen(false);
   };
 
