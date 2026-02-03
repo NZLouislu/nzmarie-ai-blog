@@ -358,6 +358,5 @@ categories: [卖房]
 
 ####  联系 Marie Nian
 持牌房地产经纪人 (REAA 2008)  
-📧 marie@ssrealty.co.nz  
+📧 nzmarie.com@gmail.com
 📱 021 069 3089  
-🏢 Southern Star Realty 
